@@ -90,11 +90,10 @@ export async function createAccountResponse(env: CloudflareEnv, adminUserId: str
 			id: userId, email, passwordHash: hashPassword(input.password), name: username,
 			role: input.role, createdByUserId: adminUserId,
 		}).returning();
-		// 接管既有信箱时只换属主与显示名：地址与历史邮件都留在原地，
-		// 但绝不能再插一条同地址的信箱（唯一索引会直接撞上）。
-		const mailboxWrite = adoptedMailboxId
-			? db.update(mailboxes).set({ userId, displayName: username }).where(eq(mailboxes.id, adoptedMailboxId))
-			: db.insert(mailboxes).values(mailbox);
+		// 接管既有信箱时这一批里**不插**信箱（同地址已经存在），属主转移放在
+		// 批次之后单独做：insert / update 混在一个 batch 里，drizzle 的
+		// `batch` 泛型推不出公共类型。
+		const mailboxInserts = adoptedMailboxId ? [] : [db.insert(mailboxes).values(mailbox)];
 		// Five bound columns per alias: 20 rows fit D1's 100-parameter limit.
 		const aliasInserts = Array.from({ length: Math.ceil(input.aliases.length / 20) }, (_, index) =>
 			db.insert(mailboxAliases).values(input.aliases.slice(index * 20, (index + 1) * 20).map((alias) => ({
@@ -102,8 +101,12 @@ export async function createAccountResponse(env: CloudflareEnv, adminUserId: str
 			}))),
 		);
 		// D1 batches are atomic: aliases and their owner either all exist or none do.
-		const [accounts] = await db.batch([accountInsert, mailboxWrite, ...aliasInserts]);
+		const [accounts] = await db.batch([accountInsert, ...mailboxInserts, ...aliasInserts]);
 		inserted = true;
+		if (adoptedMailboxId) {
+			// 接管：地址与历史邮件都留在原地，只换属主与显示名。
+			await db.update(mailboxes).set({ userId, displayName: username }).where(eq(mailboxes.id, adoptedMailboxId));
+		}
 		await ensureBookingUsername(env, userId, email);
 		await ensureMailboxDomainRouting(env, db, mailbox, changes);
 		return NextResponse.json({ account: accountListItemFromUser(accounts[0]) }, { status: 201 });
