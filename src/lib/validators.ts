@@ -177,6 +177,10 @@ export const createUserAccountSchema = z.object({
 	role: z.enum(["admin", "user"]).default("user"),
 	// Existing API/MCP clients retain the previous behavior when this is omitted.
 	useAllDomains: z.boolean().default(true),
+	// Take over a personal mailbox with this address that the calling admin already
+	// owns, instead of failing with 409. Provisioning flows create the mailbox first
+	// and the login account later, so the two steps have to meet in the middle.
+	adoptMailbox: z.boolean().default(false),
 	aliases: z.array(createMailboxAliasSchema).default([]),
 });
 
