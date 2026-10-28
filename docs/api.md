@@ -91,6 +91,8 @@ The `storage` scope reports and tests object storage: `GET /api/v1/storage` retu
 
 Admin API keys cannot read or send mail. Enable **Allow MCP access** when creating an admin key to use its selected `domains`, `accounts`, `mailboxes`, and `storage` permissions through `/mcp`. The `manage_domains`, `manage_accounts`, `manage_mailboxes`, and `manage_storage` (`status`, `test`) tools expose the corresponding management actions below. Admin MCP keys do not expose mail tools. Use Settings > API keys for mail and mail MCP access.
 
+A script that only holds an admin key can still get mailbox-scoped **read** access through `POST /api/v1/mail-keys` (described below), without signing in to the dashboard. It issues a personal mail key, not an admin key: `read` and optionally `jmap`, limited to the mailboxes in the request, never `send`.
+
 | Scope | Mailflare route | Purpose |
 | --- | --- | --- |
 | `accounts` | `GET /api/v1/accounts` | List managed accounts |
@@ -102,8 +104,31 @@ Admin API keys cannot read or send mail. Enable **Allow MCP access** when creati
 | `mailboxes` | `GET /api/v1/mailboxes/[id]` | Get a managed mailbox |
 | `mailboxes` | `PATCH /api/v1/mailboxes/[id]` | Update mailbox settings |
 | `mailboxes` | `DELETE /api/v1/mailboxes/[id]` | Delete a mailbox and its routing rule |
+| `mailboxes` | `GET /api/v1/mail-keys` | List the mail keys issued for this admin's mailboxes |
+| `mailboxes` | `POST /api/v1/mail-keys` | Issue a mailbox-scoped mail key (`{ mailboxIds, name?, scopes? }`) |
+| `mailboxes` | `DELETE /api/v1/mail-keys?id=` | Revoke a mail key |
 | `storage` | `GET /api/v1/storage` | Active object storage (R2, Backblaze B2, AWS S3 or local files) |
 | `storage` | `POST /api/v1/storage` | Write, read and delete a test object to verify storage |
+
+### Issuing a mail key from a script
+
+Verification mail is read with `GET /api/v1/messages`, which needs the `read` scope, and admin keys never carry it (see above). `POST /api/v1/mail-keys` bridges the two: it takes the admin key and returns a fresh personal key limited to the mailboxes you name.
+
+```bash
+curl -X POST https://mail.example.com/api/v1/mail-keys \
+  -H "Authorization: Bearer $ADMIN_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"welcome-mailer","mailboxIds":["mbx_abc"],"scopes":["read"]}'
+```
+
+It answers `201` with the secret once: `{ id, name, prefix, key, scopes, mailboxIds, mailboxes }`. Then read mail with that key:
+
+```bash
+curl "https://mail.example.com/api/v1/messages?mailboxId=mbx_abc&limit=5" \
+  -H "Authorization: Bearer $MAIL_KEY"
+```
+
+Only mailboxes the admin owns — or that belong to accounts the admin created — can be named, so one key cannot reach another tenant's mail; a mailbox outside that set answers `404`. `GET /api/v1/mail-keys` lists what was issued (prefix, scopes, mailbox ids, `lastUsedAt`), and `DELETE /api/v1/mail-keys?id=` revokes one. Keys appear in the owner's **Settings > API keys** list and can be revoked there too.
 
 ### Choose aliases when creating an account
 
