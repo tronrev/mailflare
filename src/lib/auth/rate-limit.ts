@@ -22,6 +22,23 @@ export async function allowDeviceLoginAttempt(env: CloudflareEnv, request: Reque
 	}
 }
 
+/**
+ * Sign-ups share the login limiter but not its bucket: a burst of registrations
+ * from one address must not lock a person out of signing in, and vice versa.
+ * The limiter is optional, so a deployment without one simply has no cap here —
+ * Turnstile is then the only gate, which is what the setup form already relies on.
+ */
+export async function allowSignupAttempt(env: CloudflareEnv, request: Request): Promise<boolean> {
+	if (!env.LOGIN_RATE_LIMIT) return true;
+	try {
+		const outcome = await env.LOGIN_RATE_LIMIT.limit({ key: `signup:${clientRateLimitKey(request)}` });
+		return outcome.success;
+	} catch (error) {
+		console.warn("Sign-up rate limiter unavailable", error);
+		return true;
+	}
+}
+
 export async function allowLoginAttempt(env: CloudflareEnv, request: Request): Promise<boolean> {
 	if (!env.LOGIN_RATE_LIMIT) return true;
 	try {

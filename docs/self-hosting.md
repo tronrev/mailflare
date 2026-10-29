@@ -108,13 +108,38 @@ and the DNS page shows what to set by hand.
 | `RESEND_API_KEY` | unset | Resend key, used when none is saved in the app |
 | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION` | unset | Amazon SES credentials, used when none are saved in the app |
 | `INBOUND_WEBHOOK_SECRET` | unset | Enables `/api/inbound` for the relay Worker |
-| `TURNSTILE_SECRET_KEY` | unset | Bot protection on login and reset forms (`NEXT_PUBLIC_TURNSTILE_SITE_KEY` at build time) |
+| `TURNSTILE_SECRET_KEY` | unset | Bot protection on login, sign-up and reset forms (`NEXT_PUBLIC_TURNSTILE_SITE_KEY` at build time) |
 | `VAPID_PUBLIC_KEY` | unset | Public Web Push application-server key |
 | `VAPID_PRIVATE_KEY` | unset | Secret Web Push application-server key |
 | `VAPID_SUBJECT` | unset | Web Push contact URI (`mailto:` or HTTPS) |
 | `AI_BASE_URL` | unset | OpenAI-compatible model API base URL for the assistant |
 | `AI_API_KEY` | unset | Server-only key for that model API |
 | `AI_MODEL` | `gpt-4o-mini` | Model ID supported by the configured API |
+
+## Open sign-up
+
+`/signup` — the landing page's **Create account** button — lets a visitor create
+a personal account on a domain this deployment already receives mail for.
+
+- **Which domain.** The first active domain, preferring one whose mail arrives
+  through Cloudflare (the only kind where each address needs a routing rule of
+  its own; catch-all providers accept new addresses by themselves). With no
+  active domain the page says sign-ups are closed instead of promising an
+  address it cannot deliver to. There is no separate on/off switch.
+- **What it creates.** One account with `role: user`, one personal mailbox on
+  that domain, and the routing that makes the address work. Nothing else — no
+  domain, no aliases, no sharing. The visitor is signed in immediately, since
+  they just chose the password.
+- **Abuse controls.** Turnstile when `TURNSTILE_SECRET_KEY` is set (the login
+  and setup forms already use it), plus the login rate limiter. Sign-ups get
+  their own bucket, so a burst of registrations cannot lock anyone out of
+  signing in.
+- **Reserved names.** `postmaster`, `abuse`, `dmarc`, `noreply` and the other
+  role addresses listed in `src/lib/auth/signup-rules.ts` cannot be registered:
+  a stranger holding one would be sending mail as a role the domain cannot
+  answer for.
+- **Before the first account,** `/signup` redirects to `/setup`. An uninstalled
+  server has no domain to hand out addresses from.
 
 ## Operations
 

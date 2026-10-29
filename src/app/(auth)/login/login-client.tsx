@@ -179,6 +179,13 @@ export function LoginClient({ adding = false }: { adding?: boolean }) {
         >
           {loading ? t("auth.signingIn") : t("auth.signIn")}
         </Button>
+        {!adding && (
+          <p className="text-center text-sm text-neutral-500">
+            <Link href="/signup" className="font-medium text-blue-600 hover:underline">
+              {t("home.createAccount")}
+            </Link>
+          </p>
+        )}
       </form>
     </AuthShell>
   );

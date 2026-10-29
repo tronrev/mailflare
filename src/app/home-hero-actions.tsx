@@ -13,7 +13,7 @@ export function HomeHeroActions() {
 	return (
 		<div className="mt-8 flex flex-col gap-3 sm:flex-row">
 			<Button size="lg" asChild className="rounded-full px-6">
-				<Link href={hasUser ? "/inbox" : "/setup"}>
+				<Link href={hasUser ? "/inbox" : "/signup"}>
 					{hasUser ? t("home.openDashboard") : t("home.createAccount")}
 					<ArrowRight className="h-4 w-4" />
 				</Link>
