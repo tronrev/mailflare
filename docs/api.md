@@ -128,7 +128,7 @@ curl "https://mail.example.com/api/v1/messages?mailboxId=mbx_abc&limit=5" \
   -H "Authorization: Bearer $MAIL_KEY"
 ```
 
-Only mailboxes the admin owns — or that belong to accounts the admin created — can be named, so one key cannot reach another tenant's mail; a mailbox outside that set answers `404`. `GET /api/v1/mail-keys` lists what was issued (prefix, scopes, mailbox ids, `lastUsedAt`), and `DELETE /api/v1/mail-keys?id=` revokes one. Keys appear in the owner's **Settings > API keys** list and can be revoked there too.
+Only mailboxes the admin owns — or that belong to accounts the admin created — can be named, so one key cannot reach another tenant's mail; a mailbox outside that set answers `404`. A key issued for a child account's mailbox is created **as that account**: `GET /api/v1/messages` grants read to the mailbox owner only, so a key left on the admin would be valid, whitelisted and still answer `404`. One key therefore belongs to one account — naming mailboxes of two different accounts in a single request answers `400`, issue one key per account. The response echoes `ownerUserId`, so a script knows whose credentials it now holds. `GET /api/v1/mail-keys` lists what was issued (prefix, scopes, mailbox ids, `ownerUserId`, `lastUsedAt`) — including keys minted for child accounts — and `DELETE /api/v1/mail-keys?id=` revokes one. Keys appear in the owner's **Settings > API keys** list and can be revoked there too.
 
 ### Choose aliases when creating an account
 

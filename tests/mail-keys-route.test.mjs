@@ -17,7 +17,10 @@ import { build } from "esbuild";
  * 1. it issues `read`/`jmap` only — never `send`, never an admin scope;
  * 2. it cannot name a mailbox outside the admin's own accounts (404);
  * 3. the secret is returned once and stored only as a hash;
- * 4. revoking never touches an admin key.
+ * 4. revoking never touches an admin key;
+ * 5. a key for a child account's mailbox is issued **as that account**, because
+ *    `GET /api/v1/messages` grants read to the mailbox owner only — a key left on
+ *    the admin would be valid, whitelisted and still answer 404.
  */
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const outDir = mkdtempSync(join(root, "tests", ".tmp-mail-keys-route-"));
@@ -79,9 +82,12 @@ async function fixture(t) {
 		INSERT INTO users (id, email, name, password_hash, role, created_at) VALUES
 			('owner', 'owner@example.com', 'Owner', 'x', 'admin', 0),
 			('other', 'other@example.com', 'Other', 'x', 'admin', 0);
+		INSERT INTO users (id, email, name, password_hash, role, created_by_user_id, created_at) VALUES
+			('child', 'child@example.com', 'Child', 'x', 'user', 'owner', 0);
 		INSERT INTO domains (id, user_id, hostname, zone_id, created_at) VALUES ('domain', 'owner', 'example.com', 'zone', 0);
 		INSERT INTO mailboxes (id, user_id, domain_id, local_part, type, disabled, created_at) VALUES
 			('mine', 'owner', 'domain', 'mine', 'personal', 0, 0),
+			('childbox', 'child', 'domain', 'childbox', 'personal', 0, 0),
 			('theirs', 'other', 'domain', 'theirs', 'personal', 0, 0);
 	`);
 	const state = { database, env: { DB: database }, auth: ADMIN_AUTH };
@@ -180,3 +186,30 @@ test("revoking a mail key works, revoking an admin key does not", async (t) => {
 	assert.equal(apiKeyRows(state.database).length, 1);
 	assert.equal(state.database.db.prepare("SELECT count(*) AS n FROM mcp_key_mailboxes").get().n, 0, "mailbox rows cascade");
 });
+
+test("a key for a child account's mailbox is issued as that account", async (t) => {
+	const state = await fixture(t);
+	const created = await post({ mailboxIds: ["childbox"], name: "child-reader" });
+	const body = await created.json();
+	assert.equal(created.status, 201);
+	assert.equal(body.ownerUserId, "child", "the response names whose credentials the script now holds");
+
+	const [row] = apiKeyRows(state.database);
+	assert.equal(row.user_id, "child", "read access is checked against the key's owner, not the minter");
+
+	const listed = await (await get()).json();
+	assert.deepEqual(listed.mailKeys.map((key) => key.ownerUserId), ["child"], "the minting admin still sees it");
+	assert.deepEqual(listed.mailKeys[0].mailboxIds, ["childbox"]);
+
+	assert.equal((await del(body.id)).status, 200, "and can revoke it");
+	assert.equal(apiKeyRows(state.database).length, 0);
+});
+
+test("one key cannot span two accounts", async (t) => {
+	const state = await fixture(t);
+	const response = await post({ mailboxIds: ["mine", "childbox"] });
+	assert.equal(response.status, 400);
+	assert.match((await response.json()).error, /one key per account/);
+	assert.equal(apiKeyRows(state.database).length, 0, "no half-created key");
+});
+
