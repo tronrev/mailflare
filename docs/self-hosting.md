@@ -107,10 +107,13 @@ handed over by letting people bring their own provider.
   credentials, sealed with AES-GCM under `BILLING_SECRET` and never read back to
   a client. Without `BILLING_SECRET` the server refuses to store them rather than
   keep them in the clear.
+- **Where it applies.** On the Domains page, `sendingEnabled` is the switch:
+  with it on, the domain sends for every account on it, free, exactly as before.
+  With it off, the domain names a provider but each account has to qualify for it
+  — that is the metered case this section sells. Wording for the operator: turn
+  the switch off when you want sending to be per account.
 - **What is not sold.** Inbound is free and unaffected; nothing here limits
-  receiving, and a domain that is already set up for sending keeps working for
-  everyone on it — the account-level charge only applies where the domain cannot
-  send.
+  receiving or creates an invoice.
 
 | Variable | Purpose |
 |---|---|

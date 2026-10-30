@@ -73,17 +73,43 @@ type AccountSending = {
 };
 
 /**
- * Whether any address this account owns sits on a domain the administrator set up
- * for sending. Then the domain already pays, and nothing is charged here.
+ * Whether any address this account owns sits on a domain that sends for everyone.
+ *
+ * `sendingProvider` says a provider is available; `sendingEnabled` says whether the
+ * administrator lets every account use it. A domain with a provider but without
+ * `sendingEnabled` is metered: the provider is the pool, but an account has to
+ * qualify for it. That distinction is what makes selling sending possible on a
+ * deployment that already has a Resend key.
  */
 async function domainAllowsSending(env: CloudflareEnv, userId: string): Promise<boolean> {
 	const [row] = await getDb(env)
 		.select({ id: mailboxes.id })
 		.from(mailboxes)
 		.innerJoin(domains, eq(mailboxes.domainId, domains.id))
-		.where(and(eq(mailboxes.userId, userId), ne(domains.sendingProvider, "none")))
+		.where(
+			and(
+				eq(mailboxes.userId, userId),
+				ne(domains.sendingProvider, "none"),
+				eq(domains.sendingEnabled, true),
+			),
+		)
 		.limit(1);
 	return !!row;
+}
+
+/** The sending setup of the domain an address belongs to, if any. */
+async function getDomainSending(
+	env: CloudflareEnv,
+	from: string,
+): Promise<{ provider: "none" | "cloudflare" | "resend" | "ses"; enabled: boolean } | null> {
+	const hostname = from.split("@")[1]?.toLowerCase();
+	if (!hostname) return null;
+	const [row] = await getDb(env)
+		.select({ provider: domains.sendingProvider, enabled: domains.sendingEnabled })
+		.from(domains)
+		.where(eq(domains.hostname, hostname))
+		.limit(1);
+	return row ?? null;
 }
 
 export async function getAccountSending(env: CloudflareEnv, userId: string): Promise<AccountSending | null> {
@@ -104,21 +130,19 @@ export async function getAccountSending(env: CloudflareEnv, userId: string): Pro
 /**
  * The provider to send this account's mail through, or a refusal.
  *
- * The domain's own configuration is tried first and its absence is the only
- * failure swallowed: "no sending provider on this domain" is exactly the case an
- * account-level entitlement exists to cover. A domain that names a provider but
- * has no key is a misconfiguration and is allowed to surface as itself.
+ * In order: a domain that sends for everyone; the account's own credentials; a
+ * paid month, spent through whichever provider the domain names (or the
+ * deployment's own key when the domain names none). A domain that names a
+ * provider but has no key is a misconfiguration and surfaces as itself rather
+ * than as "buy sending".
  */
 export async function resolveOutboundProvider(
 	env: CloudflareEnv,
 	options: { userId: string; from: string },
 ): Promise<OutboundProviderConfig> {
-	try {
-		return await getOutboundProviderConfig(env, options.from);
-	} catch (error) {
-		const message = error instanceof Error ? error.message : "";
-		if (!/Sending is not set up/i.test(message)) throw error;
-	}
+	const domain = await getDomainSending(env, options.from);
+	const domainSends = !!domain && domain.provider !== "none";
+	if (domainSends && domain.enabled) return getOutboundProviderConfig(env, options.from);
 
 	const account = await getAccountSending(env, options.userId);
 	if (!account) throw new Error(SEND_LOCKED_MESSAGE);
@@ -129,6 +153,9 @@ export async function resolveOutboundProvider(
 	}
 
 	if (isPaidActive(account.sendPaidUntil, Date.now())) {
+		// A metered domain already says which provider it wants; use that one, so a
+		// paid month sends the same way the domain would.
+		if (domainSends) return getOutboundProviderConfig(env, options.from);
 		const paid = await configFromSystem(env);
 		if (paid) return paid;
 	}
