@@ -12,7 +12,8 @@ import { createAuditLog } from "@/lib/mailboxes/audit";
 import { loadMessageAttachmentContents, storeMessageAttachments, validateAttachments } from "@/lib/email/attachments";
 import type { AttachmentContent } from "@/lib/email/attachment-types";
 import { getOutboundAttachmentMaxMb } from "@/lib/email/attachment-policy";
-import { getOutboundProviderConfig, sendThroughProvider } from "@/lib/email/outbound-provider";
+import { sendThroughProvider } from "@/lib/email/outbound-provider";
+import { resolveOutboundProvider } from "@/lib/payments/entitlement";
 import { prepareCloudflareAttachments } from "@/lib/email/cloud-attachment-utils";
 import { ensureTrackingToken, getTrackingHostForSender } from "@/lib/tracking/open-tracking";
 import { setFollowUp } from "@/lib/follow-ups/service";
@@ -199,7 +200,9 @@ async function deliverEmail(env: CloudflareEnv, delivery: PreparedDelivery): Pro
 	const db = getDb(env);
 	const toAddr = joinEmailAddressList(to);
 	try {
-		const provider = await getOutboundProviderConfig(env, from);
+		// The domain's own sending setup, or this account's own: its provider
+		// credentials, or sending time it has paid for. See lib/payments/entitlement.
+		const provider = await resolveOutboundProvider(env, { userId: input.userId, from });
 		// Cloudflare's 5 MiB cap forces big files into download links; Resend takes
 		// the attachments directly (the admin's outgoing limit still applies).
 		const prepared = provider.provider === "cloudflare"
