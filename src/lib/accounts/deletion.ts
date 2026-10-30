@@ -10,6 +10,7 @@ import { getAccountSeatError } from "@/lib/licenses/seats";
 import { removeMailboxDomainRouting } from "@/lib/mailboxes/domain-addresses";
 import { avatarKeyFor } from "@/app/api/profile/avatar/utils";
 import { getAccountPurgeCutoff } from "./deletion-utils";
+import { unverifiedCutoff } from "@/lib/auth/verify-email";
 import type { DeleteAccountsInput, DeleteAccountsResult } from "./deletion-types";
 
 const CHUNK = 50;
@@ -91,7 +92,7 @@ export async function restoreAccount(env: CloudflareEnv, actor: SessionUser, id:
 	return { ok: true, deleted: 0 };
 }
 
-async function purgeAccount(env: CloudflareEnv, account: typeof users.$inferSelect): Promise<void> {
+export async function purgeAccount(env: CloudflareEnv, account: typeof users.$inferSelect): Promise<void> {
 	const db = getDb(env);
 	const owned = await db.select().from(mailboxes).where(eq(mailboxes.userId, account.id));
 	for (const mailbox of owned) {
@@ -124,6 +125,35 @@ export async function runAccountRetention(env: CloudflareEnv, now = new Date()):
 			removed += 1;
 		} catch (error) {
 			console.error("Account purge failed", { userId: account.id, error });
+		}
+	}
+	return removed;
+}
+
+/**
+ * Erases self-service sign-ups that never confirmed their recovery address.
+ *
+ * Their address was typed by a stranger who never proved they can read it, so
+ * keeping it would let anyone take a name by filling in the form and abandoning
+ * it: the local part stays occupied, the routing rule stays live, and mail for
+ * that address collects silently. Runs every few minutes rather than daily so
+ * a name is usually free again long before anyone notices it was taken.
+ */
+export async function runUnverifiedSignupPurge(env: CloudflareEnv, now = new Date()): Promise<number> {
+	const db = getDb(env);
+	const abandoned = await db
+		.select()
+		.from(users)
+		.where(and(isNull(users.emailVerifiedAt), lte(users.createdAt, unverifiedCutoff(now))))
+		.limit(25);
+	let removed = 0;
+	for (const account of abandoned) {
+		if (account.isPrimaryAdmin) continue;
+		try {
+			await purgeAccount(env, account);
+			removed += 1;
+		} catch (error) {
+			console.error("Unconfirmed sign-up purge failed", { userId: account.id, error });
 		}
 	}
 	return removed;

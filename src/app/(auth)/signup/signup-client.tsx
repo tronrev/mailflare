@@ -61,7 +61,13 @@ export function SignupClient({ hostname }: { hostname: string | null }) {
         setTurnstileReset((value) => value + 1);
         return;
       }
-      router.replace(data.redirect ?? "/inbox");
+      if (data.redirect) {
+        const target = new URL(data.redirect, window.location.origin);
+        if (data.sentTo) target.searchParams.set("email", data.sentTo);
+        router.replace(`${target.pathname}${target.search}`);
+      } else {
+        router.replace("/verify-email?sent=1");
+      }
       router.refresh();
     } catch {
       setError(t("auth.serverUnreachable"));
@@ -150,11 +156,9 @@ export function SignupClient({ hostname }: { hostname: string | null }) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="recoveryEmail">
-            {t("settings.profile.recoveryTitle")}{" "}
-            <span className="font-normal text-neutral-400">{t("aliases.optional")}</span>
-          </Label>
-          <Input id="recoveryEmail" name="recoveryEmail" type="email" autoComplete="email" />
+          <Label htmlFor="recoveryEmail">{t("settings.profile.recoveryTitle")}</Label>
+          <Input id="recoveryEmail" name="recoveryEmail" type="email" autoComplete="email" required />
+          <p className="text-xs text-neutral-500">{t("verify.recoveryHint")}</p>
         </div>
 
         {error && (

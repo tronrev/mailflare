@@ -9,6 +9,8 @@ import { isUniqueConstraintError } from "@/lib/database-errors";
 import { normalizeRecipientLocalPart } from "@/lib/email/recipient-address";
 import { newId } from "@/lib/ids";
 import { ensureMailboxDomainRouting } from "@/lib/mailboxes/domain-addresses";
+import { issueEmailVerification } from "@/lib/auth/verify-email";
+import type { Translator } from "@/lib/i18n/utils";
 import {
 	checkRecoveryEmail,
 	checkSignupPassword,
@@ -54,10 +56,14 @@ export type SignupInput = {
 	username: unknown;
 	password: unknown;
 	recoveryEmail?: unknown;
+	/** Public origin, so the confirmation link points back at this deployment. */
+	origin: string;
+	/** Language the confirmation mail is written in. */
+	t: Translator;
 };
 
 export type SignupOutcome =
-	| { ok: true; userId: string; mailboxId: string; email: string }
+	| { ok: true; userId: string; mailboxId: string; email: string; verificationSentTo: string }
 	| { ok: false; status: number; error: string };
 
 /**
@@ -68,13 +74,19 @@ export type SignupOutcome =
  * Callers must have already passed Turnstile and the rate limit; this function
  * is about the account, not about deciding whether the request may happen.
  */
+/** Thrown when the confirmation link could not be mailed; the caller undoes the account. */
+class SignupMailUndelivered extends Error {
+	constructor() {
+		super("verification mail could not be delivered");
+		this.name = "SignupMailUndelivered";
+	}
+}
+
 export async function createSignupAccount(env: CloudflareEnv, input: SignupInput): Promise<SignupOutcome> {
 	const usernameCheck = checkSignupUsername(input.username);
 	if (!usernameCheck.ok) return { ok: false, status: 400, error: usernameCheck.error };
 	const passwordProblem = checkSignupPassword(input.password);
 	if (passwordProblem) return { ok: false, status: 400, error: passwordProblem };
-	const recovery = checkRecoveryEmail(input.recoveryEmail);
-	if (!recovery.ok) return { ok: false, status: 400, error: recovery.error };
 
 	const domain = await getSignupDomain(env);
 	if (!domain) {
@@ -84,6 +96,11 @@ export async function createSignupAccount(env: CloudflareEnv, input: SignupInput
 			error: "Sign-ups are closed: this server has no active domain to hand out addresses from.",
 		};
 	}
+
+	// Checked against the domain being signed up on: a link mailed to the address
+	// that is still waiting to be opened is a circle, not a proof.
+	const recovery = checkRecoveryEmail(input.recoveryEmail, domain.hostname);
+	if (!recovery.ok) return { ok: false, status: 400, error: recovery.error };
 
 	const username = usernameCheck.username;
 	const email = signupAddress(username, domain.hostname);
@@ -135,13 +152,25 @@ export async function createSignupAccount(env: CloudflareEnv, input: SignupInput
 				passwordHash: hashPassword(input.password as string),
 				name: username,
 				role: "user",
+				// Unconfirmed until the link mailed below is opened.
+				emailVerifiedAt: null,
 			}),
 			db.insert(mailboxes).values(mailbox),
 		]);
 		inserted = true;
 		await ensureBookingUsername(env, userId, email);
 		await ensureMailboxDomainRouting(env, db, mailbox, changes);
-		return { ok: true, userId, mailboxId, email };
+		// The link has to go out before the account exists in anyone's eyes: an
+		// unconfirmed account that nobody was told about can only be squatted on.
+		const delivered = await issueEmailVerification(env, {
+			userId,
+			email,
+			recoveryEmail: recovery.email,
+			origin: input.origin,
+			t: input.t,
+		});
+		if (!delivered) throw new SignupMailUndelivered();
+		return { ok: true, userId, mailboxId, email, verificationSentTo: recovery.email };
 	} catch (error) {
 		// `mailboxes.user_id` cascades, so removing the account takes the mailbox
 		// with it; the routing rules were created outside the database and need
@@ -156,6 +185,13 @@ export async function createSignupAccount(env: CloudflareEnv, input: SignupInput
 		await rollbackEmailRoutingRuleChanges(env, changes).catch((rollbackError) => {
 			console.warn("Could not roll back routing rules after a failed sign-up", rollbackError);
 		});
+		if (error instanceof SignupMailUndelivered) {
+			return {
+				ok: false,
+				status: 503,
+				error: "This server cannot send the confirmation email right now, so the account was not created. Try again later.",
+			};
+		}
 		if (isUniqueConstraintError(error)) {
 			return { ok: false, status: 409, error: "That username was just taken. Try another one." };
 		}
