@@ -42,6 +42,12 @@ export const users = sqliteTable("users", {
 	// Set when an admin deletes the account. The account is also `disabled` and can be restored until the
 	// retention window ends, after which the scheduled purge removes it and its data.
 	deletedAt: timestamp("deleted_at"),
+	// Self-service sign-ups start unverified: the address belongs to someone who
+	// has not proven they can read the recovery mailbox yet. Null means "never
+	// proved it", and such an account cannot sign in. Accounts created by an
+	// administrator (and every account that existed before this column) are
+	// stamped at creation, because an admin already vouched for them.
+	emailVerifiedAt: timestamp("email_verified_at"),
 	createdByUserId: text("created_by_user_id").references((): AnySQLiteColumn => users.id, { onDelete: "set null" }),
 	createdAt: timestamp("created_at")
 		.notNull()
@@ -49,6 +55,8 @@ export const users = sqliteTable("users", {
 }, (t) => [
 	uniqueIndex("users_booking_username_idx").on(t.bookingUsername),
 	index("users_created_by_idx").on(t.createdByUserId),
+	// The scheduled purge looks for accounts that never confirmed their address.
+	index("users_email_verified_at_idx").on(t.emailVerifiedAt),
 ]);
 
 export const domains = sqliteTable(
@@ -796,6 +804,28 @@ export const passwordResetTokens = sqliteTable(
 			.$defaultFn(() => new Date()),
 	},
 	(t) => [index("password_reset_tokens_user_idx").on(t.userId)],
+);
+
+/**
+ * Confirmation links mailed to the recovery address of a self-service sign-up.
+ * Same shape and hashing as a reset token: only the hash is stored, and a link
+ * works once. A row expires with the account itself, after 24 hours.
+ */
+export const emailVerificationTokens = sqliteTable(
+	"email_verification_tokens",
+	{
+		id: text("id").primaryKey(),
+		userId: text("user_id")
+			.notNull()
+			.references(() => users.id, { onDelete: "cascade" }),
+		tokenHash: text("token_hash").notNull().unique(),
+		expiresAt: timestamp("expires_at").notNull(),
+		usedAt: timestamp("used_at"),
+		createdAt: timestamp("created_at")
+			.notNull()
+			.$defaultFn(() => new Date()),
+	},
+	(t) => [index("email_verification_tokens_user_idx").on(t.userId)],
 );
 
 /** One-time backup codes for accounts with TOTP, hashed like session tokens. */

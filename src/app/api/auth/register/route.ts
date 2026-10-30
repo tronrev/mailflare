@@ -61,6 +61,8 @@ export async function POST(request: Request) {
 		name,
 		role: "admin",
 		isPrimaryAdmin: true,
+		// The install wizard's own account: no confirmation round trip.
+		emailVerifiedAt: new Date(),
 	});
 
 	// Tracks what the attempt changed on the Cloudflare zone so a failure can undo

@@ -49,3 +49,19 @@ export async function allowLoginAttempt(env: CloudflareEnv, request: Request): P
 		return true;
 	}
 }
+
+/**
+ * Confirmation mails have their own bucket for the same reason sign-ups do: the
+ * endpoint sends mail on demand, so a loop would turn one IP into a mail bomb
+ * aimed at whatever address it names — and it must not eat the sign-in budget.
+ */
+export async function allowVerificationMailAttempt(env: CloudflareEnv, request: Request): Promise<boolean> {
+	if (!env.LOGIN_RATE_LIMIT) return true;
+	try {
+		const outcome = await env.LOGIN_RATE_LIMIT.limit({ key: `verify:${clientRateLimitKey(request)}` });
+		return outcome.success;
+	} catch (error) {
+		console.warn("Verification mail rate limiter unavailable", error);
+		return true;
+	}
+}

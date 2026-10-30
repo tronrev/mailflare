@@ -81,11 +81,26 @@ test("passwords are judged on length only", () => {
 	assert.equal(checkSignupPassword("password"), null);
 });
 
-test("the recovery address is optional and must look like an address", () => {
-	assert.deepEqual(checkRecoveryEmail(""), { ok: true, email: null });
-	assert.deepEqual(checkRecoveryEmail(undefined), { ok: true, email: null });
+test("the recovery address is required and must look like an address", () => {
+	// Required, not optional: the confirmation link is the only way to activate
+	// the account, so an empty answer has to be refused rather than stored.
+	assert.equal(checkRecoveryEmail("").ok, false);
+	assert.equal(checkRecoveryEmail(undefined).ok, false);
+	assert.equal(checkRecoveryEmail("   ").ok, false);
 	assert.deepEqual(checkRecoveryEmail("  me@example.com "), { ok: true, email: "me@example.com" });
 	for (const bad of ["me", "me@", "@example.com", "me@example", "a b@example.com"]) {
 		assert.equal(checkRecoveryEmail(bad).ok, false, bad);
 	}
+});
+
+test("the recovery address cannot be on the domain being signed up on", () => {
+	// Opening the link inside the mailbox you are trying to open proves nothing,
+	// and the mailbox does not exist yet — the mail would land nowhere.
+	const own = checkRecoveryEmail("me@example.com", "example.com");
+	assert.equal(own.ok, false);
+	assert.match(own.error, /another service/i);
+	assert.equal(checkRecoveryEmail("me@EXAMPLE.com", "example.com").ok, false);
+	assert.deepEqual(checkRecoveryEmail("me@gmail.com", "example.com"), { ok: true, email: "me@gmail.com" });
+	// A lookalike domain is a different domain.
+	assert.deepEqual(checkRecoveryEmail("me@mail.example.com", "example.com"), { ok: true, email: "me@mail.example.com" });
 });

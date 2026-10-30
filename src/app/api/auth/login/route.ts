@@ -46,6 +46,19 @@ export async function POST(request: Request) {
 	if (user.disabled || user.deletedAt) {
 		return NextResponse.json({ error: "Account disabled" }, { status: 403 });
 	}
+	// The password is right, but a self-service account that never confirmed its
+	// recovery address is not an account yet. Say so plainly and point at the
+	// page that can send another link, rather than a bare "invalid credentials".
+	if (!user.emailVerifiedAt) {
+		return NextResponse.json(
+			{
+				error: "Confirm your email address before signing in. The link is in the inbox of the address you signed up with.",
+				code: "email_unverified",
+				redirect: "/verify-email",
+			},
+			{ status: 403 },
+		);
+	}
 
 	// The password is right but a second factor is on: hand back a short-lived
 	// challenge instead of a session and let /api/auth/mfa/verify finish.
