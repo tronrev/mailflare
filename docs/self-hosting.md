@@ -169,12 +169,27 @@ a personal account on a domain this deployment already receives mail for.
   address it cannot deliver to. There is no separate on/off switch.
 - **What it creates.** One account with `role: user`, one personal mailbox on
   that domain, and the routing that makes the address work. Nothing else — no
-  domain, no aliases, no sharing. The visitor is signed in immediately, since
-  they just chose the password.
+  domain, no aliases, no sharing.
+- **Confirmation is required.** The recovery address is mandatory and must be on
+  another service (a link mailed to the mailbox it is meant to open proves
+  nothing). Sign-up mails a 24-hour confirmation link there and returns no
+  session: the account cannot sign in until the link is opened. Opening it
+  signs the person in, since it proves control of the address.
+- **Outbound mail is a prerequisite.** Confirmation goes through the same system
+  sender as password resets, so a deployment with no domain able to send
+  (`sendingProvider: none`, or Cloudflare sending not enabled) refuses sign-ups
+  with a 503 instead of creating accounts nobody can activate. Configure Resend
+  or SES first — see **Sending** above.
+- **Abandoned sign-ups are erased.** Accounts that never confirm are deleted by
+  the five-minute scheduled purge once 24 hours have passed, together with their
+  mailbox, routing rule and address, so a name cannot be squatted by filling in
+  the form and walking away. Accounts created by an administrator, and every
+  account that existed before this rule, count as confirmed.
 - **Abuse controls.** Turnstile when `TURNSTILE_SECRET_KEY` is set (the login
   and setup forms already use it), plus the login rate limiter. Sign-ups get
   their own bucket, so a burst of registrations cannot lock anyone out of
-  signing in.
+  signing in; confirmation mails get a third one, so they cannot be used as a
+  mail bomb.
 - **Reserved names.** `postmaster`, `abuse`, `dmarc`, `noreply` and the other
   role addresses listed in `src/lib/auth/signup-rules.ts` cannot be registered:
   a stranger holding one would be sending mail as a role the domain cannot

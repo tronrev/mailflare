@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { getEnv } from "@/lib/cloudflare";
-import { ACCOUNTS_COOKIE, rememberLogin } from "@/lib/auth/accounts";
 import { recordAuthActivity } from "@/lib/auth/activity";
 import { allowSignupAttempt } from "@/lib/auth/rate-limit";
-import { createSession, SESSION_COOKIE } from "@/lib/auth/session";
 import { hasAdminAccount } from "@/lib/auth/setup";
+import { getServerTranslator } from "@/lib/i18n/server";
 import { createSignupAccount } from "@/lib/auth/signup";
 import { verifyTurnstileToken } from "@/lib/auth/turnstile";
 import { readJsonBody } from "@/lib/http/request";
@@ -53,29 +51,24 @@ export async function POST(request: Request) {
 		username: payload.username,
 		password: payload.password,
 		recoveryEmail: payload.recoveryEmail,
+		origin: new URL(request.url).origin,
+		t: await getServerTranslator(),
 	});
 	if (!outcome.ok) {
 		return NextResponse.json({ error: outcome.error }, { status: outcome.status });
 	}
 
-	const token = await createSession(env, outcome.userId);
 	await recordAuthActivity(env, { action: "auth.signup", userId: outcome.userId, request });
 
+	// No session yet. The address is a claim until the link in its inbox is
+	// opened, and a cookie handed out now would make the claim look proven.
 	const response = NextResponse.json({
 		ok: true,
-		token,
-		redirect: "/inbox",
+		pendingVerification: true,
+		redirect: "/verify-email?sent=1",
 		email: outcome.email,
+		sentTo: outcome.verificationSentTo,
 	});
 	response.headers.set("Cache-Control", "no-store");
-	response.cookies.set(SESSION_COOKIE, token, {
-		httpOnly: true,
-		secure: process.env.NODE_ENV === "production",
-		sameSite: "lax",
-		path: "/",
-		maxAge: 60 * 60 * 24 * 30,
-	});
-	const accountsJar = await cookies();
-	await rememberLogin(env, response, accountsJar.get(ACCOUNTS_COOKIE)?.value, token, accountsJar.get(SESSION_COOKIE)?.value);
 	return response;
 }

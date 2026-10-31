@@ -250,6 +250,7 @@ export async function ensureDemoUser(env: CloudflareEnv) {
 		name: "Demo User",
 		role: admin ? "user" : "admin",
 		isPrimaryAdmin: !admin,
+		emailVerifiedAt: new Date(),
 	});
 	await ensureBookingUsername(env, id, demoCredentials.email);
 

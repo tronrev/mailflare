@@ -91,15 +91,29 @@ export function checkSignupPassword(password: unknown): string | null {
 }
 
 /**
- * Optional recovery address. Sign-up cannot require one: the person has no
- * working mailbox yet, which is usually the reason they are here.
+ * Required recovery address. The confirmation link goes here, so without it the
+ * account could never be activated — and an account nobody can activate is just
+ * a squatted name plus a live routing rule. It must also be somewhere other
+ * than this server: reading the link out of the inbox you are trying to open
+ * proves nothing about control of the address you are claiming.
  */
-export function checkRecoveryEmail(raw: unknown): { ok: true; email: string | null } | { ok: false; error: string } {
-	if (raw === undefined || raw === null || raw === "") return { ok: true, email: null };
+export function checkRecoveryEmail(
+	raw: unknown,
+	ownHostname?: string | null,
+): { ok: true; email: string } | { ok: false; error: string } {
+	if (raw === undefined || raw === null || (typeof raw === "string" && raw.trim() === "")) {
+		return { ok: false, error: "Enter the email address where you can receive the confirmation link." };
+	}
 	if (typeof raw !== "string") return { ok: false, error: "Enter a valid email address." };
 	const email = raw.trim();
 	if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
 		return { ok: false, error: "Enter a valid email address." };
+	}
+	if (ownHostname && email.slice(email.lastIndexOf("@") + 1).toLowerCase() === ownHostname.toLowerCase()) {
+		return {
+			ok: false,
+			error: "Use a mailbox on another service — the link has to reach you before this address works.",
+		};
 	}
 	return { ok: true, email };
 }

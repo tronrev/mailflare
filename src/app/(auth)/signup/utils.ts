@@ -1,10 +1,9 @@
-import { persistAuthSession } from "@/lib/auth/client";
-
 export type SignupResponse = {
 	ok?: boolean;
-	token?: string;
 	redirect?: string;
 	email?: string;
+	sentTo?: string;
+	pendingVerification?: boolean;
 	error?: string;
 };
 
@@ -22,7 +21,8 @@ export async function submitSignup(payload: SignupPayload): Promise<{ ok: boolea
 		signal: AbortSignal.timeout(30_000),
 		body: JSON.stringify(payload),
 	});
-	// The session token arrives with the account, so the person lands in their
-	// inbox already signed in instead of retyping the password they just chose.
-	return { ok: res.ok, data: (await persistAuthSession(res)) as SignupResponse };
+	// No session comes back: the account only starts working once the link mailed
+	// to the recovery address is opened, so there is nothing to persist here.
+	const data = (await res.json().catch(() => ({}))) as SignupResponse;
+	return { ok: res.ok, data };
 }

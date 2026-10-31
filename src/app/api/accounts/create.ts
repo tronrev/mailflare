@@ -89,6 +89,10 @@ export async function createAccountResponse(env: CloudflareEnv, adminUserId: str
 		const accountInsert = db.insert(users).values({
 			id: userId, email, passwordHash: hashPassword(input.password), name: username,
 			role: input.role, createdByUserId: adminUserId,
+			// An administrator created this account, so its address was vouched for
+			// by someone: only self-service sign-ups have to prove it themselves, and
+			// only they are swept when they never do.
+			emailVerifiedAt: new Date(),
 		}).returning();
 		// 接管既有信箱时这一批里**不插**信箱（同地址已经存在），属主转移放在
 		// 批次之后单独做：insert / update 混在一个 batch 里，drizzle 的
