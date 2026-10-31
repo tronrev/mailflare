@@ -49,6 +49,15 @@ export const users = sqliteTable("users", {
 	// stamped at creation, because an admin already vouched for them.
 	emailVerifiedAt: timestamp("email_verified_at"),
 	createdByUserId: text("created_by_user_id").references((): AnySQLiteColumn => users.id, { onDelete: "set null" }),
+	// Outbound mail is charged to the account, not the domain: an account on a
+	// receive-only domain buys sending here, either month by month (this column)
+	// or by bringing its own provider credentials (the two below).
+	sendPaidUntil: timestamp("send_paid_until"),
+	/** "resend" or "ses" when this account sends through its own provider. */
+	sendProvider: text("send_provider", { enum: ["resend", "ses"] }),
+	/** Sealed JSON credential blob; never returned to any client. */
+	sendCredentials: text("send_credentials"),
+	sendCredentialsAt: timestamp("send_credentials_at"),
 	createdAt: timestamp("created_at")
 		.notNull()
 		.$defaultFn(() => new Date()),
@@ -730,6 +739,45 @@ export const sessions = sqliteTable("sessions", {
 		.notNull()
 		.$defaultFn(() => new Date()),
 }, (t) => [index("sessions_user_idx").on(t.userId)]);
+
+/**
+ * One attempt to buy sending time with USDT-TRC20.
+ *
+ * The amount carries a per-account checksum, so a transfer identifies its order
+ * by (amount, time window) without a memo — see `lib/payments/usdt-amount.ts`.
+ * `txId` is unique: one transaction may credit exactly one order, which is what
+ * stops a payment from being replayed against a second purchase.
+ */
+export const usdtOrders = sqliteTable(
+	"usdt_orders",
+	{
+		id: text("id").primaryKey(),
+		userId: text("user_id")
+			.notNull()
+			.references(() => users.id, { onDelete: "cascade" }),
+		months: integer("months").notNull(),
+		/** Smallest USDT unit (6 decimals) the payer must send. */
+		amountMicro: integer("amount_micro").notNull(),
+		/** The receiving address, frozen at purchase time. */
+		address: text("address").notNull(),
+		status: text("status", { enum: ["pending", "paid", "expired"] })
+			.notNull()
+			.default("pending"),
+		txId: text("tx_id"),
+		createdAt: timestamp("created_at")
+			.notNull()
+			.$defaultFn(() => new Date()),
+		expiresAt: timestamp("expires_at").notNull(),
+		paidAt: timestamp("paid_at"),
+		/** `users.send_paid_until` after this order was credited. */
+		paidUntil: timestamp("paid_until"),
+	},
+	(t) => [
+		uniqueIndex("usdt_orders_tx_idx").on(t.txId),
+		index("usdt_orders_user_idx").on(t.userId),
+		index("usdt_orders_status_idx").on(t.status, t.expiresAt),
+	],
+);
 
 /** A native app's push registration (APNs), owned by the device's API key. */
 export const pushDevices = sqliteTable(

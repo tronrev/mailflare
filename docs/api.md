@@ -217,6 +217,47 @@ The dashboard composer accepts up to 10 attachments. An administrator sets the o
 The limits below apply to domains that send through Cloudflare. Resend and Amazon SES take attachments directly, within the same administrator limit. Cloudflare Email Sending limits the entire encoded message, including attachments, to 5 MiB for general recipients, or 25 MiB for verified destination addresses. To stay under the general limit, files over 3 MB and smaller files that would exceed the message budget are sent as R2 download links. The recipient can download them for 30 days; anyone with the link can access the file during that time. The outgoing cap still applies to those files. Cloudflare also limits recipient count to 50, subject length to 998 characters, and headers to 16 KB.
 Incoming mail that exceeds the attachment count or 25 MB decoded attachment limit is rejected during delivery, so the sender's mail provider can report a delivery failure. Cloudflare Email Routing also limits the entire raw message to 25 MiB, including MIME encoding, and may reject it before Mailflare runs.
 
+## Buying sending time
+
+Where a domain only receives, an account can pay for sending in months, or store
+its own provider credentials. Both are session-authenticated and scoped to the
+caller; the amounts come from the server and are never taken from the request.
+
+`GET /api/billing` returns the account's sending state: `allowed`, `reason`
+(`domain`, `own`, `paid`, or `null`), `paidUntil`, `paidDaysLeft`, `own` (a
+description, never the key), `systemProvider` (what a paid month would spend),
+`canStoreCredentials`, `pricePerMonth`, `months`, `address` and recent `orders`.
+
+`POST /api/billing/orders` with `{ "months": 3 }` opens an order and returns it:
+
+```json
+{
+  "order": {
+    "id": "ord_...",
+    "months": 3,
+    "amount": "3.482",
+    "amountMicro": 3482000,
+    "address": "TRonreRqhvN7MAPApLqTnhV1GS9F3RaE8N",
+    "status": "pending",
+    "expiresAt": "2026-10-30T12:30:00.000Z"
+  }
+}
+```
+
+Send exactly `amount` USDT (TRC20) to `address` before `expiresAt`. The three
+decimals identify the account, not the order, so pay the figure you were given:
+a rounded amount matches nothing. One open order per account — opening another
+expires the previous one. `GET /api/billing/orders/{id}` reports the outcome and
+reads the chain on demand (throttled, so polling it is cheap); the five-minute
+cron does the same in the background.
+
+`PUT /api/billing/credentials` with `{ "provider": "resend", "apiKey": "re_..." }`
+or `{ "provider": "ses", "accessKeyId": "...", "secretAccessKey": "...", "region": "us-east-1" }`
+stores the account's own provider, sealed with AES-GCM under `BILLING_SECRET`;
+`DELETE` removes it. A Resend key is checked with Resend before it is stored. With
+neither `BILLING_SECRET` nor a working key the server refuses rather than storing
+a secret in the clear.
+
 ## JMAP
 
 Mailflare serves [JMAP](https://jmap.io) (RFC 8620 core and RFC 8621 mail, plus submission) so external mail apps can read and send mail. Discovery is at `/.well-known/jmap`, which redirects to `/jmap/session`. Authenticate with an API key that has the `jmap` scope, either as `Authorization: Bearer <key>` or as the password of HTTP Basic auth (the username is ignored). Settings > Account > App passwords mints such a key.

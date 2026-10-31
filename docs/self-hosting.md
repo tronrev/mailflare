@@ -80,6 +80,47 @@ through either needs `APP_URL` set to your public HTTPS address. See
 [Sending and receiving providers](providers.md). Using SES as a plain SMTP
 relay through `SMTP_URL`, described above, still works and needs none of this.
 
+### Selling sending time (optional)
+
+A domain that only receives is the common case: receiving needs DNS, sending
+needs a provider that will vouch for the domain. Rather than leave every account
+on such a domain unable to reply, sending can be sold per account, in months, or
+handed over by letting people bring their own provider.
+
+- **What it costs.** 1 USDT per month, 1 to 12 months. The order asks for
+  `months` plus three digits taken from the account's own `created_at`, so no two
+  accounts are ever asked for the same amount and a transfer identifies its order
+  without a memo. An order holds its amount for 30 minutes.
+- **How payments are seen.** The chain is the only source of truth: there is no
+  webhook and no payment processor. The five-minute cron reads incoming
+  USDT-TRC20 transfers through TronGrid and matches them to open orders by amount
+  and time. `usdt_orders.tx_id` is unique, so one transfer credits at most one
+  order; an order paid inside its window is still matched if the cron only looks
+  afterwards.
+- **What the money buys.** `users.send_paid_until`; a renewal bought early
+  extends it instead of restarting it.
+- **It needs a provider to spend.** The paid path sends through the deployment's
+  own Resend key or Amazon SES credentials — Cloudflare Email Sending is set up
+  per domain, which is the thing that was missing. Without one, `POST
+  /api/billing/orders` answers 503 instead of taking money it cannot deliver on.
+- **Or bring your own.** Accounts can store a Resend API key or Amazon SES
+  credentials, sealed with AES-GCM under `BILLING_SECRET` and never read back to
+  a client. Without `BILLING_SECRET` the server refuses to store them rather than
+  keep them in the clear.
+- **Where it applies.** On the Domains page, `sendingEnabled` is the switch:
+  with it on, the domain sends for every account on it, free, exactly as before.
+  With it off, the domain names a provider but each account has to qualify for it
+  — that is the metered case this section sells. Wording for the operator: turn
+  the switch off when you want sending to be per account.
+- **What is not sold.** Inbound is free and unaffected; nothing here limits
+  receiving or creates an invoice.
+
+| Variable | Purpose |
+|---|---|
+| `USDT_PAYMENT_ADDRESS` | Receiving address for USDT-TRC20; defaults to the built-in one. |
+| `TRONGRID_API_KEY` | Optional. The free tier covers the five-minute polling; a key raises the ceiling. |
+| `BILLING_SECRET` | Seals users' own provider credentials. Any long random string; rotating it invalidates stored keys (they are treated as absent). |
+
 ## Cloudflare zone management (optional)
 
 If `CF_TOKEN` can also edit DNS and Email Routing on your zones, adding a

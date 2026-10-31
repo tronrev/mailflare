@@ -82,4 +82,10 @@ interface CloudflareEnv {
 	VAPID_PRIVATE_KEY?: string;
 	/** Contact URI for VAPID, e.g. mailto:admin@example.com or https://mail.example.com. */
 	VAPID_SUBJECT?: string;
+	/** Receiving address for USDT-TRC20 payments; defaults to the built-in one. */
+	USDT_PAYMENT_ADDRESS?: string;
+	/** Optional TronGrid key: the free tier covers a handful of polling requests per five minutes. */
+	TRONGRID_API_KEY?: string;
+	/** Seals users' own provider credentials (AES-GCM). Without it, storing a key is refused. */
+	BILLING_SECRET?: string;
 }

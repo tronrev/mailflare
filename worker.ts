@@ -24,6 +24,8 @@ import { processAgentDraftJob } from "./src/lib/agent/jobs/utils";
 import { runAgentMaintenance } from "./src/lib/agent/maintenance";
 import { runTrashRetention } from "./src/lib/email/trash-retention";
 import { runDriveTrashRetention } from "./src/lib/drive/retention";
+import { runAccountRetention } from "./src/lib/accounts/deletion";
+import { sweepUsdtOrders } from "./src/lib/payments/orders";
 import { runAccountRetention, runUnverifiedSignupPurge } from "./src/lib/accounts/deletion";
 import { runJmapChangeRetention } from "./src/lib/jmap/changes";
 import { runFollowUpReminders } from "./src/lib/follow-ups/service";
@@ -141,6 +143,9 @@ export default {
 		ctx.waitUntil(runTrashRetention(env, new Date(controller.scheduledTime)));
 		ctx.waitUntil(runFollowUpReminders(env, new Date(controller.scheduledTime)));
 		ctx.waitUntil(sweepImportJobs(env, new Date(controller.scheduledTime)));
+		// Payments have no webhook: the chain is the only source of truth, so the
+		// five-minute cron is what turns a transfer into sending time.
+		ctx.waitUntil(sweepUsdtOrders(env, new Date(controller.scheduledTime)));
 		// Every five minutes: a name held by an abandoned sign-up should come back
 		// long before the person who wanted it tries again.
 		ctx.waitUntil(runUnverifiedSignupPurge(env, new Date(controller.scheduledTime)));
