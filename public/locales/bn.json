@@ -369,6 +369,7 @@
 	"settings.nav.sending": "পাঠানো",
 	"settings.sending.title": "পাঠানো",
 	"settings.sending.statusDomain": "অন্তর্ভুক্ত: আপনার একটি ডোমেইন পাঠানোর জন্য সেট করা আছে।",
+	"settings.sending.statusAdmin": "আপনি এই ডিপ্লয়মেন্টের প্রশাসক, তাই এই ডোমেইন থেকে পাঠানোতে কোনো চার্জ নেই।",
 	"settings.sending.statusPaid": "{date} পর্যন্ত পরিশোধিত ({days} দিন বাকি)।",
 	"settings.sending.statusOwn": "আপনার নিজের {provider} দিয়ে পাঠানো হচ্ছে।",
 	"settings.sending.statusLocked": "আপনার ঠিকানার জন্য পাঠানো এখনও চালু হয়নি।",

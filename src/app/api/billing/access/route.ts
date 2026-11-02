@@ -1,6 +1,6 @@
 import { getEnv } from "@/lib/cloudflare";
 import { requireSessionUser } from "@/lib/api/auth";
-import { getSendStatus } from "@/lib/payments/entitlement";
+import { getSendStatus, type SendStatusView } from "@/lib/payments/entitlement";
 
 /**
  * The one bit the composer needs before it opens: may this account send, and if
@@ -16,7 +16,18 @@ export async function GET(request: Request) {
 	const auth = await requireSessionUser(env, request);
 	if (auth.error) return auth.error;
 
-	const status = await getSendStatus(env, { userId: auth.user.id });
+	let status: SendStatusView;
+	try {
+		status = await getSendStatus(env, { userId: auth.user.id });
+	} catch (error) {
+		const detail = error instanceof Error ? error.message : String(error);
+		console.error("[billing] send access failed:", detail);
+		return Response.json(
+			{ error: "Could not load sending settings", ...(auth.user.role === "admin" ? { detail } : {}) },
+			{ status: 500, headers: { "Cache-Control": "no-store" } },
+		);
+	}
+
 	return Response.json(
 		{
 			allowed: status.allowed,

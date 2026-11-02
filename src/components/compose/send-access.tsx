@@ -22,7 +22,7 @@ import { needsSendGuide, type SendAccessView } from "@/lib/payments/send-guide";
  */
 
 export type SendAccess = SendAccessView & {
-	reason: "domain" | "own" | "paid" | null;
+	reason: "domain" | "admin" | "own" | "paid" | null;
 	buyingOffered: boolean;
 	canStoreCredentials: boolean;
 	pricePerMonth: number;

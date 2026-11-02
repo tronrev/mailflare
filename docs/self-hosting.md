@@ -112,6 +112,10 @@ handed over by letting people bring their own provider.
   With it off, the domain names a provider but each account has to qualify for it
   — that is the metered case this section sells. Wording for the operator: turn
   the switch off when you want sending to be per account.
+- **Administrators are never metered.** They own the switch above, so an address
+  on a metered domain still sends for them, and the settings page says so instead
+  of offering them a price. Without this the person who set the deployment up
+  would have to buy sending time from themselves.
 - **What is not sold.** Inbound is free and unaffected; nothing here limits
   receiving or creates an invoice.
 - **The address is yours, not the repository's.** It comes from
@@ -119,6 +123,12 @@ handed over by letting people bring their own provider.
   fork does not start collecting into somebody else's wallet. Unset, malformed or
   set to a non-TRC20 string means buying is simply not offered: the settings page
   says so and `POST /api/billing/orders` answers 503.
+- **Reading orders is not the same as deciding.** The settings page asks one
+  endpoint for both; if the orders table cannot be read the section still renders,
+  because "may I send" does not depend on a purchase history. The error is logged,
+  and returned to an administrator as `ordersError` so a half-applied migration is
+  visible rather than silent (`scripts/sql/repair-0079-usdt-orders.sql` finishes
+  one that stopped after the `users` columns).
 
 | Variable | Purpose |
 |---|---|

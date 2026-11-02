@@ -1,4 +1,4 @@
-import { and, eq, ne } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { getDb } from "@/db";
 import { domains, mailboxes, users } from "@/db/schema";
 import { getAwsConfig } from "@/lib/aws/config";
@@ -6,8 +6,9 @@ import { getOutboundProviderConfig, getResendKeyStatus } from "@/lib/email/outbo
 import type { OutboundProviderConfig } from "@/lib/email/outbound-provider-types";
 import { describeCredentials, type OwnCredentials } from "@/lib/payments/credentials";
 import { openJson, secretHint } from "@/lib/payments/secret-box";
-import { ORDER_MAX_MONTHS, ORDER_MIN_MONTHS, isPaidActive, paidDaysLeft } from "@/lib/payments/usdt-amount";
 import { paymentAddress } from "@/lib/payments/orders";
+import { sendAccess, type SendReason } from "@/lib/payments/send-access-rules";
+import { ORDER_MAX_MONTHS, ORDER_MIN_MONTHS, isPaidActive, paidDaysLeft } from "@/lib/payments/usdt-amount";
 
 /**
  * Who is allowed to send mail, and through what.
@@ -74,28 +75,42 @@ type AccountSending = {
 };
 
 /**
- * Whether any address this account owns sits on a domain that sends for everyone.
+ * What the account's own addresses can do, reduced to the two facts that matter.
  *
- * `sendingProvider` says a provider is available; `sendingEnabled` says whether the
+ * `sendingProvider` says a provider exists; `sendingEnabled` says whether the
  * administrator lets every account use it. A domain with a provider but without
  * `sendingEnabled` is metered: the provider is the pool, but an account has to
  * qualify for it. That distinction is what makes selling sending possible on a
  * deployment that already has a Resend key.
+ *
+ * Both facts are returned together because they answer two different questions —
+ * "may this account send?" ignores `sendingEnabled` for an administrator, while
+ * everyone else needs it — and computing them from one read keeps the two
+ * answers impossible to disagree.
+ *
+ * Two plain lookups rather than a join: the joined query was the one thing the
+ * production database could not answer, and a mailbox's domain is cheap to fetch
+ * on its own.
  */
-async function domainAllowsSending(env: CloudflareEnv, userId: string): Promise<boolean> {
-	const [row] = await getDb(env)
-		.select({ id: mailboxes.id })
+async function accountDomains(
+	env: CloudflareEnv,
+	userId: string,
+): Promise<{ hasProvider: boolean; openToAll: boolean }> {
+	const owned = await getDb(env)
+		.select({ domainId: mailboxes.domainId })
 		.from(mailboxes)
-		.innerJoin(domains, eq(mailboxes.domainId, domains.id))
-		.where(
-			and(
-				eq(mailboxes.userId, userId),
-				ne(domains.sendingProvider, "none"),
-				eq(domains.sendingEnabled, true),
-			),
-		)
-		.limit(1);
-	return !!row;
+		.where(eq(mailboxes.userId, userId));
+	const domainIds = [...new Set(owned.map((row) => row.domainId).filter((id): id is string => !!id))];
+	if (domainIds.length === 0) return { hasProvider: false, openToAll: false };
+
+	const sending = await getDb(env)
+		.select({ provider: domains.sendingProvider, enabled: domains.sendingEnabled })
+		.from(domains)
+		.where(inArray(domains.id, domainIds));
+	return {
+		hasProvider: sending.some((row) => row.provider !== "none"),
+		openToAll: sending.some((row) => row.provider !== "none" && row.enabled),
+	};
 }
 
 /** The sending setup of the domain an address belongs to, if any. */
@@ -149,6 +164,12 @@ export async function resolveOutboundProvider(
 	const account = await getAccountSending(env, options.userId);
 	if (!account) throw new Error(SEND_LOCKED_MESSAGE);
 
+	// An administrator owns the switch that decides whether a domain is metered,
+	// so it does not meter them. Without this the person who set the deployment up
+	// could not send from their own address until they bought time from
+	// themselves, which is not a thing.
+	if (domainSends && account.role === "admin") return getOutboundProviderConfig(env, options.from);
+
 	if (account.sendProvider && account.sendCredentials) {
 		const credentials = await openJson<OwnCredentials>(env.BILLING_SECRET ?? "", account.sendCredentials);
 		if (credentials?.provider === account.sendProvider) return configFromOwn(credentials);
@@ -167,7 +188,8 @@ export async function resolveOutboundProvider(
 export type SendStatusView = {
 	/** Sending works right now, for any of the reasons below. */
 	allowed: boolean;
-	reason: "domain" | "own" | "paid" | null;
+	/** Why: the domain, an administrator, their own key, or a paid month. */
+	reason: SendReason;
 	/**
 	 * An administrator. Nothing is sold to them: they own the settings that decide
 	 * whether this deployment sends at all, so a paywall would only be noise.
@@ -194,7 +216,7 @@ export async function getSendStatus(
 	options: { userId: string; openOrderId?: string | null },
 ): Promise<SendStatusView> {
 	const account = await getAccountSending(env, options.userId);
-	const domainAllows = await domainAllowsSending(env, options.userId);
+	const ownDomains = await accountDomains(env, options.userId);
 
 	let own: SendStatusView["own"] = null;
 	if (account?.sendProvider && account.sendCredentials) {
@@ -205,9 +227,17 @@ export async function getSendStatus(
 	const paid = isPaidActive(account?.sendPaidUntil, Date.now());
 	const systemProvider = await getSystemProvider(env);
 	const address = paymentAddress(env);
+	const access = sendAccess({
+		admin: account?.role === "admin",
+		domainHasProvider: ownDomains.hasProvider,
+		domainOpenToAll: ownDomains.openToAll,
+		own: !!own,
+		paid,
+		hasSystemProvider: !!systemProvider,
+	});
 	return {
-		allowed: domainAllows || !!own || (paid && !!systemProvider),
-		reason: domainAllows ? "domain" : own ? "own" : paid && systemProvider ? "paid" : null,
+		allowed: access.allowed,
+		reason: access.reason,
 		admin: account?.role === "admin",
 		paidUntil: account?.sendPaidUntil?.toISOString() ?? null,
 		paidDaysLeft: paidDaysLeft(account?.sendPaidUntil, Date.now()),

@@ -2,7 +2,7 @@ import { getEnv } from "@/lib/cloudflare";
 import { requireSessionUser } from "@/lib/api/auth";
 import { hasValidSessionMutationOrigin } from "@/lib/auth/origin";
 import { getSystemProvider } from "@/lib/payments/entitlement";
-import { createOrder, listOrders } from "@/lib/payments/orders";
+import { createOrder, listOrders, type CreateOrderOutcome } from "@/lib/payments/orders";
 
 /**
  * Buying sending time.
@@ -16,7 +16,11 @@ export async function GET(request: Request) {
 	const env = getEnv();
 	const auth = await requireSessionUser(env, request);
 	if (auth.error) return auth.error;
-	return Response.json({ orders: await listOrders(env, auth.user.id) }, { headers: { "Cache-Control": "no-store" } });
+	try {
+		return Response.json({ orders: await listOrders(env, auth.user.id) }, { headers: { "Cache-Control": "no-store" } });
+	} catch (error) {
+		return failure(error, auth.user.role === "admin", "Could not read orders");
+	}
 }
 
 export async function POST(request: Request) {
@@ -34,7 +38,26 @@ export async function POST(request: Request) {
 	}
 
 	const body = (await request.json().catch(() => null)) as { months?: unknown } | null;
-	const outcome = await createOrder(env, auth.user.id, body?.months);
+	let outcome: CreateOrderOutcome;
+	try {
+		outcome = await createOrder(env, auth.user.id, body?.months);
+	} catch (error) {
+		return failure(error, auth.user.role === "admin", "Could not open an order");
+	}
 	if (!outcome.ok) return Response.json({ error: outcome.error }, { status: outcome.status });
 	return Response.json({ order: outcome.order }, { headers: { "Cache-Control": "no-store" } });
+}
+
+/**
+ * A database that cannot answer is still an answer the person in front of the
+ * page needs: an empty 500 leaves the Buy button doing nothing visible. The
+ * administrator gets the reason, because they are the one who can fix a table.
+ */
+function failure(error: unknown, isAdmin: boolean, message: string) {
+	const detail = error instanceof Error ? error.message : String(error);
+	console.error("[billing] orders:", detail);
+	return Response.json(
+		{ error: message, ...(isAdmin ? { detail } : {}) },
+		{ status: 500, headers: { "Cache-Control": "no-store" } },
+	);
 }

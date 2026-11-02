@@ -365,6 +365,7 @@
 	"settings.nav.sending": "Gửi thư",
 	"settings.sending.title": "Gửi thư",
 	"settings.sending.statusDomain": "Đã bao gồm: một tên miền của bạn đã được thiết lập để gửi.",
+	"settings.sending.statusAdmin": "Bạn quản trị bản triển khai này, nên gửi thư từ tên miền này không bị tính phí.",
 	"settings.sending.statusPaid": "Đã trả đến {date} (còn {days} ngày).",
 	"settings.sending.statusOwn": "Đang gửi qua {provider} của bạn.",
 	"settings.sending.statusLocked": "Chưa bật gửi cho các địa chỉ của bạn.",

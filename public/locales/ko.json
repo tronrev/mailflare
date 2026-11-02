@@ -369,6 +369,7 @@
 	"settings.nav.sending": "발신",
 	"settings.sending.title": "발신",
 	"settings.sending.statusDomain": "포함됨: 도메인 중 하나가 발신용으로 설정되어 있습니다.",
+	"settings.sending.statusAdmin": "이 배포의 관리자이므로 이 도메인에서 보내는 메일은 과금되지 않습니다.",
 	"settings.sending.statusPaid": "{date}까지 결제됨(남은 기간 {days}일).",
 	"settings.sending.statusOwn": "직접 등록한 {provider}로 발신합니다.",
 	"settings.sending.statusLocked": "이 주소에서는 아직 발신이 활성화되지 않았습니다.",

@@ -369,6 +369,7 @@
 	"settings.nav.sending": "Aikawa",
 	"settings.sending.title": "Aikawa",
 	"settings.sending.statusDomain": "An haɗa: ɗaya daga cikin yankunanka an saita don aikawa.",
+	"settings.sending.statusAdmin": "Kai ne ma'aikacin wannan turawa, don haka aikawa daga wannan yanki ba a biya.",
 	"settings.sending.statusPaid": "An biya har {date} (sauran kwanaki {days}).",
 	"settings.sending.statusOwn": "Ana aikawa ta {provider} naka.",
 	"settings.sending.statusLocked": "Ba a kunna aikawa don adireshinka ba tukuna.",

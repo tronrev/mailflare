@@ -369,6 +369,7 @@
 	"settings.nav.sending": "भेजना",
 	"settings.sending.title": "भेजना",
 	"settings.sending.statusDomain": "शामिल: आपका एक डोमेन भेजने के लिए सेट है।",
+	"settings.sending.statusAdmin": "आप इस परिनियोजन के व्यवस्थापक हैं, इसलिए इस डोमेन से भेजना शुल्क-मुक्त है।",
 	"settings.sending.statusPaid": "{date} तक भुगतान किया गया ({days} दिन शेष)।",
 	"settings.sending.statusOwn": "आपके अपने {provider} से भेजा जा रहा है।",
 	"settings.sending.statusLocked": "आपके पतों के लिए भेजना अभी चालू नहीं है।",

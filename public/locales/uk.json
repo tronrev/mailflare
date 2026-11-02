@@ -377,6 +377,7 @@
 	"settings.nav.sending": "Надсилання",
 	"settings.sending.title": "Надсилання",
 	"settings.sending.statusDomain": "Включено: один із ваших доменів налаштований для надсилання.",
+	"settings.sending.statusAdmin": "Ви адмініструєте це розгортання, тому надсилання з цього домену не тарифікується.",
 	"settings.sending.statusPaid": "Сплачено до {date} (залишилося {days} дн.).",
 	"settings.sending.statusOwn": "Надсилання через ваш {provider}.",
 	"settings.sending.statusLocked": "Надсилання для ваших адрес ще не ввімкнено.",

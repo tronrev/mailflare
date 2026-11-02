@@ -369,6 +369,7 @@
 	"settings.nav.sending": "Penghantaran",
 	"settings.sending.title": "Penghantaran",
 	"settings.sending.statusDomain": "Termasuk: salah satu domain anda sudah disediakan untuk menghantar.",
+	"settings.sending.statusAdmin": "Anda pentadbir pemasangan ini, jadi penghantaran dari domain ini tidak dicaj.",
 	"settings.sending.statusPaid": "Dibayar sehingga {date} ({days} hari lagi).",
 	"settings.sending.statusOwn": "Menghantar melalui {provider} anda sendiri.",
 	"settings.sending.statusLocked": "Penghantaran belum diaktifkan untuk alamat anda.",

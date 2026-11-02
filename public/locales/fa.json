@@ -369,6 +369,7 @@
 	"settings.nav.sending": "ارسال",
 	"settings.sending.title": "ارسال",
 	"settings.sending.statusDomain": "شامل: یکی از دامنه‌های شما برای ارسال تنظیم شده است.",
+	"settings.sending.statusAdmin": "شما مدیر این استقرار هستید، بنابراین ارسال از این دامنه هزینه‌ای ندارد.",
 	"settings.sending.statusPaid": "پرداخت‌شده تا {date} ({days} روز باقی مانده).",
 	"settings.sending.statusOwn": "ارسال با {provider} خودتان.",
 	"settings.sending.statusLocked": "ارسال برای نشانی‌های شما هنوز فعال نیست.",

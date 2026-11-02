@@ -369,6 +369,7 @@
 	"settings.nav.sending": "بھیجنا",
 	"settings.sending.title": "بھیجنا",
 	"settings.sending.statusDomain": "شامل: آپ کا ایک ڈومین بھیجنے کے لیے ترتیب دیا گیا ہے۔",
+	"settings.sending.statusAdmin": "آپ اس تعیناتی کے منتظم ہیں، اس لیے اس ڈومین سے بھیجنے پر کوئی معاوضہ نہیں۔",
 	"settings.sending.statusPaid": "{date} تک ادا شدہ ({days} دن باقی)۔",
 	"settings.sending.statusOwn": "آپ کے اپنے {provider} سے بھیجا جا رہا ہے۔",
 	"settings.sending.statusLocked": "آپ کے پتوں کے لیے بھیجنا ابھی فعال نہیں۔",

@@ -373,6 +373,7 @@
 	"settings.nav.sending": "Envoi",
 	"settings.sending.title": "Envoi",
 	"settings.sending.statusDomain": "Inclus : l'un de vos domaines est configuré pour l'envoi.",
+	"settings.sending.statusAdmin": "Vous administrez cette installation : l'envoi depuis ce domaine n'est pas facturé.",
 	"settings.sending.statusPaid": "Payé jusqu'au {date} ({days} jours restants).",
 	"settings.sending.statusOwn": "Envoi via votre propre {provider}.",
 	"settings.sending.statusLocked": "L'envoi n'est pas encore activé pour vos adresses.",
