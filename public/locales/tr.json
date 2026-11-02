@@ -360,6 +360,7 @@
 	"settings.nav.appPasswords": "Uygulama parolaları",
 	"settings.nav.rules": "Kurallar ve Yönlendirme",
 	"settings.nav.sending": "Gönderim",
+	"settings.sending.title": "Gönderim",
 	"settings.sending.statusDomain": "Dahil: alan adlarınızdan biri gönderim için ayarlı.",
 	"settings.sending.statusPaid": "{date} tarihine kadar ödendi ({days} gün kaldı).",
 	"settings.sending.statusOwn": "Kendi {provider} sağlayıcınızla gönderiliyor.",

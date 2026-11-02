@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "ایپ پاس ورڈز",
 	"settings.nav.rules": "اصول اور روٹنگ",
 	"settings.nav.sending": "بھیجنا",
+	"settings.sending.title": "بھیجنا",
 	"settings.sending.statusDomain": "شامل: آپ کا ایک ڈومین بھیجنے کے لیے ترتیب دیا گیا ہے۔",
 	"settings.sending.statusPaid": "{date} تک ادا شدہ ({days} دن باقی)۔",
 	"settings.sending.statusOwn": "آپ کے اپنے {provider} سے بھیجا جا رہا ہے۔",

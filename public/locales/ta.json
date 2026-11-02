@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "ஆப் கடவுச்சொற்கள்",
 	"settings.nav.rules": "விதிகள் & வழிசெலுத்தல்",
 	"settings.nav.sending": "அனுப்புதல்",
+	"settings.sending.title": "அனுப்புதல்",
 	"settings.sending.statusDomain": "சேர்க்கப்பட்டது: உங்கள் ஒரு டொமைன் அனுப்புவதற்கு அமைக்கப்பட்டுள்ளது.",
 	"settings.sending.statusPaid": "{date} வரை செலுத்தப்பட்டது ({days} நாட்கள் மீதம்).",
 	"settings.sending.statusOwn": "உங்கள் சொந்த {provider} மூலம் அனுப்புகிறது.",

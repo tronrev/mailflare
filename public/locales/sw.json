@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "Nenosiri za programu",
 	"settings.nav.rules": "Kanuni na Uelekezaji",
 	"settings.nav.sending": "Kutuma",
+	"settings.sending.title": "Kutuma",
 	"settings.sending.statusDomain": "Imejumuisha: kikoa kimoja chako kimeandaliwa kwa kutuma.",
 	"settings.sending.statusPaid": "Imelipwa hadi {date} (siku {days} zimebaki).",
 	"settings.sending.statusOwn": "Inatuma kupitia {provider} yako mwenyewe.",

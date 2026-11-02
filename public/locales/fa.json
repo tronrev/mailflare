@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "گذرواژه‌های برنامه",
 	"settings.nav.rules": "قوانین و مسیریابی",
 	"settings.nav.sending": "ارسال",
+	"settings.sending.title": "ارسال",
 	"settings.sending.statusDomain": "شامل: یکی از دامنه‌های شما برای ارسال تنظیم شده است.",
 	"settings.sending.statusPaid": "پرداخت‌شده تا {date} ({days} روز باقی مانده).",
 	"settings.sending.statusOwn": "ارسال با {provider} خودتان.",

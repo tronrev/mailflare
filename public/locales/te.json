@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "యాప్ పాస్‌వర్డ్‌లు",
 	"settings.nav.rules": "నియమాలు మరియు రూటింగ్",
 	"settings.nav.sending": "పంపడం",
+	"settings.sending.title": "పంపడం",
 	"settings.sending.statusDomain": "చేర్చబడింది: మీ డొమైన్‌లలో ఒకటి పంపడానికి సిద్ధంగా ఉంది.",
 	"settings.sending.statusPaid": "{date} వరకు చెల్లించబడింది ({days} రోజులు మిగిలాయి).",
 	"settings.sending.statusOwn": "మీ సొంత {provider} ద్వారా పంపుతోంది.",

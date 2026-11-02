@@ -375,6 +375,7 @@
 	"settings.nav.appPasswords": "Hasła aplikacji",
 	"settings.nav.rules": "Reguły i routing",
 	"settings.nav.sending": "Wysyłanie",
+	"settings.sending.title": "Wysyłanie",
 	"settings.sending.statusDomain": "W cenie: jedna z twoich domen jest skonfigurowana do wysyłania.",
 	"settings.sending.statusPaid": "Opłacone do {date} (pozostało {days} dni).",
 	"settings.sending.statusOwn": "Wysyłanie przez własnego {provider}.",

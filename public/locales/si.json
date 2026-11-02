@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "යෙදුම් මුරපද",
 	"settings.nav.rules": "නීති සහ මාර්ගගත කිරීම",
 	"settings.nav.sending": "යැවීම",
+	"settings.sending.title": "යැවීම",
 	"settings.sending.statusDomain": "ඇතුළත්: ඔබේ එක් වසමක් යැවීමට සකසා ඇත.",
 	"settings.sending.statusPaid": "{date} දක්වා ගෙවා ඇත (තවත් දින {days}).",
 	"settings.sending.statusOwn": "ඔබේම {provider} හරහා යවමින්.",

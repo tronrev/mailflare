@@ -363,6 +363,7 @@
 	"settings.nav.appPasswords": "アプリパスワード",
 	"settings.nav.rules": "ルールとルーティング",
 	"settings.nav.sending": "送信",
+	"settings.sending.title": "送信",
 	"settings.sending.statusDomain": "含まれます: いずれかのドメインが送信用に設定済みです。",
 	"settings.sending.statusPaid": "{date} まで有効（残り {days} 日）。",
 	"settings.sending.statusOwn": "ご自身の {provider} で送信しています。",

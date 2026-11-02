@@ -363,6 +363,7 @@
 	"settings.nav.appPasswords": "Mật khẩu ứng dụng",
 	"settings.nav.rules": "Quy tắc & Định tuyến",
 	"settings.nav.sending": "Gửi thư",
+	"settings.sending.title": "Gửi thư",
 	"settings.sending.statusDomain": "Đã bao gồm: một tên miền của bạn đã được thiết lập để gửi.",
 	"settings.sending.statusPaid": "Đã trả đến {date} (còn {days} ngày).",
 	"settings.sending.statusOwn": "Đang gửi qua {provider} của bạn.",

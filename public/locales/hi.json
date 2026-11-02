@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "ऐप पासवर्ड",
 	"settings.nav.rules": "नियम और रूटिंग",
 	"settings.nav.sending": "भेजना",
+	"settings.sending.title": "भेजना",
 	"settings.sending.statusDomain": "शामिल: आपका एक डोमेन भेजने के लिए सेट है।",
 	"settings.sending.statusPaid": "{date} तक भुगतान किया गया ({days} दिन शेष)।",
 	"settings.sending.statusOwn": "आपके अपने {provider} से भेजा जा रहा है।",

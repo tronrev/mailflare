@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "รหัสผ่านแอป",
 	"settings.nav.rules": "กฎและการกำหนดเส้นทาง",
 	"settings.nav.sending": "การส่ง",
+	"settings.sending.title": "การส่ง",
 	"settings.sending.statusDomain": "รวมอยู่แล้ว: โดเมนหนึ่งของคุณตั้งค่าไว้สำหรับการส่ง",
 	"settings.sending.statusPaid": "ชำระถึง {date} (เหลือ {days} วัน)",
 	"settings.sending.statusOwn": "ส่งผ่าน {provider} ของคุณเอง",

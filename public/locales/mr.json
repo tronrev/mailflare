@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "अ‍ॅप पासवर्ड",
 	"settings.nav.rules": "नियम आणि रूटिंग",
 	"settings.nav.sending": "पाठवणे",
+	"settings.sending.title": "पाठवणे",
 	"settings.sending.statusDomain": "समाविष्ट: तुमचे एक डोमेन पाठवण्यासाठी सेट आहे.",
 	"settings.sending.statusPaid": "{date} पर्यंत पैसे दिले ({days} दिवस शिल्लक).",
 	"settings.sending.statusOwn": "तुमच्या स्वतःच्या {provider} द्वारे पाठवत आहे.",

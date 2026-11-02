@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "ಆ್ಯಪ್ ಪಾಸ್‌ವರ್ಡ್‌ಗಳು",
 	"settings.nav.rules": "ನಿಯಮಗಳು ಮತ್ತು ರೂಟಿಂಗ್",
 	"settings.nav.sending": "ಕಳುಹಿಸುವುದು",
+	"settings.sending.title": "ಕಳುಹಿಸುವುದು",
 	"settings.sending.statusDomain": "ಸೇರಿಸಲಾಗಿದೆ: ನಿಮ್ಮ ಒಂದು ಡೊಮೇನ್ ಕಳುಹಿಸಲು ಸಿದ್ಧವಾಗಿದೆ.",
 	"settings.sending.statusPaid": "{date} ವರೆಗೆ ಪಾವತಿಸಲಾಗಿದೆ ({days} ದಿನ ಬಾಕಿ).",
 	"settings.sending.statusOwn": "ನಿಮ್ಮ ಸ್ವಂತ {provider} ಮೂಲಕ ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ.",

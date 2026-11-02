@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "앱 비밀번호",
 	"settings.nav.rules": "규칙 및 라우팅",
 	"settings.nav.sending": "발신",
+	"settings.sending.title": "발신",
 	"settings.sending.statusDomain": "포함됨: 도메인 중 하나가 발신용으로 설정되어 있습니다.",
 	"settings.sending.statusPaid": "{date}까지 결제됨(남은 기간 {days}일).",
 	"settings.sending.statusOwn": "직접 등록한 {provider}로 발신합니다.",

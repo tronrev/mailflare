@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "App-wachtwoorden",
 	"settings.nav.rules": "Regels en routering",
 	"settings.nav.sending": "Verzenden",
+	"settings.sending.title": "Verzenden",
 	"settings.sending.statusDomain": "Inbegrepen: een van je domeinen is ingesteld om te verzenden.",
 	"settings.sending.statusPaid": "Betaald tot {date} ({days} dagen over).",
 	"settings.sending.statusOwn": "Verzenden via je eigen {provider}.",

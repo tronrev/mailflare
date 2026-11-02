@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "App passwords",
 	"settings.nav.rules": "Rules & Routing",
 	"settings.nav.sending": "Sending",
+	"settings.sending.title": "Sending",
 	"settings.sending.statusDomain": "Included: a domain of yours is set up for sending.",
 	"settings.sending.statusPaid": "Paid until {date} ({days} days left).",
 	"settings.sending.statusOwn": "Sending through your own {provider}.",

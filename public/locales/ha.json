@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "Kalmomin sirri na manhaja",
 	"settings.nav.rules": "Ƙa'idoji da Tura hanya",
 	"settings.nav.sending": "Aikawa",
+	"settings.sending.title": "Aikawa",
 	"settings.sending.statusDomain": "An haɗa: ɗaya daga cikin yankunanka an saita don aikawa.",
 	"settings.sending.statusPaid": "An biya har {date} (sauran kwanaki {days}).",
 	"settings.sending.statusOwn": "Ana aikawa ta {provider} naka.",

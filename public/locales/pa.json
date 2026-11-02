@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "ਐਪ ਪਾਸਵਰਡ",
 	"settings.nav.rules": "ਨਿਯਮ ਅਤੇ ਰੂਟਿੰਗ",
 	"settings.nav.sending": "ਭੇਜਣਾ",
+	"settings.sending.title": "ਭੇਜਣਾ",
 	"settings.sending.statusDomain": "ਸ਼ਾਮਲ: ਤੁਹਾਡਾ ਇੱਕ ਡੋਮੇਨ ਭੇਜਣ ਲਈ ਸੈੱਟ ਹੈ।",
 	"settings.sending.statusPaid": "{date} ਤੱਕ ਭੁਗਤਾਨ ਕੀਤਾ ({days} ਦਿਨ ਬਾਕੀ)।",
 	"settings.sending.statusOwn": "ਤੁਹਾਡੇ ਆਪਣੇ {provider} ਰਾਹੀਂ ਭੇਜਿਆ ਜਾ ਰਿਹਾ ਹੈ।",

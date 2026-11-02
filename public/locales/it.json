@@ -371,6 +371,7 @@
 	"settings.nav.appPasswords": "Password per app",
 	"settings.nav.rules": "Regole e instradamento",
 	"settings.nav.sending": "Invio",
+	"settings.sending.title": "Invio",
 	"settings.sending.statusDomain": "Incluso: uno dei tuoi domini è configurato per l'invio.",
 	"settings.sending.statusPaid": "Pagato fino al {date} ({days} giorni rimasti).",
 	"settings.sending.statusOwn": "Invio tramite il tuo {provider}.",

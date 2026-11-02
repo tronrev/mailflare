@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "ઍપ પાસવર્ડ",
 	"settings.nav.rules": "નિયમો અને રૂટિંગ",
 	"settings.nav.sending": "મોકલવું",
+	"settings.sending.title": "મોકલવું",
 	"settings.sending.statusDomain": "સમાવેશ: તમારું એક ડોમેન મોકલવા માટે સેટ છે.",
 	"settings.sending.statusPaid": "{date} સુધી ચૂકવેલ ({days} દિવસ બાકી).",
 	"settings.sending.statusOwn": "તમારા પોતાના {provider} દ્વારા મોકલાઈ રહ્યું છે.",

@@ -383,6 +383,7 @@
 	"settings.nav.appPasswords": "كلمات مرور التطبيقات",
 	"settings.nav.rules": "القواعد والتوجيه",
 	"settings.nav.sending": "الإرسال",
+	"settings.sending.title": "الإرسال",
 	"settings.sending.statusDomain": "مشمول: أحد نطاقاتك مهيأ للإرسال.",
 	"settings.sending.statusPaid": "مدفوع حتى {date} (متبقٍ {days} يومًا).",
 	"settings.sending.statusOwn": "الإرسال عبر {provider} الخاص بك.",

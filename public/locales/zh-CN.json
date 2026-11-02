@@ -363,6 +363,7 @@
 	"settings.nav.appPasswords": "应用专用密码",
 	"settings.nav.rules": "规则与路由",
 	"settings.nav.sending": "发信",
+	"settings.sending.title": "发信",
 	"settings.sending.statusDomain": "已包含：你的某个域名已开通发信。",
 	"settings.sending.statusPaid": "已付费至 {date}（还剩 {days} 天）。",
 	"settings.sending.statusOwn": "正在使用你自己的 {provider}。",

@@ -375,6 +375,7 @@
 	"settings.nav.appPasswords": "Паролі застосунків",
 	"settings.nav.rules": "Правила й маршрутизація",
 	"settings.nav.sending": "Надсилання",
+	"settings.sending.title": "Надсилання",
 	"settings.sending.statusDomain": "Включено: один із ваших доменів налаштований для надсилання.",
 	"settings.sending.statusPaid": "Сплачено до {date} (залишилося {days} дн.).",
 	"settings.sending.statusOwn": "Надсилання через ваш {provider}.",

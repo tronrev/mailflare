@@ -371,6 +371,7 @@
 	"settings.nav.appPasswords": "Contraseñas de aplicación",
 	"settings.nav.rules": "Reglas y enrutamiento",
 	"settings.nav.sending": "Envío",
+	"settings.sending.title": "Envío",
 	"settings.sending.statusDomain": "Incluido: uno de tus dominios está configurado para enviar.",
 	"settings.sending.statusPaid": "Pagado hasta {date} ({days} días restantes).",
 	"settings.sending.statusOwn": "Enviando con tu propio {provider}.",
