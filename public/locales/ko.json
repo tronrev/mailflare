@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "앱 비밀번호",
 	"settings.nav.rules": "규칙 및 라우팅",
 	"settings.nav.sending": "발신",
+	"settings.sending.title": "발신",
 	"settings.sending.statusDomain": "포함됨: 도메인 중 하나가 발신용으로 설정되어 있습니다.",
 	"settings.sending.statusPaid": "{date}까지 결제됨(남은 기간 {days}일).",
 	"settings.sending.statusOwn": "직접 등록한 {provider}로 발신합니다.",
@@ -2182,5 +2183,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "발송이 아직 켜져 있지 않습니다",
+	"compose.locked.subtitle": "이 주소는 메일을 받을 수 있습니다. 보내려면 아래 두 방법 중 하나가 필요합니다.",
+	"compose.locked.body": "발송 시간을 구매하거나 직접 발급받은 공급자 키를 추가하세요. 둘 다 설정 → 발송에 있습니다.",
+	"compose.locked.buyTitle": "발송 시간 구매",
+	"compose.locked.buyHint": "월 {price} USDT, 1~12개월, USDT-TRC20로 결제합니다.",
+	"compose.locked.openBuy": "발송 시간 구매",
+	"compose.locked.ownTitle": "직접 등록한 공급자 사용",
+	"compose.locked.ownHint": "Resend API 키 또는 Amazon SES 자격 증명. 결제는 없습니다.",
+	"compose.locked.openOwn": "키 추가",
+	"compose.locked.notOffered": "이 서버는 발송 시간을 판매하지 않습니다. 직접 발급받은 공급자 키를 추가하세요.",
+	"compose.locked.unavailable": "이 서버에서는 발송을 아직 사용할 수 없습니다. 관리자에게 설정을 요청하세요.",
+	"compose.locked.later": "나중에"
 }

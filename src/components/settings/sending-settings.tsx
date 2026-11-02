@@ -23,10 +23,13 @@ import { Select } from "@/components/ui/select";
 type SendStatus = {
 	allowed: boolean;
 	reason: "domain" | "own" | "paid" | null;
+	admin: boolean;
 	paidUntil: string | null;
 	paidDaysLeft: number;
 	own: { provider: "resend" | "ses"; description: string } | null;
 	systemProvider: "resend" | "ses" | null;
+	/** Buying needs a provider to spend the money on and an address to send it to. */
+	buyingOffered: boolean;
 	canStoreCredentials: boolean;
 	pricePerMonth: number;
 	months: { min: number; max: number };
@@ -181,13 +184,13 @@ export function SendingSettings() {
 			</Card>
 
 			{status && status.reason !== "domain" ? (
-				<Card>
+				<Card id="buy" className="scroll-mt-6">
 					<CardHeader>
 						<CardTitle>{t("settings.sending.buy")}</CardTitle>
 						<CardDescription>{t("settings.sending.buyHint")}</CardDescription>
 					</CardHeader>
 					<CardContent className="space-y-4 pb-6">
-						{status.systemProvider ? (
+						{status.buyingOffered ? (
 							<>
 								<div className="flex items-end gap-3">
 									<div className="space-y-2">
@@ -243,7 +246,7 @@ export function SendingSettings() {
 				</Card>
 			) : null}
 
-			<Card>
+			<Card id="own" className="scroll-mt-6">
 				<CardHeader>
 					<CardTitle>{t("settings.sending.ownTitle")}</CardTitle>
 					<CardDescription>{status?.own?.description ?? t("settings.sending.ownHint")}</CardDescription>

@@ -26,6 +26,16 @@ export const ORDER_TTL_MINUTES = 30;
 /** USDT-TRC20. Any other token sent to the address is not money for an order. */
 export const USDT_TRC20_CONTRACT = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
 
+/**
+ * A TRON address is base58check: `T`, then 33 characters of the base58 alphabet,
+ * which has no `0`, `O`, `I` or `l`. Checked before an address is ever shown as
+ * "send your money here" — a typo in a deployment's configuration would
+ * otherwise be a page that silently collects nothing.
+ */
+export function isTronAddress(value: string | null | undefined): boolean {
+	return typeof value === "string" && /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(value.trim());
+}
+
 export type MonthCount = number;
 
 /**

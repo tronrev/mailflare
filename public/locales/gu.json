@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "ઍપ પાસવર્ડ",
 	"settings.nav.rules": "નિયમો અને રૂટિંગ",
 	"settings.nav.sending": "મોકલવું",
+	"settings.sending.title": "મોકલવું",
 	"settings.sending.statusDomain": "સમાવેશ: તમારું એક ડોમેન મોકલવા માટે સેટ છે.",
 	"settings.sending.statusPaid": "{date} સુધી ચૂકવેલ ({days} દિવસ બાકી).",
 	"settings.sending.statusOwn": "તમારા પોતાના {provider} દ્વારા મોકલાઈ રહ્યું છે.",
@@ -2182,5 +2183,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "મોકલવું હજી ચાલુ નથી",
+	"compose.locked.subtitle": "આ સરનામું મેલ મેળવે છે; મોકલવા માટે નીચેના બેમાંથી એક જરૂરી છે.",
+	"compose.locked.body": "મોકલવાનો સમય ખરીદો અથવા તમારા પ્રદાતાની ચાવી ઉમેરો. બંને સેટિંગ્સ → મોકલવું માં છે.",
+	"compose.locked.buyTitle": "મોકલવાનો સમય ખરીદો",
+	"compose.locked.buyHint": "દર મહિને {price} USDT, 1 થી 12 મહિના, USDT-TRC20 માં ચુકવણી.",
+	"compose.locked.openBuy": "મોકલવાનો સમય ખરીદો",
+	"compose.locked.ownTitle": "તમારો પોતાનો પ્રદાતા વાપરો",
+	"compose.locked.ownHint": "Resend API ચાવી અથવા Amazon SES ઓળખપત્રો. કોઈ ચુકવણી નહીં.",
+	"compose.locked.openOwn": "ચાવી ઉમેરો",
+	"compose.locked.notOffered": "આ સર્વર મોકલવાનો સમય વેચતું નથી; તમારા પ્રદાતાની ચાવી ઉમેરો.",
+	"compose.locked.unavailable": "આ સર્વર પર મોકલવું હજી ઉપલબ્ધ નથી. એડમિનને સેટ કરવા કહો.",
+	"compose.locked.later": "હમણાં નહીં"
 }

@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "گذرواژه‌های برنامه",
 	"settings.nav.rules": "قوانین و مسیریابی",
 	"settings.nav.sending": "ارسال",
+	"settings.sending.title": "ارسال",
 	"settings.sending.statusDomain": "شامل: یکی از دامنه‌های شما برای ارسال تنظیم شده است.",
 	"settings.sending.statusPaid": "پرداخت‌شده تا {date} ({days} روز باقی مانده).",
 	"settings.sending.statusOwn": "ارسال با {provider} خودتان.",
@@ -2182,5 +2183,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "ارسال هنوز فعال نشده است",
+	"compose.locked.subtitle": "این نشانی ایمیل دریافت می‌کند؛ برای ارسال یکی از دو روش زیر لازم است.",
+	"compose.locked.body": "زمان ارسال بخرید یا کلید سرویس‌دهنده خودتان را بیفزایید. هر دو در تنظیمات → ارسال است.",
+	"compose.locked.buyTitle": "خرید زمان ارسال",
+	"compose.locked.buyHint": "ماهی {price} USDT، از ۱ تا ۱۲ ماه، پرداخت با USDT-TRC20.",
+	"compose.locked.openBuy": "خرید زمان ارسال",
+	"compose.locked.ownTitle": "استفاده از سرویس‌دهنده خودتان",
+	"compose.locked.ownHint": "کلید API ری‌سند یا اطلاعات Amazon SES. بدون هزینه.",
+	"compose.locked.openOwn": "افزودن کلید",
+	"compose.locked.notOffered": "این سرور زمان ارسال نمی‌فروشد؛ کلید سرویس‌دهنده خودتان را بیفزایید.",
+	"compose.locked.unavailable": "ارسال در این سرور هنوز در دسترس نیست. از مدیر بخواهید آن را تنظیم کند.",
+	"compose.locked.later": "بعداً"
 }

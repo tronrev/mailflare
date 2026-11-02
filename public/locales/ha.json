@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "Kalmomin sirri na manhaja",
 	"settings.nav.rules": "Ƙa'idoji da Tura hanya",
 	"settings.nav.sending": "Aikawa",
+	"settings.sending.title": "Aikawa",
 	"settings.sending.statusDomain": "An haɗa: ɗaya daga cikin yankunanka an saita don aikawa.",
 	"settings.sending.statusPaid": "An biya har {date} (sauran kwanaki {days}).",
 	"settings.sending.statusOwn": "Ana aikawa ta {provider} naka.",
@@ -2182,5 +2183,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "Ba a kunna aikawa ba tukuna",
+	"compose.locked.subtitle": "Wannan adireshin yana karɓar wasiƙa; don aikawa ana buƙatar ɗaya daga cikin hanyoyi biyu da ke ƙasa.",
+	"compose.locked.body": "Sayi lokacin aikawa ko ƙara maɓallin mai bayarwa naka. Dukansu suna cikin Saiti → Aikawa.",
+	"compose.locked.buyTitle": "Sayi lokacin aikawa",
+	"compose.locked.buyHint": "{price} USDT kowace wata, daga 1 zuwa 12 watanni, ana biya da USDT-TRC20.",
+	"compose.locked.openBuy": "Sayi lokacin aikawa",
+	"compose.locked.ownTitle": "Yi amfani da mai bayarwa naka",
+	"compose.locked.ownHint": "Maɓallin Resend API ko bayanan Amazon SES. Babu kuɗi.",
+	"compose.locked.openOwn": "Ƙara maɓalli",
+	"compose.locked.notOffered": "Wannan uwar garken ba ya sayar da lokacin aikawa; ƙara maɓallin mai bayarwa naka.",
+	"compose.locked.unavailable": "Aikawa ba ya samuwa a wannan uwar garken tukuna. Ka nemi mai kula ya saita shi.",
+	"compose.locked.later": "Ba yanzu ba"
 }

@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "යෙදුම් මුරපද",
 	"settings.nav.rules": "නීති සහ මාර්ගගත කිරීම",
 	"settings.nav.sending": "යැවීම",
+	"settings.sending.title": "යැවීම",
 	"settings.sending.statusDomain": "ඇතුළත්: ඔබේ එක් වසමක් යැවීමට සකසා ඇත.",
 	"settings.sending.statusPaid": "{date} දක්වා ගෙවා ඇත (තවත් දින {days}).",
 	"settings.sending.statusOwn": "ඔබේම {provider} හරහා යවමින්.",
@@ -2182,5 +2183,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "යැවීම තවම සක්‍රීය කර නැත",
+	"compose.locked.subtitle": "මෙම ලිපිනය තැපැල් ලබා ගනී; යැවීමට පහත ක්‍රම දෙකින් එකක් අවශ්‍යයි.",
+	"compose.locked.body": "යැවීමේ කාලය මිලදී ගන්න හෝ ඔබේම සැපයුම්කරුගේ යතුර එක් කරන්න. දෙකම සැකසීම් → යැවීම තුළ ඇත.",
+	"compose.locked.buyTitle": "යැවීමේ කාලය මිලදී ගන්න",
+	"compose.locked.buyHint": "මාසයකට {price} USDT, මාස 1 සිට 12 දක්වා, USDT-TRC20 වලින් ගෙවයි.",
+	"compose.locked.openBuy": "යැවීමේ කාලය මිලදී ගන්න",
+	"compose.locked.ownTitle": "ඔබේම සැපයුම්කරු භාවිත කරන්න",
+	"compose.locked.ownHint": "Resend API යතුරක් හෝ Amazon SES අක්තපත්‍ර. ගාස්තු නැත.",
+	"compose.locked.openOwn": "යතුරක් එක් කරන්න",
+	"compose.locked.notOffered": "මෙම සේවාදායකය යැවීමේ කාලය විකුණන්නේ නැත; ඔබේම සැපයුම්කරුගේ යතුර එක් කරන්න.",
+	"compose.locked.unavailable": "මෙම සේවාදායකයේ යැවීම තවම නොමැත. පරිපාලකගෙන් සැකසීමට කියන්න.",
+	"compose.locked.later": "දැන් නොවේ"
 }

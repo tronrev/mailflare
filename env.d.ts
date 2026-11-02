@@ -82,7 +82,11 @@ interface CloudflareEnv {
 	VAPID_PRIVATE_KEY?: string;
 	/** Contact URI for VAPID, e.g. mailto:admin@example.com or https://mail.example.com. */
 	VAPID_SUBJECT?: string;
-	/** Receiving address for USDT-TRC20 payments; defaults to the built-in one. */
+	/**
+	 * Where USDT-TRC20 payments go. Set it with `wrangler secret put
+	 * USDT_PAYMENT_ADDRESS`; there is no default, and unset means this deployment
+	 * does not sell sending time.
+	 */
 	USDT_PAYMENT_ADDRESS?: string;
 	/** Optional TronGrid key: the free tier covers a handful of polling requests per five minutes. */
 	TRONGRID_API_KEY?: string;

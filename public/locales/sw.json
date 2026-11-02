@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "Nenosiri za programu",
 	"settings.nav.rules": "Kanuni na Uelekezaji",
 	"settings.nav.sending": "Kutuma",
+	"settings.sending.title": "Kutuma",
 	"settings.sending.statusDomain": "Imejumuisha: kikoa kimoja chako kimeandaliwa kwa kutuma.",
 	"settings.sending.statusPaid": "Imelipwa hadi {date} (siku {days} zimebaki).",
 	"settings.sending.statusOwn": "Inatuma kupitia {provider} yako mwenyewe.",
@@ -2182,5 +2183,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "Utumaji bado umewashwa",
+	"compose.locked.subtitle": "Anwani hii inapokea barua; kutuma kunahitaji mojawapo ya njia mbili zilizo hapa chini.",
+	"compose.locked.body": "Nunua muda wa kutuma au ongeza ufunguo wa mtoa huduma wako. Zote ziko katika Mipangilio → Utumaji.",
+	"compose.locked.buyTitle": "Nunua muda wa kutuma",
+	"compose.locked.buyHint": "{price} USDT kwa mwezi, miezi 1 hadi 12, hulipwa kwa USDT-TRC20.",
+	"compose.locked.openBuy": "Nunua muda wa kutuma",
+	"compose.locked.ownTitle": "Tumia mtoa huduma wako",
+	"compose.locked.ownHint": "Ufunguo wa Resend API au vitambulisho vya Amazon SES. Hakuna malipo.",
+	"compose.locked.openOwn": "Ongeza ufunguo",
+	"compose.locked.notOffered": "Seva hii haiuza muda wa kutuma; ongeza ufunguo wa mtoa huduma wako.",
+	"compose.locked.unavailable": "Utumaji haupatikani kwenye seva hii bado. Mwombe msimamizi ausanidi.",
+	"compose.locked.later": "Si sasa"
 }

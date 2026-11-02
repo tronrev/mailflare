@@ -145,3 +145,18 @@ test("the API key is only sent when one is configured", async () => {
 	assert.equal("TRON-PRO-API-KEY" in seen[0], false);
 	assert.equal(seen[1]["TRON-PRO-API-KEY"], "k");
 });
+
+test("only a well-formed TRON address is offered as a place to send money", () => {
+	// The receiving address is configuration, not a constant: every deployment
+	// supplies its own, so it is checked before a page ever shows it.
+	assert.equal(amount.isTronAddress("TRonreRqhvN7MAPApLqTnhV1GS9F3RaE8N"), true);
+	assert.equal(amount.isTronAddress("  TRonreRqhvN7MAPApLqTnhV1GS9F3RaE8N  "), true);
+	// Wrong length, wrong prefix, and the letters base58 does not have.
+	assert.equal(amount.isTronAddress("TRonreRqhvN7MAPApLqTnhV1GS9F3RaE8"), false);
+	assert.equal(amount.isTronAddress("TRonreRqhvN7MAPApLqTnhV1GS9F3RaE8NN"), false);
+	assert.equal(amount.isTronAddress("AonreRqhvN7MAPApLqTnhV1GS9F3RaE8N"), false);
+	assert.equal(amount.isTronAddress("TRonreRqhvN7MAPApLqTnhV1GS9F3RaE0N"), false);
+	assert.equal(amount.isTronAddress(""), false);
+	assert.equal(amount.isTronAddress(undefined), false);
+	assert.equal(amount.isTronAddress(null), false);
+});

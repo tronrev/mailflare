@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "Kata laluan apl",
 	"settings.nav.rules": "Peraturan & Penghalaan",
 	"settings.nav.sending": "Penghantaran",
+	"settings.sending.title": "Penghantaran",
 	"settings.sending.statusDomain": "Termasuk: salah satu domain anda sudah disediakan untuk menghantar.",
 	"settings.sending.statusPaid": "Dibayar sehingga {date} ({days} hari lagi).",
 	"settings.sending.statusOwn": "Menghantar melalui {provider} anda sendiri.",
@@ -2182,5 +2183,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "Penghantaran belum dihidupkan",
+	"compose.locked.subtitle": "Alamat ini menerima mel; untuk menghantar perlu salah satu daripada dua pilihan di bawah.",
+	"compose.locked.body": "Beli masa penghantaran atau tambah kunci pembekal anda sendiri. Kedua-duanya di Tetapan → Penghantaran.",
+	"compose.locked.buyTitle": "Beli masa penghantaran",
+	"compose.locked.buyHint": "{price} USDT sebulan, 1 hingga 12 bulan, dibayar dalam USDT-TRC20.",
+	"compose.locked.openBuy": "Beli masa penghantaran",
+	"compose.locked.ownTitle": "Guna pembekal anda sendiri",
+	"compose.locked.ownHint": "Kunci API Resend atau kelayakan Amazon SES. Tiada bayaran.",
+	"compose.locked.openOwn": "Tambah kunci",
+	"compose.locked.notOffered": "Pelayan ini tidak menjual masa penghantaran; tambah kunci pembekal anda sendiri.",
+	"compose.locked.unavailable": "Penghantaran belum tersedia di pelayan ini. Minta pentadbir menyediakannya.",
+	"compose.locked.later": "Bukan sekarang"
 }

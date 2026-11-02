@@ -363,6 +363,7 @@
 	"settings.nav.appPasswords": "Mật khẩu ứng dụng",
 	"settings.nav.rules": "Quy tắc & Định tuyến",
 	"settings.nav.sending": "Gửi thư",
+	"settings.sending.title": "Gửi thư",
 	"settings.sending.statusDomain": "Đã bao gồm: một tên miền của bạn đã được thiết lập để gửi.",
 	"settings.sending.statusPaid": "Đã trả đến {date} (còn {days} ngày).",
 	"settings.sending.statusOwn": "Đang gửi qua {provider} của bạn.",
@@ -2167,5 +2168,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "Tính năng gửi chưa được bật",
+	"compose.locked.subtitle": "Địa chỉ này nhận được thư; để gửi cần một trong hai cách dưới đây.",
+	"compose.locked.body": "Mua thời gian gửi hoặc thêm khóa nhà cung cấp của bạn. Cả hai đều ở Cài đặt → Gửi.",
+	"compose.locked.buyTitle": "Mua thời gian gửi",
+	"compose.locked.buyHint": "{price} USDT mỗi tháng, từ 1 đến 12 tháng, thanh toán bằng USDT-TRC20.",
+	"compose.locked.openBuy": "Mua thời gian gửi",
+	"compose.locked.ownTitle": "Dùng nhà cung cấp của bạn",
+	"compose.locked.ownHint": "Khóa API Resend hoặc thông tin đăng nhập Amazon SES. Không mất phí.",
+	"compose.locked.openOwn": "Thêm khóa",
+	"compose.locked.notOffered": "Máy chủ này không bán thời gian gửi; hãy thêm khóa nhà cung cấp của bạn.",
+	"compose.locked.unavailable": "Máy chủ này chưa hỗ trợ gửi thư. Hãy nhờ quản trị viên thiết lập.",
+	"compose.locked.later": "Để sau"
 }

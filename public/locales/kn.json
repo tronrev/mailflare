@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "ಆ್ಯಪ್ ಪಾಸ್‌ವರ್ಡ್‌ಗಳು",
 	"settings.nav.rules": "ನಿಯಮಗಳು ಮತ್ತು ರೂಟಿಂಗ್",
 	"settings.nav.sending": "ಕಳುಹಿಸುವುದು",
+	"settings.sending.title": "ಕಳುಹಿಸುವುದು",
 	"settings.sending.statusDomain": "ಸೇರಿಸಲಾಗಿದೆ: ನಿಮ್ಮ ಒಂದು ಡೊಮೇನ್ ಕಳುಹಿಸಲು ಸಿದ್ಧವಾಗಿದೆ.",
 	"settings.sending.statusPaid": "{date} ವರೆಗೆ ಪಾವತಿಸಲಾಗಿದೆ ({days} ದಿನ ಬಾಕಿ).",
 	"settings.sending.statusOwn": "ನಿಮ್ಮ ಸ್ವಂತ {provider} ಮೂಲಕ ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ.",
@@ -2182,5 +2183,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "ಕಳುಹಿಸುವಿಕೆ ಇನ್ನೂ ಆನ್ ಆಗಿಲ್ಲ",
+	"compose.locked.subtitle": "ಈ ವಿಳಾಸ ಮೇಲ್ ಸ್ವೀಕರಿಸುತ್ತದೆ; ಕಳುಹಿಸಲು ಕೆಳಗಿನ ಎರಡರಲ್ಲಿ ಒಂದು ಬೇಕು.",
+	"compose.locked.body": "ಕಳುಹಿಸುವ ಸಮಯವನ್ನು ಖರೀದಿಸಿ ಅಥವಾ ನಿಮ್ಮ ಸ್ವಂತ ಒದಗಿಸುವವರ ಕೀಲಿಯನ್ನು ಸೇರಿಸಿ. ಎರಡೂ ಸೆಟ್ಟಿಂಗ್‌ಗಳು → ಕಳುಹಿಸುವಿಕೆ ನಲ್ಲಿವೆ.",
+	"compose.locked.buyTitle": "ಕಳುಹಿಸುವ ಸಮಯ ಖರೀದಿಸಿ",
+	"compose.locked.buyHint": "ತಿಂಗಳಿಗೆ {price} USDT, 1 ರಿಂದ 12 ತಿಂಗಳು, USDT-TRC20 ನಲ್ಲಿ ಪಾವತಿ.",
+	"compose.locked.openBuy": "ಕಳುಹಿಸುವ ಸಮಯ ಖರೀದಿಸಿ",
+	"compose.locked.ownTitle": "ನಿಮ್ಮ ಸ್ವಂತ ಒದಗಿಸುವವರನ್ನು ಬಳಸಿ",
+	"compose.locked.ownHint": "Resend API ಕೀಲಿ ಅಥವಾ Amazon SES ರುಜುವಾತುಗಳು. ಯಾವುದೇ ಶುಲ್ಕವಿಲ್ಲ.",
+	"compose.locked.openOwn": "ಕೀಲಿ ಸೇರಿಸಿ",
+	"compose.locked.notOffered": "ಈ ಸರ್ವರ್ ಕಳುಹಿಸುವ ಸಮಯವನ್ನು ಮಾರಾಟ ಮಾಡುವುದಿಲ್ಲ; ನಿಮ್ಮ ಒದಗಿಸುವವರ ಕೀಲಿ ಸೇರಿಸಿ.",
+	"compose.locked.unavailable": "ಈ ಸರ್ವರ್‌ನಲ್ಲಿ ಕಳುಹಿಸುವಿಕೆ ಇನ್ನೂ ಲಭ್ಯವಿಲ್ಲ. ನಿರ್ವಾಹಕರನ್ನು ಸೆಟಪ್ ಮಾಡಲು ಕೇಳಿ.",
+	"compose.locked.later": "ಈಗ ಬೇಡ"
 }

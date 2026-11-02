@@ -371,6 +371,7 @@
 	"settings.nav.appPasswords": "Contraseñas de aplicación",
 	"settings.nav.rules": "Reglas y enrutamiento",
 	"settings.nav.sending": "Envío",
+	"settings.sending.title": "Envío",
 	"settings.sending.statusDomain": "Incluido: uno de tus dominios está configurado para enviar.",
 	"settings.sending.statusPaid": "Pagado hasta {date} ({days} días restantes).",
 	"settings.sending.statusOwn": "Enviando con tu propio {provider}.",
@@ -2197,5 +2198,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "El envío aún no está activado",
+	"compose.locked.subtitle": "Esta dirección recibe correo; para enviar hace falta una de las dos opciones de abajo.",
+	"compose.locked.body": "Compra tiempo de envío o añade la clave de tu propio proveedor. Ambas están en Ajustes → Envío.",
+	"compose.locked.buyTitle": "Comprar tiempo de envío",
+	"compose.locked.buyHint": "{price} USDT al mes, de 1 a 12 meses, pagado en USDT-TRC20.",
+	"compose.locked.openBuy": "Comprar tiempo de envío",
+	"compose.locked.ownTitle": "Usa tu propio proveedor",
+	"compose.locked.ownHint": "Una clave de API de Resend o credenciales de Amazon SES. Sin pago.",
+	"compose.locked.openOwn": "Añadir una clave",
+	"compose.locked.notOffered": "Este servidor no vende tiempo de envío; añade la clave de tu proveedor.",
+	"compose.locked.unavailable": "El envío aún no está disponible en este servidor. Pide a un administrador que lo configure.",
+	"compose.locked.later": "Ahora no"
 }

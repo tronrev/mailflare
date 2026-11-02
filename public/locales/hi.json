@@ -367,6 +367,7 @@
 	"settings.nav.appPasswords": "ऐप पासवर्ड",
 	"settings.nav.rules": "नियम और रूटिंग",
 	"settings.nav.sending": "भेजना",
+	"settings.sending.title": "भेजना",
 	"settings.sending.statusDomain": "शामिल: आपका एक डोमेन भेजने के लिए सेट है।",
 	"settings.sending.statusPaid": "{date} तक भुगतान किया गया ({days} दिन शेष)।",
 	"settings.sending.statusOwn": "आपके अपने {provider} से भेजा जा रहा है।",
@@ -2182,5 +2183,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "अभी भेजना चालू नहीं है",
+	"compose.locked.subtitle": "यह पता मेल प्राप्त करता है; भेजने के लिए नीचे दिए दो विकल्पों में से एक चाहिए।",
+	"compose.locked.body": "भेजने का समय खरीदें या अपने प्रदाता की कुंजी जोड़ें। दोनों सेटिंग्स → भेजना में हैं।",
+	"compose.locked.buyTitle": "भेजने का समय खरीदें",
+	"compose.locked.buyHint": "प्रति माह {price} USDT, 1 से 12 माह, USDT-TRC20 में भुगतान।",
+	"compose.locked.openBuy": "भेजने का समय खरीदें",
+	"compose.locked.ownTitle": "अपना प्रदाता इस्तेमाल करें",
+	"compose.locked.ownHint": "Resend API कुंजी या Amazon SES क्रेडेंशियल। कोई शुल्क नहीं।",
+	"compose.locked.openOwn": "कुंजी जोड़ें",
+	"compose.locked.notOffered": "यह सर्वर भेजने का समय नहीं बेचता; अपने प्रदाता की कुंजी जोड़ें।",
+	"compose.locked.unavailable": "इस सर्वर पर भेजना अभी उपलब्ध नहीं है। व्यवस्थापक से सेट करने को कहें।",
+	"compose.locked.later": "अभी नहीं"
 }

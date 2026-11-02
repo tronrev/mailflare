@@ -375,6 +375,7 @@
 	"settings.nav.appPasswords": "Паролі застосунків",
 	"settings.nav.rules": "Правила й маршрутизація",
 	"settings.nav.sending": "Надсилання",
+	"settings.sending.title": "Надсилання",
 	"settings.sending.statusDomain": "Включено: один із ваших доменів налаштований для надсилання.",
 	"settings.sending.statusPaid": "Сплачено до {date} (залишилося {days} дн.).",
 	"settings.sending.statusOwn": "Надсилання через ваш {provider}.",
@@ -2212,5 +2213,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "Надсилання ще не ввімкнено",
+	"compose.locked.subtitle": "Ця адреса отримує пошту; для надсилання потрібен один із двох варіантів нижче.",
+	"compose.locked.body": "Придбайте час надсилання або додайте ключ свого постачальника. Обидва в «Налаштування → Надсилання».",
+	"compose.locked.buyTitle": "Придбати час надсилання",
+	"compose.locked.buyHint": "{price} USDT на місяць, від 1 до 12 місяців, оплата в USDT-TRC20.",
+	"compose.locked.openBuy": "Придбати час надсилання",
+	"compose.locked.ownTitle": "Свій постачальник",
+	"compose.locked.ownHint": "Ключ API Resend або облікові дані Amazon SES. Без оплати.",
+	"compose.locked.openOwn": "Додати ключ",
+	"compose.locked.notOffered": "Цей сервер не продає час надсилання; додайте ключ свого постачальника.",
+	"compose.locked.unavailable": "Надсилання на цьому сервері ще недоступне. Попросіть адміністратора налаштувати його.",
+	"compose.locked.later": "Не зараз"
 }

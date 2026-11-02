@@ -363,6 +363,7 @@
 	"settings.nav.appPasswords": "Kata sandi aplikasi",
 	"settings.nav.rules": "Aturan & Perutean",
 	"settings.nav.sending": "Pengiriman",
+	"settings.sending.title": "Pengiriman",
 	"settings.sending.statusDomain": "Termasuk: salah satu domain Anda sudah disiapkan untuk mengirim.",
 	"settings.sending.statusPaid": "Dibayar hingga {date} ({days} hari tersisa).",
 	"settings.sending.statusOwn": "Mengirim melalui {provider} Anda sendiri.",
@@ -2167,5 +2168,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "Pengiriman belum diaktifkan",
+	"compose.locked.subtitle": "Alamat ini menerima surat; untuk mengirim diperlukan salah satu dari dua opsi di bawah.",
+	"compose.locked.body": "Beli waktu pengiriman atau tambahkan kunci penyedia Anda sendiri. Keduanya ada di Pengaturan → Pengiriman.",
+	"compose.locked.buyTitle": "Beli waktu pengiriman",
+	"compose.locked.buyHint": "{price} USDT per bulan, 1 sampai 12 bulan, dibayar dengan USDT-TRC20.",
+	"compose.locked.openBuy": "Beli waktu pengiriman",
+	"compose.locked.ownTitle": "Gunakan penyedia Anda sendiri",
+	"compose.locked.ownHint": "Kunci API Resend atau kredensial Amazon SES. Tanpa biaya.",
+	"compose.locked.openOwn": "Tambahkan kunci",
+	"compose.locked.notOffered": "Server ini tidak menjual waktu pengiriman; tambahkan kunci penyedia Anda sendiri.",
+	"compose.locked.unavailable": "Pengiriman belum tersedia di server ini. Minta administrator mengaturnya.",
+	"compose.locked.later": "Nanti saja"
 }
