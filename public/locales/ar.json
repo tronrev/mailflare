@@ -2242,5 +2242,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "الإرسال غير مُفعّل بعد",
+	"compose.locked.subtitle": "هذا العنوان يستقبل البريد؛ وللإرسال منه تحتاج إلى أحد الخيارين أدناه.",
+	"compose.locked.body": "اشترِ مدة إرسال أو أضف مفتاح مزوّدك. كلاهما في الإعدادات ← الإرسال.",
+	"compose.locked.buyTitle": "شراء مدة إرسال",
+	"compose.locked.buyHint": "{price} USDT شهريًا، من شهر إلى 12 شهرًا، تُدفع بعملة USDT-TRC20.",
+	"compose.locked.openBuy": "شراء مدة إرسال",
+	"compose.locked.ownTitle": "استخدم مزوّدك الخاص",
+	"compose.locked.ownHint": "مفتاح Resend API أو بيانات اعتماد Amazon SES. بلا مقابل.",
+	"compose.locked.openOwn": "إضافة مفتاح",
+	"compose.locked.notOffered": "هذا الخادم لا يبيع مدة إرسال؛ أضف مفتاح مزوّدك.",
+	"compose.locked.unavailable": "الإرسال غير متاح على هذا الخادم بعد. اطلب من المسؤول إعداده.",
+	"compose.locked.later": "ليس الآن"
 }

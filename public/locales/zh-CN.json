@@ -2167,5 +2167,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "发信功能尚未开通",
+	"compose.locked.subtitle": "这个地址可以收信；要发信，需要下面两种方式之一。",
+	"compose.locked.body": "购买发信时长，或添加你自己的服务商密钥。两项都在「设置 → 发信」里。",
+	"compose.locked.buyTitle": "购买发信时长",
+	"compose.locked.buyHint": "每月 {price} USDT，可买 1 至 12 个月，用 USDT-TRC20 支付。",
+	"compose.locked.openBuy": "购买发信时长",
+	"compose.locked.ownTitle": "使用你自己的服务商",
+	"compose.locked.ownHint": "Resend API 密钥或 Amazon SES 凭据，无需付费。",
+	"compose.locked.openOwn": "添加密钥",
+	"compose.locked.notOffered": "本服务器不提供购买发信时长，请添加你自己的服务商密钥。",
+	"compose.locked.unavailable": "本服务器暂不支持发信，请联系管理员开通。",
+	"compose.locked.later": "以后再说"
 }

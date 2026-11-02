@@ -2197,5 +2197,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "L'envoi n'est pas encore activé",
+	"compose.locked.subtitle": "Cette adresse reçoit le courrier ; pour envoyer, il faut l'une des deux options ci-dessous.",
+	"compose.locked.body": "Achetez du temps d'envoi ou ajoutez la clé de votre propre fournisseur. Les deux se trouvent dans Réglages → Envoi.",
+	"compose.locked.buyTitle": "Acheter du temps d'envoi",
+	"compose.locked.buyHint": "{price} USDT par mois, de 1 à 12 mois, payé en USDT-TRC20.",
+	"compose.locked.openBuy": "Acheter du temps d'envoi",
+	"compose.locked.ownTitle": "Utiliser votre propre fournisseur",
+	"compose.locked.ownHint": "Une clé API Resend ou des identifiants Amazon SES. Aucun paiement.",
+	"compose.locked.openOwn": "Ajouter une clé",
+	"compose.locked.notOffered": "Ce serveur ne vend pas de temps d'envoi ; ajoutez la clé de votre fournisseur.",
+	"compose.locked.unavailable": "L'envoi n'est pas encore disponible sur ce serveur. Demandez à un administrateur de le configurer.",
+	"compose.locked.later": "Plus tard"
 }

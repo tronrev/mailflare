@@ -2182,5 +2182,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "পাঠানো এখনো চালু হয়নি",
+	"compose.locked.subtitle": "এই ঠিকানা মেইল গ্রহণ করে; পাঠাতে নিচের দুটি উপায়ের একটি দরকার।",
+	"compose.locked.body": "পাঠানোর সময় কিনুন বা নিজের প্রোভাইডারের কী যোগ করুন। দুটোই সেটিংস → পাঠানো-তে আছে।",
+	"compose.locked.buyTitle": "পাঠানোর সময় কিনুন",
+	"compose.locked.buyHint": "মাসে {price} USDT, ১ থেকে ১২ মাস, USDT-TRC20-এ পরিশোধ।",
+	"compose.locked.openBuy": "পাঠানোর সময় কিনুন",
+	"compose.locked.ownTitle": "নিজের প্রোভাইডার ব্যবহার করুন",
+	"compose.locked.ownHint": "Resend API কী বা Amazon SES ক্রেডেনশিয়াল। কোনো খরচ নেই।",
+	"compose.locked.openOwn": "কী যোগ করুন",
+	"compose.locked.notOffered": "এই সার্ভার পাঠানোর সময় বিক্রি করে না; নিজের প্রোভাইডারের কী যোগ করুন।",
+	"compose.locked.unavailable": "এই সার্ভারে পাঠানো এখনো নেই। প্রশাসককে সেট আপ করতে বলুন।",
+	"compose.locked.later": "এখন নয়"
 }

@@ -2182,5 +2182,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "पाठवणे अजून सुरू नाही",
+	"compose.locked.subtitle": "हा पत्ता मेल घेतो; पाठवण्यासाठी खालीलपैकी एक पर्याय आवश्यक आहे.",
+	"compose.locked.body": "पाठवण्याची वेळ खरेदी करा किंवा तुमच्या प्रदात्याची किल्ली जोडा. दोन्ही सेटिंग्ज → पाठवणे मध्ये आहेत.",
+	"compose.locked.buyTitle": "पाठवण्याची वेळ खरेदी करा",
+	"compose.locked.buyHint": "दरमहा {price} USDT, 1 ते 12 महिने, USDT-TRC20 मध्ये देय.",
+	"compose.locked.openBuy": "पाठवण्याची वेळ खरेदी करा",
+	"compose.locked.ownTitle": "तुमचा स्वतःचा प्रदाता वापरा",
+	"compose.locked.ownHint": "Resend API किल्ली किंवा Amazon SES क्रेडेन्शियल्स. काही शुल्क नाही.",
+	"compose.locked.openOwn": "किल्ली जोडा",
+	"compose.locked.notOffered": "हा सर्व्हर पाठवण्याची वेळ विकत नाही; तुमच्या प्रदात्याची किल्ली जोडा.",
+	"compose.locked.unavailable": "या सर्व्हरवर पाठवणे अजून उपलब्ध नाही. प्रशासकाला सेट करण्यास सांगा.",
+	"compose.locked.later": "आत्ता नको"
 }

@@ -114,10 +114,15 @@ handed over by letting people bring their own provider.
   the switch off when you want sending to be per account.
 - **What is not sold.** Inbound is free and unaffected; nothing here limits
   receiving or creates an invoice.
+- **The address is yours, not the repository's.** It comes from
+  `USDT_PAYMENT_ADDRESS` only — a secret, never a default in the source tree, so a
+  fork does not start collecting into somebody else's wallet. Unset, malformed or
+  set to a non-TRC20 string means buying is simply not offered: the settings page
+  says so and `POST /api/billing/orders` answers 503.
 
 | Variable | Purpose |
 |---|---|
-| `USDT_PAYMENT_ADDRESS` | Receiving address for USDT-TRC20; defaults to the built-in one. |
+| `USDT_PAYMENT_ADDRESS` | Where the money goes: your own TRC20 address, set with `wrangler secret put USDT_PAYMENT_ADDRESS`. There is no built-in one — unset means this deployment sells nothing, and no order can be opened. |
 | `TRONGRID_API_KEY` | Optional. The free tier covers the five-minute polling; a key raises the ceiling. |
 | `BILLING_SECRET` | Seals users' own provider credentials. Any long random string; rotating it invalidates stored keys (they are treated as absent). |
 

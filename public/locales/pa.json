@@ -2182,5 +2182,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "ਭੇਜਣਾ ਅਜੇ ਚਾਲੂ ਨਹੀਂ",
+	"compose.locked.subtitle": "ਇਹ ਪਤਾ ਮੇਲ ਪ੍ਰਾਪਤ ਕਰਦਾ ਹੈ; ਭੇਜਣ ਲਈ ਹੇਠਾਂ ਦਿੱਤੇ ਦੋ ਵਿਕਲਪਾਂ ਵਿੱਚੋਂ ਇੱਕ ਲੋੜੀਂਦਾ ਹੈ।",
+	"compose.locked.body": "ਭੇਜਣ ਦਾ ਸਮਾਂ ਖਰੀਦੋ ਜਾਂ ਆਪਣੇ ਪ੍ਰਦਾਤਾ ਦੀ ਕੁੰਜੀ ਜੋੜੋ। ਦੋਵੇਂ ਸੈਟਿੰਗਾਂ → ਭੇਜਣਾ ਵਿੱਚ ਹਨ।",
+	"compose.locked.buyTitle": "ਭੇਜਣ ਦਾ ਸਮਾਂ ਖਰੀਦੋ",
+	"compose.locked.buyHint": "ਹਰ ਮਹੀਨੇ {price} USDT, 1 ਤੋਂ 12 ਮਹੀਨੇ, USDT-TRC20 ਵਿੱਚ ਭੁਗਤਾਨ।",
+	"compose.locked.openBuy": "ਭੇਜਣ ਦਾ ਸਮਾਂ ਖਰੀਦੋ",
+	"compose.locked.ownTitle": "ਆਪਣਾ ਪ੍ਰਦਾਤਾ ਵਰਤੋ",
+	"compose.locked.ownHint": "Resend API ਕੁੰਜੀ ਜਾਂ Amazon SES ਪ੍ਰਮਾਣ-ਪੱਤਰ। ਕੋਈ ਖਰਚ ਨਹੀਂ।",
+	"compose.locked.openOwn": "ਕੁੰਜੀ ਜੋੜੋ",
+	"compose.locked.notOffered": "ਇਹ ਸਰਵਰ ਭੇਜਣ ਦਾ ਸਮਾਂ ਨਹੀਂ ਵੇਚਦਾ; ਆਪਣੇ ਪ੍ਰਦਾਤਾ ਦੀ ਕੁੰਜੀ ਜੋੜੋ।",
+	"compose.locked.unavailable": "ਇਸ ਸਰਵਰ ਉੱਤੇ ਭੇਜਣਾ ਅਜੇ ਉਪਲਬਧ ਨਹੀਂ। ਐਡਮਿਨ ਨੂੰ ਸੈੱਟ ਕਰਨ ਲਈ ਕਹੋ।",
+	"compose.locked.later": "ਹੁਣ ਨਹੀਂ"
 }

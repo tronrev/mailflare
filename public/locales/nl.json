@@ -2182,5 +2182,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "Verzenden staat nog niet aan",
+	"compose.locked.subtitle": "Dit adres ontvangt mail; om te verzenden is een van de twee opties hieronder nodig.",
+	"compose.locked.body": "Koop zendtijd of voeg je eigen providersleutel toe. Beide staan in Instellingen → Verzenden.",
+	"compose.locked.buyTitle": "Zendtijd kopen",
+	"compose.locked.buyHint": "{price} USDT per maand, 1 tot 12 maanden, betaald in USDT-TRC20.",
+	"compose.locked.openBuy": "Zendtijd kopen",
+	"compose.locked.ownTitle": "Eigen provider gebruiken",
+	"compose.locked.ownHint": "Een Resend-API-sleutel of Amazon SES-inloggegevens. Niets te betalen.",
+	"compose.locked.openOwn": "Sleutel toevoegen",
+	"compose.locked.notOffered": "Deze server verkoopt geen zendtijd; voeg je eigen providersleutel toe.",
+	"compose.locked.unavailable": "Verzenden is nog niet beschikbaar op deze server. Vraag een beheerder het in te stellen.",
+	"compose.locked.later": "Niet nu"
 }

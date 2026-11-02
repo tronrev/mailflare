@@ -2182,5 +2182,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "അയയ്ക്കൽ ഇതുവരെ ഓണാക്കിയിട്ടില്ല",
+	"compose.locked.subtitle": "ഈ വിലാസം മെയിൽ സ്വീകരിക്കുന്നു; അയയ്ക്കാൻ താഴെയുള്ള രണ്ടിൽ ഒന്ന് വേണം.",
+	"compose.locked.body": "അയയ്ക്കാനുള്ള സമയം വാങ്ങുക അല്ലെങ്കിൽ നിങ്ങളുടെ ദാതാവിന്റെ കീ ചേർക്കുക. രണ്ടും ക്രമീകരണങ്ങൾ → അയയ്ക്കൽ എന്നതിലാണ്.",
+	"compose.locked.buyTitle": "അയയ്ക്കാനുള്ള സമയം വാങ്ങുക",
+	"compose.locked.buyHint": "മാസം {price} USDT, 1 മുതൽ 12 മാസം വരെ, USDT-TRC20 ൽ അടയ്ക്കുന്നു.",
+	"compose.locked.openBuy": "അയയ്ക്കാനുള്ള സമയം വാങ്ങുക",
+	"compose.locked.ownTitle": "നിങ്ങളുടെ സ്വന്തം ദാതാവിനെ ഉപയോഗിക്കുക",
+	"compose.locked.ownHint": "Resend API കീ അല്ലെങ്കിൽ Amazon SES ക്രെഡൻഷ്യലുകൾ. നിരക്കില്ല.",
+	"compose.locked.openOwn": "കീ ചേർക്കുക",
+	"compose.locked.notOffered": "ഈ സെർവർ അയയ്ക്കാനുള്ള സമയം വിൽക്കുന്നില്ല; നിങ്ങളുടെ ദാതാവിന്റെ കീ ചേർക്കുക.",
+	"compose.locked.unavailable": "ഈ സെർവറിൽ അയയ്ക്കൽ ഇതുവരെ ലഭ്യമല്ല. അഡ്മിനിസ്ട്രേറ്ററോട് ക്രമീകരിക്കാൻ ആവശ്യപ്പെടുക.",
+	"compose.locked.later": "ഇപ്പോൾ വേണ്ട"
 }

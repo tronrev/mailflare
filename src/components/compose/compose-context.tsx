@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import { SendAccessProvider, useSendAccess } from "@/components/compose/send-access";
 
 type ComposeContextValue = {
 	open: boolean;
@@ -29,9 +30,20 @@ export function useCompose() {
 }
 
 export function ComposeProvider({ children }: { children: ReactNode }) {
+	// The send status is asked for here rather than in each layout, so every screen
+	// that can open a composer gets the same answer and the same guide.
+	return (
+		<SendAccessProvider>
+			<ComposeProviderInner>{children}</ComposeProviderInner>
+		</SendAccessProvider>
+	);
+}
+
+function ComposeProviderInner({ children }: { children: ReactNode }) {
 	const [open, setOpen] = useState(false);
 	const [draftId, setDraftId] = useState<string | null>(null);
 	const opener = useRef<HTMLElement | null>(null);
+	const sendAccess = useSendAccess();
 
 	function rememberOpener() {
 		opener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -50,9 +62,16 @@ export function ComposeProvider({ children }: { children: ReactNode }) {
 				open,
 				draftId,
 				openComposer: () => {
-					rememberOpener();
-					setDraftId(null);
-					setOpen(true);
+					// A new letter is the moment the account finds out it cannot send;
+					// ask first, and let the guide answer for a locked account. Drafts
+					// are never blocked — reading and editing one is free.
+					const openNew = () => {
+						rememberOpener();
+						setDraftId(null);
+						setOpen(true);
+					};
+					if (sendAccess) sendAccess.requireSend(openNew);
+					else openNew();
 				},
 				openDraftComposer: (nextDraftId) => {
 					if (!open) rememberOpener();

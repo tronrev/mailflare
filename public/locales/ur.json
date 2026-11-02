@@ -2182,5 +2182,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "بھیجنا ابھی فعال نہیں ہے",
+	"compose.locked.subtitle": "یہ پتہ میل وصول کرتا ہے؛ بھیجنے کے لیے نیچے دیے دو طریقوں میں سے ایک درکار ہے۔",
+	"compose.locked.body": "بھیجنے کا وقت خریدیں یا اپنے فراہم کنندہ کی کلید شامل کریں۔ دونوں ترتیبات → بھیجنا میں ہیں۔",
+	"compose.locked.buyTitle": "بھیجنے کا وقت خریدیں",
+	"compose.locked.buyHint": "ماہانہ {price} USDT، 1 سے 12 ماہ، USDT-TRC20 میں ادائیگی۔",
+	"compose.locked.openBuy": "بھیجنے کا وقت خریدیں",
+	"compose.locked.ownTitle": "اپنا فراہم کنندہ استعمال کریں",
+	"compose.locked.ownHint": "Resend API کلید یا Amazon SES اسناد۔ کوئی قیمت نہیں۔",
+	"compose.locked.openOwn": "کلید شامل کریں",
+	"compose.locked.notOffered": "یہ سرور بھیجنے کا وقت نہیں بیچتا؛ اپنے فراہم کنندہ کی کلید شامل کریں۔",
+	"compose.locked.unavailable": "اس سرور پر بھیجنا ابھی دستیاب نہیں۔ منتظم سے ترتیب دینے کو کہیں۔",
+	"compose.locked.later": "ابھی نہیں"
 }

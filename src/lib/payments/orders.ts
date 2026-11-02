@@ -6,6 +6,7 @@ import {
 	MATCH_GRACE_MS,
 	ORDER_TTL_MINUTES,
 	formatAmount,
+	isTronAddress,
 	isValidMonthCount,
 	orderAmountMicro,
 	paidUntilAfter,
@@ -23,11 +24,18 @@ import { fetchUsdtTransfers, type UsdtTransfer } from "@/lib/payments/trongrid";
  * a page refresh and after a crash — and it must agree with itself every time.
  */
 
-/** Where the money goes. Set `USDT_PAYMENT_ADDRESS` to receive somewhere else. */
-export const DEFAULT_USDT_ADDRESS = "TRonreRqhvN7MAPApLqTnhV1GS9F3RaE8N";
-
+/**
+ * Where the money goes.
+ *
+ * Configured on the deployment — `wrangler secret put USDT_PAYMENT_ADDRESS` — and
+ * never committed: an address in a public tree is an address whose payments
+ * anybody can watch, and it would quietly be adopted by every fork. Unset (or
+ * not a TRON address) means this deployment does not sell sending at all, which
+ * the settings page and the composer both read from this one place.
+ */
 export function paymentAddress(env: CloudflareEnv): string {
-	return env.USDT_PAYMENT_ADDRESS?.trim() || DEFAULT_USDT_ADDRESS;
+	const address = env.USDT_PAYMENT_ADDRESS?.trim() ?? "";
+	return isTronAddress(address) ? address : "";
 }
 
 export type OrderView = {
@@ -77,6 +85,12 @@ export async function createOrder(env: CloudflareEnv, userId: string, months: un
 	if (!isValidMonthCount(months)) {
 		return { ok: false, status: 400, error: "Choose between 1 and 12 months" };
 	}
+	const address = paymentAddress(env);
+	if (!address) {
+		// Nothing to pay into: refuse before a row exists, so no order is left
+		// holding an amount nobody can settle.
+		return { ok: false, status: 503, error: "This deployment does not sell sending time" };
+	}
 	const db = getDb(env);
 	const [user] = await db
 		.select({ id: users.id, createdAt: users.createdAt, sendPaidUntil: users.sendPaidUntil })
@@ -96,7 +110,7 @@ export async function createOrder(env: CloudflareEnv, userId: string, months: un
 		userId,
 		months,
 		amountMicro: orderAmountMicro(months, user.createdAt),
-		address: paymentAddress(env),
+		address,
 		status: "pending",
 		createdAt: now,
 		expiresAt: new Date(now.getTime() + ORDER_TTL_MINUTES * 60 * 1000),

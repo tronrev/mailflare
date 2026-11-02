@@ -2212,5 +2212,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "Отправка ещё не включена",
+	"compose.locked.subtitle": "Этот адрес получает почту; для отправки нужен один из двух вариантов ниже.",
+	"compose.locked.body": "Купите время отправки или добавьте ключ своего провайдера. И то и другое в «Настройки → Отправка».",
+	"compose.locked.buyTitle": "Купить время отправки",
+	"compose.locked.buyHint": "{price} USDT в месяц, от 1 до 12 месяцев, оплата в USDT-TRC20.",
+	"compose.locked.openBuy": "Купить время отправки",
+	"compose.locked.ownTitle": "Свой провайдер",
+	"compose.locked.ownHint": "Ключ API Resend или учётные данные Amazon SES. Без оплаты.",
+	"compose.locked.openOwn": "Добавить ключ",
+	"compose.locked.notOffered": "Этот сервер не продаёт время отправки; добавьте ключ своего провайдера.",
+	"compose.locked.unavailable": "Отправка на этом сервере пока недоступна. Попросите администратора её настроить.",
+	"compose.locked.later": "Не сейчас"
 }

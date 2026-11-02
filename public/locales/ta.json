@@ -2182,5 +2182,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "அனுப்புதல் இன்னும் இயக்கப்படவில்லை",
+	"compose.locked.subtitle": "இந்த முகவரி மின்னஞ்சலைப் பெறுகிறது; அனுப்ப கீழே உள்ள இரண்டில் ஒன்று தேவை.",
+	"compose.locked.body": "அனுப்பும் நேரத்தை வாங்குங்கள் அல்லது உங்கள் வழங்குநர் சாவியைச் சேர்க்கவும். இரண்டும் அமைப்புகள் → அனுப்புதல் இல் உள்ளன.",
+	"compose.locked.buyTitle": "அனுப்பும் நேரத்தை வாங்கு",
+	"compose.locked.buyHint": "மாதம் {price} USDT, 1 முதல் 12 மாதங்கள், USDT-TRC20 மூலம் செலுத்தப்படுகிறது.",
+	"compose.locked.openBuy": "அனுப்பும் நேரத்தை வாங்கு",
+	"compose.locked.ownTitle": "உங்கள் சொந்த வழங்குநரைப் பயன்படுத்துங்கள்",
+	"compose.locked.ownHint": "Resend API சாவி அல்லது Amazon SES சான்றுகள். கட்டணம் இல்லை.",
+	"compose.locked.openOwn": "சாவியைச் சேர்",
+	"compose.locked.notOffered": "இந்த சேவையகம் அனுப்பும் நேரத்தை விற்காது; உங்கள் வழங்குநர் சாவியைச் சேர்க்கவும்.",
+	"compose.locked.unavailable": "இந்த சேவையகத்தில் அனுப்புதல் இன்னும் கிடைக்கவில்லை. நிர்வாகியை அமைக்கச் சொல்லுங்கள்.",
+	"compose.locked.later": "இப்போது வேண்டாம்"
 }

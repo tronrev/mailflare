@@ -2182,5 +2182,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "Gönderim henüz açık değil",
+	"compose.locked.subtitle": "Bu adres posta alıyor; göndermek için aşağıdaki iki seçenekten biri gerekir.",
+	"compose.locked.body": "Gönderim süresi satın alın ya da kendi sağlayıcı anahtarınızı ekleyin. İkisi de Ayarlar → Gönderim bölümünde.",
+	"compose.locked.buyTitle": "Gönderim süresi satın al",
+	"compose.locked.buyHint": "Ayda {price} USDT, 1–12 ay, USDT-TRC20 ile ödenir.",
+	"compose.locked.openBuy": "Gönderim süresi satın al",
+	"compose.locked.ownTitle": "Kendi sağlayıcınızı kullanın",
+	"compose.locked.ownHint": "Bir Resend API anahtarı veya Amazon SES kimlik bilgileri. Ödeme yok.",
+	"compose.locked.openOwn": "Anahtar ekle",
+	"compose.locked.notOffered": "Bu sunucu gönderim süresi satmıyor; kendi sağlayıcı anahtarınızı ekleyin.",
+	"compose.locked.unavailable": "Gönderim bu sunucuda henüz kullanılamıyor. Yöneticiden ayarlamasını isteyin.",
+	"compose.locked.later": "Şimdi değil"
 }

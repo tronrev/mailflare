@@ -2167,5 +2167,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "送信はまだ有効になっていません",
+	"compose.locked.subtitle": "このアドレスは受信できます。送信には以下のいずれかが必要です。",
+	"compose.locked.body": "送信時間を購入するか、ご自身のプロバイダーのキーを追加してください。どちらも「設定 → 送信」にあります。",
+	"compose.locked.buyTitle": "送信時間を購入",
+	"compose.locked.buyHint": "月額 {price} USDT、1〜12 か月、USDT-TRC20 で支払います。",
+	"compose.locked.openBuy": "送信時間を購入",
+	"compose.locked.ownTitle": "ご自身のプロバイダーを使う",
+	"compose.locked.ownHint": "Resend の API キー、または Amazon SES の認証情報。支払いは不要です。",
+	"compose.locked.openOwn": "キーを追加",
+	"compose.locked.notOffered": "このサーバーでは送信時間を販売していません。ご自身のプロバイダーのキーを追加してください。",
+	"compose.locked.unavailable": "このサーバーでは送信をまだ利用できません。管理者に設定を依頼してください。",
+	"compose.locked.later": "後で"
 }

@@ -2182,5 +2182,17 @@
 	"dnsSkipped.markDone": "I've set it up",
 	"compose.cancelSend": "Cancel",
 	"compose.sendCancelled": "Sending cancelled. Message moved to Drafts.",
-	"compose.cancelTooLate": "Too late to cancel: the message is already being sent."
+	"compose.cancelTooLate": "Too late to cancel: the message is already being sent.",
+	"compose.locked.title": "Senden ist noch nicht aktiviert",
+	"compose.locked.subtitle": "Diese Adresse empfängt Post; zum Senden braucht es eine der beiden Möglichkeiten unten.",
+	"compose.locked.body": "Sendezeit kaufen oder einen eigenen Anbieterschlüssel hinterlegen. Beides liegt unter Einstellungen → Senden.",
+	"compose.locked.buyTitle": "Sendezeit kaufen",
+	"compose.locked.buyHint": "{price} USDT pro Monat, 1 bis 12 Monate, gezahlt in USDT-TRC20.",
+	"compose.locked.openBuy": "Sendezeit kaufen",
+	"compose.locked.ownTitle": "Eigenen Anbieter verwenden",
+	"compose.locked.ownHint": "Ein Resend-API-Schlüssel oder Amazon-SES-Zugangsdaten. Kostenlos.",
+	"compose.locked.openOwn": "Schlüssel hinterlegen",
+	"compose.locked.notOffered": "Dieser Server kann keine Sendezeit verkaufen; hinterlegen Sie einen eigenen Anbieterschlüssel.",
+	"compose.locked.unavailable": "Senden ist auf diesem Server noch nicht verfügbar. Bitte einen Administrator fragen.",
+	"compose.locked.later": "Später"
 }

@@ -65,6 +65,7 @@ async function configFromSystem(env: CloudflareEnv): Promise<OutboundProviderCon
 }
 
 type AccountSending = {
+	role: "admin" | "user";
 	sendProvider: "resend" | "ses" | null;
 	sendCredentials: string | null;
 	sendCredentialsAt: Date | null;
@@ -115,6 +116,7 @@ async function getDomainSending(
 export async function getAccountSending(env: CloudflareEnv, userId: string): Promise<AccountSending | null> {
 	const [row] = await getDb(env)
 		.select({
+			role: users.role,
 			sendProvider: users.sendProvider,
 			sendCredentials: users.sendCredentials,
 			sendCredentialsAt: users.sendCredentialsAt,
@@ -166,11 +168,18 @@ export type SendStatusView = {
 	/** Sending works right now, for any of the reasons below. */
 	allowed: boolean;
 	reason: "domain" | "own" | "paid" | null;
+	/**
+	 * An administrator. Nothing is sold to them: they own the settings that decide
+	 * whether this deployment sends at all, so a paywall would only be noise.
+	 */
+	admin: boolean;
 	paidUntil: string | null;
 	paidDaysLeft: number;
 	own: { provider: "resend" | "ses"; description: string } | null;
-	/** The provider a paid month would use; null means buying is not offered here. */
+	/** The provider a paid month spends the deployment's own credentials on. */
 	systemProvider: SystemProvider;
+	/** Buying needs both a provider to spend the money on and an address to send it to. */
+	buyingOffered: boolean;
 	/** Whether credentials can be sealed at all (`BILLING_SECRET` set). */
 	canStoreCredentials: boolean;
 	pricePerMonth: number;
@@ -195,17 +204,20 @@ export async function getSendStatus(
 
 	const paid = isPaidActive(account?.sendPaidUntil, Date.now());
 	const systemProvider = await getSystemProvider(env);
+	const address = paymentAddress(env);
 	return {
 		allowed: domainAllows || !!own || (paid && !!systemProvider),
 		reason: domainAllows ? "domain" : own ? "own" : paid && systemProvider ? "paid" : null,
+		admin: account?.role === "admin",
 		paidUntil: account?.sendPaidUntil?.toISOString() ?? null,
 		paidDaysLeft: paidDaysLeft(account?.sendPaidUntil, Date.now()),
 		own,
 		systemProvider,
+		buyingOffered: !!systemProvider && address !== "",
 		canStoreCredentials: !!env.BILLING_SECRET?.trim(),
 		pricePerMonth: 1,
 		months: { min: ORDER_MIN_MONTHS, max: ORDER_MAX_MONTHS },
-		address: paymentAddress(env),
+		address,
 		openOrderId: options.openOrderId ?? null,
 	};
 }

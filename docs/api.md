@@ -226,7 +226,8 @@ caller; the amounts come from the server and are never taken from the request.
 `GET /api/billing` returns the account's sending state: `allowed`, `reason`
 (`domain`, `own`, `paid`, or `null`), `paidUntil`, `paidDaysLeft`, `own` (a
 description, never the key), `systemProvider` (what a paid month would spend),
-`canStoreCredentials`, `pricePerMonth`, `months`, `address` and recent `orders`.
+`admin`, `buyingOffered` (a provider *and* an address to pay into), `canStoreCredentials`,
+`pricePerMonth`, `months`, `address` and recent `orders`.
 
 `POST /api/billing/orders` with `{ "months": 3 }` opens an order and returns it:
 
@@ -237,7 +238,7 @@ description, never the key), `systemProvider` (what a paid month would spend),
     "months": 3,
     "amount": "3.482",
     "amountMicro": 3482000,
-    "address": "TRonreRqhvN7MAPApLqTnhV1GS9F3RaE8N",
+    "address": "TYourDeploymentAddressGoesHere",
     "status": "pending",
     "expiresAt": "2026-10-30T12:30:00.000Z"
   }
@@ -250,6 +251,16 @@ a rounded amount matches nothing. One open order per account — opening another
 expires the previous one. `GET /api/billing/orders/{id}` reports the outcome and
 reads the chain on demand (throttled, so polling it is cheap); the five-minute
 cron does the same in the background.
+
+`GET /api/billing/access` is the same answer without the history: `allowed`,
+`reason`, `admin`, `buyingOffered`, `canStoreCredentials`, `pricePerMonth`,
+`months`, `address`, `paidUntil`, `paidDaysLeft`. The composer asks it before it
+opens; an account that cannot send gets the settings page's two options instead of
+an editor whose Send button will be refused. Administrators are exempt (`admin`),
+because they own the switch this section describes.
+
+The receiving address is deployment configuration (`USDT_PAYMENT_ADDRESS`), never
+a constant: where it is unset, `buyingOffered` is false and orders are refused.
 
 `PUT /api/billing/credentials` with `{ "provider": "resend", "apiKey": "re_..." }`
 or `{ "provider": "ses", "accessKeyId": "...", "secretAccessKey": "...", "region": "us-east-1" }`
