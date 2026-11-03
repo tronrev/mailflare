@@ -377,6 +377,7 @@
 	"settings.nav.sending": "Отправка",
 	"settings.sending.title": "Отправка",
 	"settings.sending.statusDomain": "Включено: один из ваших доменов настроен для отправки.",
+	"settings.sending.statusAdmin": "Вы администрируете эту установку, поэтому отправка с этого домена не тарифицируется.",
 	"settings.sending.statusPaid": "Оплачено до {date} (осталось {days} дн.).",
 	"settings.sending.statusOwn": "Отправка через ваш {provider}.",
 	"settings.sending.statusLocked": "Отправка для ваших адресов пока не включена.",

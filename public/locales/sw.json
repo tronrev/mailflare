@@ -369,6 +369,7 @@
 	"settings.nav.sending": "Kutuma",
 	"settings.sending.title": "Kutuma",
 	"settings.sending.statusDomain": "Imejumuisha: kikoa kimoja chako kimeandaliwa kwa kutuma.",
+	"settings.sending.statusAdmin": "Wewe ndiye msimamizi wa usanidi huu, kwa hivyo kutuma kutoka kikoa hiki hakulipwi.",
 	"settings.sending.statusPaid": "Imelipwa hadi {date} (siku {days} zimebaki).",
 	"settings.sending.statusOwn": "Inatuma kupitia {provider} yako mwenyewe.",
 	"settings.sending.statusLocked": "Kutuma hakujawashwa kwa anwani zako bado.",

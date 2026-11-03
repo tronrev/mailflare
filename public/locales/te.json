@@ -369,6 +369,7 @@
 	"settings.nav.sending": "పంపడం",
 	"settings.sending.title": "పంపడం",
 	"settings.sending.statusDomain": "చేర్చబడింది: మీ డొమైన్‌లలో ఒకటి పంపడానికి సిద్ధంగా ఉంది.",
+	"settings.sending.statusAdmin": "మీరు ఈ డిప్లాయ్‌మెంట్ నిర్వాహకుడు, కాబట్టి ఈ డొమైన్ నుండి పంపడానికి ఛార్జీ లేదు.",
 	"settings.sending.statusPaid": "{date} వరకు చెల్లించబడింది ({days} రోజులు మిగిలాయి).",
 	"settings.sending.statusOwn": "మీ సొంత {provider} ద్వారా పంపుతోంది.",
 	"settings.sending.statusLocked": "మీ చిరునామాలకు పంపడం ఇంకా ప్రారంభం కాలేదు.",

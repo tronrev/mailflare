@@ -369,6 +369,7 @@
 	"settings.nav.sending": "ಕಳುಹಿಸುವುದು",
 	"settings.sending.title": "ಕಳುಹಿಸುವುದು",
 	"settings.sending.statusDomain": "ಸೇರಿಸಲಾಗಿದೆ: ನಿಮ್ಮ ಒಂದು ಡೊಮೇನ್ ಕಳುಹಿಸಲು ಸಿದ್ಧವಾಗಿದೆ.",
+	"settings.sending.statusAdmin": "ನೀವು ಈ ನಿಯೋಜನೆಯ ನಿರ್ವಾಹಕರು, ಆದ್ದರಿಂದ ಈ ಡೊಮೇನ್‌ನಿಂದ ಕಳುಹಿಸಲು ಶುಲ್ಕವಿಲ್ಲ.",
 	"settings.sending.statusPaid": "{date} ವರೆಗೆ ಪಾವತಿಸಲಾಗಿದೆ ({days} ದಿನ ಬಾಕಿ).",
 	"settings.sending.statusOwn": "ನಿಮ್ಮ ಸ್ವಂತ {provider} ಮೂಲಕ ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ.",
 	"settings.sending.statusLocked": "ನಿಮ್ಮ ವಿಳಾಸಗಳಿಗೆ ಕಳುಹಿಸುವುದು ಇನ್ನೂ ಸಕ್ರಿಯವಾಗಿಲ್ಲ.",

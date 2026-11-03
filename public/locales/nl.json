@@ -369,6 +369,7 @@
 	"settings.nav.sending": "Verzenden",
 	"settings.sending.title": "Verzenden",
 	"settings.sending.statusDomain": "Inbegrepen: een van je domeinen is ingesteld om te verzenden.",
+	"settings.sending.statusAdmin": "Je beheert deze installatie; verzenden vanaf dit domein wordt niet per account gerekend.",
 	"settings.sending.statusPaid": "Betaald tot {date} ({days} dagen over).",
 	"settings.sending.statusOwn": "Verzenden via je eigen {provider}.",
 	"settings.sending.statusLocked": "Verzenden is nog niet ingeschakeld voor je adressen.",

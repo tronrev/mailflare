@@ -373,6 +373,7 @@
 	"settings.nav.sending": "Envío",
 	"settings.sending.title": "Envío",
 	"settings.sending.statusDomain": "Incluido: uno de tus dominios está configurado para enviar.",
+	"settings.sending.statusAdmin": "Administras esta instalación, así que el envío desde este dominio no se factura.",
 	"settings.sending.statusPaid": "Pagado hasta {date} ({days} días restantes).",
 	"settings.sending.statusOwn": "Enviando con tu propio {provider}.",
 	"settings.sending.statusLocked": "El envío aún no está habilitado para tus direcciones.",

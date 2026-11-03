@@ -369,6 +369,7 @@
 	"settings.nav.sending": "Senden",
 	"settings.sending.title": "Senden",
 	"settings.sending.statusDomain": "Inklusive: Eine deiner Domains ist für den Versand eingerichtet.",
+	"settings.sending.statusAdmin": "Sie verwalten diese Installation; das Senden über diese Domain wird nicht abgerechnet.",
 	"settings.sending.statusPaid": "Bezahlt bis {date} ({days} Tage übrig).",
 	"settings.sending.statusOwn": "Versand über deinen eigenen {provider}.",
 	"settings.sending.statusLocked": "Der Versand ist für deine Adressen noch nicht aktiviert.",

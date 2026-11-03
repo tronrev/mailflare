@@ -377,6 +377,7 @@
 	"settings.nav.sending": "Wysyłanie",
 	"settings.sending.title": "Wysyłanie",
 	"settings.sending.statusDomain": "W cenie: jedna z twoich domen jest skonfigurowana do wysyłania.",
+	"settings.sending.statusAdmin": "Administrujesz tą instalacją, więc wysyłanie z tej domeny nie jest rozliczane.",
 	"settings.sending.statusPaid": "Opłacone do {date} (pozostało {days} dni).",
 	"settings.sending.statusOwn": "Wysyłanie przez własnego {provider}.",
 	"settings.sending.statusLocked": "Wysyłanie nie jest jeszcze włączone dla twoich adresów.",

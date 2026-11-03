@@ -365,6 +365,7 @@
 	"settings.nav.sending": "发信",
 	"settings.sending.title": "发信",
 	"settings.sending.statusDomain": "已包含：你的某个域名已开通发信。",
+	"settings.sending.statusAdmin": "你是本部署的管理员，用这个域名发信不按账号计费。",
 	"settings.sending.statusPaid": "已付费至 {date}（还剩 {days} 天）。",
 	"settings.sending.statusOwn": "正在使用你自己的 {provider}。",
 	"settings.sending.statusLocked": "你的地址尚未开通发信。",

@@ -22,7 +22,7 @@ import { Select } from "@/components/ui/select";
 
 type SendStatus = {
 	allowed: boolean;
-	reason: "domain" | "own" | "paid" | null;
+	reason: "domain" | "admin" | "own" | "paid" | null;
 	admin: boolean;
 	paidUntil: string | null;
 	paidDaysLeft: number;
@@ -35,6 +35,8 @@ type SendStatus = {
 	months: { min: number; max: number };
 	address: string;
 	orders?: Order[];
+	/** Only sent to an administrator: the orders table could not be read. */
+	ordersError?: string;
 };
 
 type Order = {
@@ -49,6 +51,16 @@ type Order = {
 };
 
 const currency = (value: string) => `${value} USDT`;
+
+/**
+ * What to show when a request fails. The endpoints name the step that broke and,
+ * for an administrator, why; repeating only "could not load" leaves whoever runs
+ * this deployment with nothing to act on.
+ */
+function failureMessage(body: { error?: unknown; detail?: unknown } | null, fallback: string): string {
+	const error = typeof body?.error === "string" ? body.error : fallback;
+	return typeof body?.detail === "string" ? `${error} — ${body.detail}` : error;
+}
 
 export function SendingSettings() {
 	const { t } = useLanguage();
@@ -65,7 +77,7 @@ export function SendingSettings() {
 	const load = useCallback(async () => {
 		const response = await fetch("/api/billing", { cache: "no-store" });
 		const body = await response.json().catch(() => null);
-		if (!response.ok) throw new Error(body?.error ?? "Could not load sending settings");
+		if (!response.ok) throw new Error(failureMessage(body, "Could not load sending settings"));
 		setStatus(body as SendStatus);
 		const pending = (body.orders as Order[] | undefined)?.find((item) => item.status === "pending");
 		if (pending) setOrder(pending);
@@ -114,7 +126,7 @@ export function SendingSettings() {
 				body: JSON.stringify({ months }),
 			});
 			const body = await response.json().catch(() => null);
-			if (!response.ok) throw new Error(body?.error ?? "Could not start the order");
+			if (!response.ok) throw new Error(failureMessage(body, "Could not start the order"));
 			setOrder(body.order as Order);
 		} catch (cause) {
 			setError(cause instanceof Error ? cause.message : String(cause));
@@ -134,7 +146,7 @@ export function SendingSettings() {
 				body: JSON.stringify({ provider, ...fields }),
 			});
 			const body = await response.json().catch(() => null);
-			if (!response.ok) throw new Error(body?.error ?? "Could not save the key");
+			if (!response.ok) throw new Error(failureMessage(body, "Could not save the key"));
 			setStatus(body as SendStatus);
 			setFields({ apiKey: "", accessKeyId: "", secretAccessKey: "", region: "us-east-1" });
 		} catch (cause) {
@@ -150,7 +162,7 @@ export function SendingSettings() {
 		try {
 			const response = await fetch("/api/billing/credentials", { method: "DELETE" });
 			const body = await response.json().catch(() => null);
-			if (!response.ok) throw new Error(body?.error ?? "Could not remove the key");
+			if (!response.ok) throw new Error(failureMessage(body, "Could not remove the key"));
 			setStatus(body as SendStatus);
 		} catch (cause) {
 			setError(cause instanceof Error ? cause.message : String(cause));
@@ -166,14 +178,23 @@ export function SendingSettings() {
 			<Card>
 				<CardHeader>
 					<CardTitle>{t("settings.sending.title")}</CardTitle>
+					{/* No status, no claim: saying "not enabled" next to "could not load"
+					    is two answers, one of them invented. */}
 					<CardDescription>
-						{status?.reason === "domain"
-							? t("settings.sending.statusDomain")
-							: status?.reason === "own" && status.own
-								? t("settings.sending.statusOwn", { provider: status.own.description })
-								: status?.reason === "paid" && status.paidUntil
-									? t("settings.sending.statusPaid", { date: status.paidUntil.slice(0, 10), days: status.paidDaysLeft })
-									: t("settings.sending.statusLocked")}
+						{!status
+							? null
+							: status.reason === "domain"
+								? t("settings.sending.statusDomain")
+								: status.reason === "admin"
+									? t("settings.sending.statusAdmin")
+									: status.reason === "own" && status.own
+										? t("settings.sending.statusOwn", { provider: status.own.description })
+										: status.reason === "paid" && status.paidUntil
+											? t("settings.sending.statusPaid", {
+													date: status.paidUntil.slice(0, 10),
+													days: status.paidDaysLeft,
+												})
+											: t("settings.sending.statusLocked")}
 					</CardDescription>
 				</CardHeader>
 				{error ? (
@@ -181,9 +202,14 @@ export function SendingSettings() {
 						<p className="pb-4 text-sm text-red-600">{error}</p>
 					</CardContent>
 				) : null}
+				{status?.ordersError ? (
+					<CardContent>
+						<p className="pb-4 text-xs text-neutral-500">{status.ordersError}</p>
+					</CardContent>
+				) : null}
 			</Card>
 
-			{status && status.reason !== "domain" ? (
+			{status && status.reason !== "domain" && status.reason !== "admin" ? (
 				<Card id="buy" className="scroll-mt-6">
 					<CardHeader>
 						<CardTitle>{t("settings.sending.buy")}</CardTitle>

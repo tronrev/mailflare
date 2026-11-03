@@ -362,6 +362,7 @@
 	"settings.nav.sending": "Gönderim",
 	"settings.sending.title": "Gönderim",
 	"settings.sending.statusDomain": "Dahil: alan adlarınızdan biri gönderim için ayarlı.",
+	"settings.sending.statusAdmin": "Bu kurulumu siz yönetiyorsunuz; bu alan adından gönderim ücretlendirilmez.",
 	"settings.sending.statusPaid": "{date} tarihine kadar ödendi ({days} gün kaldı).",
 	"settings.sending.statusOwn": "Kendi {provider} sağlayıcınızla gönderiliyor.",
 	"settings.sending.statusLocked": "Adresleriniz için gönderim henüz açık değil.",

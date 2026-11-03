@@ -369,6 +369,7 @@
 	"settings.nav.sending": "การส่ง",
 	"settings.sending.title": "การส่ง",
 	"settings.sending.statusDomain": "รวมอยู่แล้ว: โดเมนหนึ่งของคุณตั้งค่าไว้สำหรับการส่ง",
+	"settings.sending.statusAdmin": "คุณเป็นผู้ดูแลระบบนี้ การส่งจากโดเมนนี้จึงไม่คิดค่าบริการ",
 	"settings.sending.statusPaid": "ชำระถึง {date} (เหลือ {days} วัน)",
 	"settings.sending.statusOwn": "ส่งผ่าน {provider} ของคุณเอง",
 	"settings.sending.statusLocked": "ยังไม่ได้เปิดการส่งสำหรับที่อยู่ของคุณ",

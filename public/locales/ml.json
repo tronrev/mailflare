@@ -369,6 +369,7 @@
 	"settings.nav.sending": "അയക്കൽ",
 	"settings.sending.title": "അയക്കൽ",
 	"settings.sending.statusDomain": "ഉൾപ്പെടുത്തിയിട്ടുണ്ട്: നിങ്ങളുടെ ഒരു ഡൊമെയ്ൻ അയക്കാൻ ക്രമീകരിച്ചിട്ടുണ്ട്.",
+	"settings.sending.statusAdmin": "നിങ്ങൾ ഈ വിന്യാസത്തിന്റെ അഡ്മിൻ ആണ്, അതിനാൽ ഈ ഡൊമെയ്നിൽ നിന്ന് അയയ്ക്കാൻ നിരക്കില്ല.",
 	"settings.sending.statusPaid": "{date} വരെ പണമടച്ചു ({days} ദിവസം ബാക്കി).",
 	"settings.sending.statusOwn": "നിങ്ങളുടെ സ്വന്തം {provider} വഴി അയക്കുന്നു.",
 	"settings.sending.statusLocked": "നിങ്ങളുടെ വിലാസങ്ങൾക്ക് അയക്കൽ ഇതുവരെ പ്രവർത്തനക്ഷമമല്ല.",

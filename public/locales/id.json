@@ -365,6 +365,7 @@
 	"settings.nav.sending": "Pengiriman",
 	"settings.sending.title": "Pengiriman",
 	"settings.sending.statusDomain": "Termasuk: salah satu domain Anda sudah disiapkan untuk mengirim.",
+	"settings.sending.statusAdmin": "Anda administrator deployment ini, jadi pengiriman dari domain ini tidak dihitung.",
 	"settings.sending.statusPaid": "Dibayar hingga {date} ({days} hari tersisa).",
 	"settings.sending.statusOwn": "Mengirim melalui {provider} Anda sendiri.",
 	"settings.sending.statusLocked": "Pengiriman belum diaktifkan untuk alamat Anda.",

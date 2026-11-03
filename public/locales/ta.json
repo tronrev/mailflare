@@ -369,6 +369,7 @@
 	"settings.nav.sending": "அனுப்புதல்",
 	"settings.sending.title": "அனுப்புதல்",
 	"settings.sending.statusDomain": "சேர்க்கப்பட்டது: உங்கள் ஒரு டொமைன் அனுப்புவதற்கு அமைக்கப்பட்டுள்ளது.",
+	"settings.sending.statusAdmin": "நீங்கள் இந்த நிறுவலின் நிர்வாகி, எனவே இந்த டொமைனிலிருந்து அனுப்ப கட்டணம் இல்லை.",
 	"settings.sending.statusPaid": "{date} வரை செலுத்தப்பட்டது ({days} நாட்கள் மீதம்).",
 	"settings.sending.statusOwn": "உங்கள் சொந்த {provider} மூலம் அனுப்புகிறது.",
 	"settings.sending.statusLocked": "உங்கள் முகவரிகளுக்கு அனுப்புதல் இன்னும் இயக்கப்படவில்லை.",

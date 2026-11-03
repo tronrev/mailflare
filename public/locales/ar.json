@@ -385,6 +385,7 @@
 	"settings.nav.sending": "الإرسال",
 	"settings.sending.title": "الإرسال",
 	"settings.sending.statusDomain": "مشمول: أحد نطاقاتك مهيأ للإرسال.",
+	"settings.sending.statusAdmin": "أنت مسؤول هذا النشر، لذا لا تُحتسب رسوم على الإرسال من هذا النطاق.",
 	"settings.sending.statusPaid": "مدفوع حتى {date} (متبقٍ {days} يومًا).",
 	"settings.sending.statusOwn": "الإرسال عبر {provider} الخاص بك.",
 	"settings.sending.statusLocked": "الإرسال غير مفعّل لعناوينك بعد.",

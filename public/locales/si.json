@@ -369,6 +369,7 @@
 	"settings.nav.sending": "යැවීම",
 	"settings.sending.title": "යැවීම",
 	"settings.sending.statusDomain": "ඇතුළත්: ඔබේ එක් වසමක් යැවීමට සකසා ඇත.",
+	"settings.sending.statusAdmin": "ඔබ මෙම යෙදවුමේ පරිපාලකයා බැවින් මෙම වසමෙන් යැවීමට ගාස්තුවක් නැත.",
 	"settings.sending.statusPaid": "{date} දක්වා ගෙවා ඇත (තවත් දින {days}).",
 	"settings.sending.statusOwn": "ඔබේම {provider} හරහා යවමින්.",
 	"settings.sending.statusLocked": "ඔබේ ලිපින සඳහා යැවීම තවම සක්‍රීය නොවේ.",
