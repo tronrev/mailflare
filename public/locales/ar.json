@@ -389,6 +389,7 @@
 	"settings.sending.statusPaid": "مدفوع حتى {date} (متبقٍ {days} يومًا).",
 	"settings.sending.statusOwn": "الإرسال عبر {provider} الخاص بك.",
 	"settings.sending.statusLocked": "الإرسال غير مفعّل لعناوينك بعد.",
+	"settings.sending.problems": "تعذّرت قراءة بعض أجزاء هذا القسم:",
 	"settings.sending.buy": "احصل على مبلغ الدفع",
 	"settings.sending.buyHint": "1 USDT شهريًا، من 1 إلى 12 شهرًا. لكل طلب مبلغه الخاص حتى يُعرف الدفع دون ملاحظة.",
 	"settings.sending.months": "الأشهر",

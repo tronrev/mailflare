@@ -381,6 +381,7 @@
 	"settings.sending.statusPaid": "Оплачено до {date} (осталось {days} дн.).",
 	"settings.sending.statusOwn": "Отправка через ваш {provider}.",
 	"settings.sending.statusLocked": "Отправка для ваших адресов пока не включена.",
+	"settings.sending.problems": "Некоторые части этого раздела не удалось прочитать:",
 	"settings.sending.buy": "Получить сумму к оплате",
 	"settings.sending.buyHint": "1 USDT в месяц, от 1 до 12 месяцев. У каждого заказа своя сумма, поэтому платёж опознаётся без комментария.",
 	"settings.sending.months": "Месяцев",

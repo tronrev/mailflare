@@ -369,6 +369,7 @@
 	"settings.sending.statusPaid": "{date} まで有効（残り {days} 日）。",
 	"settings.sending.statusOwn": "ご自身の {provider} で送信しています。",
 	"settings.sending.statusLocked": "このアドレスではまだ送信が有効になっていません。",
+	"settings.sending.problems": "このセクションの一部を読み取れませんでした:",
 	"settings.sending.buy": "支払い金額を取得",
 	"settings.sending.buyHint": "月 1 USDT、1〜12 か月。注文ごとに金額が異なるため、メモなしで支払いを特定できます。",
 	"settings.sending.months": "月数",

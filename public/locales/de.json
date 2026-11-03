@@ -373,6 +373,7 @@
 	"settings.sending.statusPaid": "Bezahlt bis {date} ({days} Tage übrig).",
 	"settings.sending.statusOwn": "Versand über deinen eigenen {provider}.",
 	"settings.sending.statusLocked": "Der Versand ist für deine Adressen noch nicht aktiviert.",
+	"settings.sending.problems": "Einige Teile dieses Bereichs konnten nicht gelesen werden:",
 	"settings.sending.buy": "Zahlungsbetrag abrufen",
 	"settings.sending.buyHint": "1 USDT pro Monat, 1 bis 12 Monate. Jede Bestellung verlangt einen eigenen Betrag, damit die Zahlung ohne Verwendungszweck zugeordnet werden kann.",
 	"settings.sending.months": "Monate",

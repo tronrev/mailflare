@@ -373,6 +373,7 @@
 	"settings.sending.statusPaid": "{date} تک ادا شدہ ({days} دن باقی)۔",
 	"settings.sending.statusOwn": "آپ کے اپنے {provider} سے بھیجا جا رہا ہے۔",
 	"settings.sending.statusLocked": "آپ کے پتوں کے لیے بھیجنا ابھی فعال نہیں۔",
+	"settings.sending.problems": "اس حصے کے کچھ حصے پڑھے نہیں جا سکے:",
 	"settings.sending.buy": "ادائیگی کی رقم حاصل کریں",
 	"settings.sending.buyHint": "ماہانہ 1 USDT، 1 سے 12 ماہ۔ ہر آرڈر کی رقم الگ ہوتی ہے تاکہ بغیر نوٹ کے ادائیگی پہچانی جا سکے۔",
 	"settings.sending.months": "مہینے",

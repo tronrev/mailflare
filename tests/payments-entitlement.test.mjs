@@ -96,3 +96,15 @@ test("the description says which provider and which key, not the key itself", ()
 	assert.equal(ses.ok, true);
 	if (ses.ok) assert.equal(creds.describeCredentials(ses.value, box.secretHint), "Amazon SES, us-east-1, key ending A123");
 });
+
+test("an expiry is rendered from whatever the column hands back", () => {
+	// The column is a timestamp, but a schema that drifted from the migrations can
+	// return a plain number. Asking a number for `toISOString` is a TypeError, and
+	// that TypeError used to blank the entire sending section.
+	assert.equal(amount.paidUntilIso(new Date("2026-12-01T00:00:00Z")), "2026-12-01T00:00:00.000Z");
+	assert.equal(amount.paidUntilIso(1796083200), "2026-12-01T00:00:00.000Z");
+	assert.equal(amount.paidUntilIso(null), null);
+	assert.equal(amount.paidUntilIso(undefined), null);
+	assert.equal(amount.paidUntilIso(new Date("nonsense")), null);
+	assert.equal(amount.paidUntilIso(0), null);
+});

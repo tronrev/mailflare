@@ -373,6 +373,7 @@
 	"settings.sending.statusPaid": "{date}까지 결제됨(남은 기간 {days}일).",
 	"settings.sending.statusOwn": "직접 등록한 {provider}로 발신합니다.",
 	"settings.sending.statusLocked": "이 주소에서는 아직 발신이 활성화되지 않았습니다.",
+	"settings.sending.problems": "이 섹션의 일부를 읽지 못했습니다:",
 	"settings.sending.buy": "결제 금액 받기",
 	"settings.sending.buyHint": "월 1 USDT, 1~12개월. 주문마다 금액이 달라 메모 없이도 결제를 식별할 수 있습니다.",
 	"settings.sending.months": "개월",

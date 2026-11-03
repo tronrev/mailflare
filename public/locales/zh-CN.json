@@ -369,6 +369,7 @@
 	"settings.sending.statusPaid": "已付费至 {date}（还剩 {days} 天）。",
 	"settings.sending.statusOwn": "正在使用你自己的 {provider}。",
 	"settings.sending.statusLocked": "你的地址尚未开通发信。",
+	"settings.sending.problems": "这一节有部分内容读取失败：",
 	"settings.sending.buy": "获取付款金额",
 	"settings.sending.buyHint": "每月 1 USDT，可买 1 至 12 个月。每笔订单金额不同，因此无需备注即可识别付款。",
 	"settings.sending.months": "月数",

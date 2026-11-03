@@ -373,6 +373,7 @@
 	"settings.sending.statusPaid": "Betaald tot {date} ({days} dagen over).",
 	"settings.sending.statusOwn": "Verzenden via je eigen {provider}.",
 	"settings.sending.statusLocked": "Verzenden is nog niet ingeschakeld voor je adressen.",
+	"settings.sending.problems": "Sommige onderdelen van dit gedeelte konden niet worden gelezen:",
 	"settings.sending.buy": "Betalingsbedrag ophalen",
 	"settings.sending.buyHint": "1 USDT per maand, 1 tot 12 maanden. Elke bestelling vraagt een eigen bedrag, zodat de betaling zonder omschrijving te herkennen is.",
 	"settings.sending.months": "Maanden",

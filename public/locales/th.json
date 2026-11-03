@@ -373,6 +373,7 @@
 	"settings.sending.statusPaid": "ชำระถึง {date} (เหลือ {days} วัน)",
 	"settings.sending.statusOwn": "ส่งผ่าน {provider} ของคุณเอง",
 	"settings.sending.statusLocked": "ยังไม่ได้เปิดการส่งสำหรับที่อยู่ของคุณ",
+	"settings.sending.problems": "อ่านบางส่วนของส่วนนี้ไม่ได้:",
 	"settings.sending.buy": "รับยอดที่ต้องชำระ",
 	"settings.sending.buyHint": "1 USDT ต่อเดือน 1 ถึง 12 เดือน แต่ละคำสั่งซื้อมียอดต่างกัน จึงระบุการชำระได้โดยไม่ต้องใส่หมายเหตุ",
 	"settings.sending.months": "เดือน",

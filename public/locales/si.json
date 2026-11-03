@@ -373,6 +373,7 @@
 	"settings.sending.statusPaid": "{date} දක්වා ගෙවා ඇත (තවත් දින {days}).",
 	"settings.sending.statusOwn": "ඔබේම {provider} හරහා යවමින්.",
 	"settings.sending.statusLocked": "ඔබේ ලිපින සඳහා යැවීම තවම සක්‍රීය නොවේ.",
+	"settings.sending.problems": "මෙම කොටසේ සමහර කොටස් කියවිය නොහැකි විය:",
 	"settings.sending.buy": "ගෙවීම් මුදල ලබාගන්න",
 	"settings.sending.buyHint": "මාසයකට 1 USDT, මාස 1 සිට 12 දක්වා. සෑම ඇණවුමකටම වෙනම මුදලක් ඇති නිසා සටහනක් නොමැතිව ගෙවීම හඳුනාගත හැක.",
 	"settings.sending.months": "මාස",

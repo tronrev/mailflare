@@ -373,6 +373,7 @@
 	"settings.sending.statusPaid": "Paid until {date} ({days} days left).",
 	"settings.sending.statusOwn": "Sending through your own {provider}.",
 	"settings.sending.statusLocked": "Sending is not enabled for your addresses yet.",
+	"settings.sending.problems": "Some parts of this section could not be read:",
 	"settings.sending.buy": "Get a payment amount",
 	"settings.sending.buyHint": "1 USDT per month, 1 to 12 months. Each order asks for its own amount so the payment identifies itself without a memo.",
 	"settings.sending.months": "Months",

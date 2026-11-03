@@ -369,6 +369,7 @@
 	"settings.sending.statusPaid": "Dibayar hingga {date} ({days} hari tersisa).",
 	"settings.sending.statusOwn": "Mengirim melalui {provider} Anda sendiri.",
 	"settings.sending.statusLocked": "Pengiriman belum diaktifkan untuk alamat Anda.",
+	"settings.sending.problems": "Sebagian bagian ini tidak dapat dibaca:",
 	"settings.sending.buy": "Dapatkan jumlah pembayaran",
 	"settings.sending.buyHint": "1 USDT per bulan, 1 sampai 12 bulan. Setiap pesanan memakai jumlah sendiri agar pembayaran dikenali tanpa berita.",
 	"settings.sending.months": "Bulan",

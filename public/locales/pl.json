@@ -381,6 +381,7 @@
 	"settings.sending.statusPaid": "Opłacone do {date} (pozostało {days} dni).",
 	"settings.sending.statusOwn": "Wysyłanie przez własnego {provider}.",
 	"settings.sending.statusLocked": "Wysyłanie nie jest jeszcze włączone dla twoich adresów.",
+	"settings.sending.problems": "Nie udało się odczytać niektórych części tej sekcji:",
 	"settings.sending.buy": "Pobierz kwotę do zapłaty",
 	"settings.sending.buyHint": "1 USDT miesięcznie, od 1 do 12 miesięcy. Każde zamówienie ma własną kwotę, więc płatność da się rozpoznać bez tytułu.",
 	"settings.sending.months": "Miesiące",

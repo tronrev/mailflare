@@ -373,6 +373,7 @@
 	"settings.sending.statusPaid": "{date} ವರೆಗೆ ಪಾವತಿಸಲಾಗಿದೆ ({days} ದಿನ ಬಾಕಿ).",
 	"settings.sending.statusOwn": "ನಿಮ್ಮ ಸ್ವಂತ {provider} ಮೂಲಕ ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ.",
 	"settings.sending.statusLocked": "ನಿಮ್ಮ ವಿಳಾಸಗಳಿಗೆ ಕಳುಹಿಸುವುದು ಇನ್ನೂ ಸಕ್ರಿಯವಾಗಿಲ್ಲ.",
+	"settings.sending.problems": "ಈ ವಿಭಾಗದ ಕೆಲವು ಭಾಗಗಳನ್ನು ಓದಲಾಗಲಿಲ್ಲ:",
 	"settings.sending.buy": "ಪಾವತಿ ಮೊತ್ತ ಪಡೆಯಿರಿ",
 	"settings.sending.buyHint": "ತಿಂಗಳಿಗೆ 1 USDT, 1 ರಿಂದ 12 ತಿಂಗಳು. ಪ್ರತಿ ಆರ್ಡರ್‌ಗೆ ಬೇರೆ ಮೊತ್ತ ಇರುತ್ತದೆ, ಹೀಗಾಗಿ ಟಿಪ್ಪಣಿ ಇಲ್ಲದೆ ಪಾವತಿ ಗುರುತಿಸಲ್ಪಡುತ್ತದೆ.",
 	"settings.sending.months": "ತಿಂಗಳುಗಳು",

@@ -1,4 +1,4 @@
-import { eq, inArray } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { domains, mailboxes, users } from "@/db/schema";
 import { getAwsConfig } from "@/lib/aws/config";
@@ -8,7 +8,7 @@ import { describeCredentials, type OwnCredentials } from "@/lib/payments/credent
 import { openJson, secretHint } from "@/lib/payments/secret-box";
 import { paymentAddress } from "@/lib/payments/orders";
 import { sendAccess, type SendReason } from "@/lib/payments/send-access-rules";
-import { ORDER_MAX_MONTHS, ORDER_MIN_MONTHS, isPaidActive, paidDaysLeft } from "@/lib/payments/usdt-amount";
+import { ORDER_MAX_MONTHS, ORDER_MIN_MONTHS, isPaidActive, paidDaysLeft, paidUntilIso } from "@/lib/payments/usdt-amount";
 
 /**
  * Who is allowed to send mail, and through what.
@@ -103,10 +103,22 @@ async function accountDomains(
 	const domainIds = [...new Set(owned.map((row) => row.domainId).filter((id): id is string => !!id))];
 	if (domainIds.length === 0) return { hasProvider: false, openToAll: false };
 
-	const sending = await getDb(env)
-		.select({ provider: domains.sendingProvider, enabled: domains.sendingEnabled })
-		.from(domains)
-		.where(inArray(domains.id, domainIds));
+	// One lookup per owned domain rather than one `in (…)` list. It is the query
+	// the rest of the app already runs against this database — `getMailboxDomainAddresses`
+	// reads a domain by id on every inbox load — and an account owns a handful.
+	const sending = (
+		await Promise.all(
+			domainIds.map(async (domainId): Promise<{ provider: "none" | "cloudflare" | "resend" | "ses"; enabled: boolean } | null> => {
+				const [row] = await getDb(env)
+					.select({ provider: domains.sendingProvider, enabled: domains.sendingEnabled })
+					.from(domains)
+					.where(eq(domains.id, domainId))
+					.limit(1);
+				return row ?? null;
+			}),
+		)
+	).filter((row): row is { provider: "none" | "cloudflare" | "resend" | "ses"; enabled: boolean } => !!row);
+
 	return {
 		hasProvider: sending.some((row) => row.provider !== "none"),
 		openToAll: sending.some((row) => row.provider !== "none" && row.enabled),
@@ -208,25 +220,65 @@ export type SendStatusView = {
 	months: { min: number; max: number };
 	address: string;
 	openOrderId: string | null;
+	/**
+	 * The reads that failed, by name, with the database's own words.
+	 *
+	 * A page that answers "sending is not enabled" because one query could not be
+	 * answered is indistinguishable from one where that is the truth, and from
+	 * outside the Worker both look like an empty 500. So a failed read degrades
+	 * only itself: the rest of the answer stands, and what broke is named here and
+	 * on the page. Absent means every part was read.
+	 */
+	problems?: Record<string, string>;
 };
+
+/**
+ * Run one part of the answer, and lose only that part if it fails.
+ *
+ * `getSendStatus` spans four reads that have nothing to do with each other: the
+ * account row, the domains behind its addresses, the deployment's provider, and
+ * the address money goes to. Any one of them failing used to take the whole
+ * section down with it, which is how a missing table turned into "could not load
+ * sending settings" with no way to tell what was missing.
+ */
+async function guarded<T>(
+	problems: Record<string, string>,
+	stage: string,
+	fallback: T,
+	read: () => Promise<T>,
+): Promise<T> {
+	try {
+		return await read();
+	} catch (error) {
+		const message = error instanceof Error ? error.message : String(error);
+		problems[stage] = message;
+		console.error(`[billing] sending ${stage} unavailable:`, message);
+		return fallback;
+	}
+}
 
 /** What the settings page needs to draw the section, and the composer needs to know whether to try. */
 export async function getSendStatus(
 	env: CloudflareEnv,
 	options: { userId: string; openOrderId?: string | null },
 ): Promise<SendStatusView> {
-	const account = await getAccountSending(env, options.userId);
-	const ownDomains = await accountDomains(env, options.userId);
+	const problems: Record<string, string> = {};
+	const account = await guarded(problems, "account", null, () => getAccountSending(env, options.userId));
+	const ownDomains = await guarded(problems, "addresses", { hasProvider: false, openToAll: false }, () =>
+		accountDomains(env, options.userId),
+	);
 
 	let own: SendStatusView["own"] = null;
 	if (account?.sendProvider && account.sendCredentials) {
-		const credentials = await openJson<OwnCredentials>(env.BILLING_SECRET ?? "", account.sendCredentials);
+		const credentials = await guarded(problems, "credentials", null, () =>
+			openJson<OwnCredentials>(env.BILLING_SECRET ?? "", account.sendCredentials),
+		);
 		if (credentials) own = { provider: credentials.provider, description: describeCredentials(credentials, secretHint) };
 	}
 
 	const paid = isPaidActive(account?.sendPaidUntil, Date.now());
-	const systemProvider = await getSystemProvider(env);
-	const address = paymentAddress(env);
+	const systemProvider = await guarded(problems, "provider", null as SystemProvider, () => getSystemProvider(env));
+	const address = await guarded(problems, "address", "", async () => paymentAddress(env));
 	const access = sendAccess({
 		admin: account?.role === "admin",
 		domainHasProvider: ownDomains.hasProvider,
@@ -239,7 +291,7 @@ export async function getSendStatus(
 		allowed: access.allowed,
 		reason: access.reason,
 		admin: account?.role === "admin",
-		paidUntil: account?.sendPaidUntil?.toISOString() ?? null,
+		paidUntil: paidUntilIso(account?.sendPaidUntil),
 		paidDaysLeft: paidDaysLeft(account?.sendPaidUntil, Date.now()),
 		own,
 		systemProvider,
@@ -249,5 +301,6 @@ export async function getSendStatus(
 		months: { min: ORDER_MIN_MONTHS, max: ORDER_MAX_MONTHS },
 		address,
 		openOrderId: options.openOrderId ?? null,
+		...(Object.keys(problems).length > 0 ? { problems } : {}),
 	};
 }

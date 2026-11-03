@@ -373,6 +373,7 @@
 	"settings.sending.statusPaid": "{date} पर्यंत पैसे दिले ({days} दिवस शिल्लक).",
 	"settings.sending.statusOwn": "तुमच्या स्वतःच्या {provider} द्वारे पाठवत आहे.",
 	"settings.sending.statusLocked": "तुमच्या पत्त्यांसाठी पाठवणे अजून सुरू नाही.",
+	"settings.sending.problems": "या विभागाचे काही भाग वाचता आले नाहीत:",
 	"settings.sending.buy": "देयक रक्कम मिळवा",
 	"settings.sending.buyHint": "दरमहा 1 USDT, 1 ते 12 महिने. प्रत्येक ऑर्डरची रक्कम वेगळी असते, त्यामुळे नोंदीशिवाय पेमेंट ओळखता येते.",
 	"settings.sending.months": "महिने",

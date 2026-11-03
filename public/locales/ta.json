@@ -373,6 +373,7 @@
 	"settings.sending.statusPaid": "{date} வரை செலுத்தப்பட்டது ({days} நாட்கள் மீதம்).",
 	"settings.sending.statusOwn": "உங்கள் சொந்த {provider} மூலம் அனுப்புகிறது.",
 	"settings.sending.statusLocked": "உங்கள் முகவரிகளுக்கு அனுப்புதல் இன்னும் இயக்கப்படவில்லை.",
+	"settings.sending.problems": "இந்தப் பிரிவின் சில பகுதிகளைப் படிக்க முடியவில்லை:",
 	"settings.sending.buy": "பணம் செலுத்தும் தொகையைப் பெறுங்கள்",
 	"settings.sending.buyHint": "மாதத்திற்கு 1 USDT, 1 முதல் 12 மாதங்கள். ஒவ்வொரு ஆர்டருக்கும் தனி தொகை, எனவே குறிப்பு இல்லாமல் பணம் அடையாளம் காணப்படும்.",
 	"settings.sending.months": "மாதங்கள்",
