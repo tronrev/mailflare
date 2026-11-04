@@ -3,6 +3,7 @@ import { getDb } from "@/db";
 import { calendarEvents, driveItems, mailboxes, messageAttachments, messages, sessions, users } from "@/db/schema";
 import { canManageUsers, isPrimaryAdmin } from "@/lib/auth/admin";
 import type { SessionUser } from "@/lib/auth/types";
+import { describeDatabaseError } from "@/lib/database-errors";
 import { deleteDriveItems } from "@/lib/drive/access";
 import { driveObjectKey } from "@/lib/drive/utils";
 import { newId } from "@/lib/ids";
@@ -114,17 +115,45 @@ export async function purgeAccount(env: CloudflareEnv, account: typeof users.$in
 	await db.delete(users).where(eq(users.id, account.id));
 }
 
+/**
+ * Reads the accounts a purge should act on, and survives not being able to.
+ *
+ * The scheduled handler runs this without a request behind it, so an exception
+ * here becomes a Worker "exception" log line whose message is drizzle's
+ * "Failed query: <sql> params: <values>" — the reason is on `cause`, which the
+ * log does not show. Catching the list read itself keeps the cron from reporting
+ * a failure nobody can act on, and names the reason in the log line instead.
+ * Nothing is erased when the list cannot be read; the next tick tries again.
+ */
+async function listForPurge(
+	label: string,
+	read: () => Promise<(typeof users.$inferSelect)[]>,
+): Promise<(typeof users.$inferSelect)[]> {
+	try {
+		return await read();
+	} catch (error) {
+		console.error(`[purge] ${label}: could not list candidates:`, describeDatabaseError(error));
+		return [];
+	}
+}
+
 /** Removes accounts whose restore window has ended, with their data. Runs from the daily scheduled handler. */
 export async function runAccountRetention(env: CloudflareEnv, now = new Date()): Promise<number> {
 	const db = getDb(env);
-	const expired = await db.select().from(users).where(and(isNotNull(users.deletedAt), lte(users.deletedAt, getAccountPurgeCutoff(now)))).limit(20);
+	const expired = await listForPurge("deleted accounts", () =>
+		db
+			.select()
+			.from(users)
+			.where(and(isNotNull(users.deletedAt), lte(users.deletedAt, getAccountPurgeCutoff(now))))
+			.limit(20),
+	);
 	let removed = 0;
 	for (const account of expired) {
 		try {
 			await purgeAccount(env, account);
 			removed += 1;
 		} catch (error) {
-			console.error("Account purge failed", { userId: account.id, error });
+			console.error("Account purge failed", { userId: account.id, error: describeDatabaseError(error) });
 		}
 	}
 	return removed;
@@ -141,11 +170,13 @@ export async function runAccountRetention(env: CloudflareEnv, now = new Date()):
  */
 export async function runUnverifiedSignupPurge(env: CloudflareEnv, now = new Date()): Promise<number> {
 	const db = getDb(env);
-	const abandoned = await db
-		.select()
-		.from(users)
-		.where(and(isNull(users.emailVerifiedAt), lte(users.createdAt, unverifiedCutoff(now))))
-		.limit(25);
+	const abandoned = await listForPurge("unconfirmed sign-ups", () =>
+		db
+			.select()
+			.from(users)
+			.where(and(isNull(users.emailVerifiedAt), lte(users.createdAt, unverifiedCutoff(now))))
+			.limit(25),
+	);
 	let removed = 0;
 	for (const account of abandoned) {
 		if (account.isPrimaryAdmin) continue;
@@ -153,7 +184,7 @@ export async function runUnverifiedSignupPurge(env: CloudflareEnv, now = new Dat
 			await purgeAccount(env, account);
 			removed += 1;
 		} catch (error) {
-			console.error("Unconfirmed sign-up purge failed", { userId: account.id, error });
+			console.error("Unconfirmed sign-up purge failed", { userId: account.id, error: describeDatabaseError(error) });
 		}
 	}
 	return removed;

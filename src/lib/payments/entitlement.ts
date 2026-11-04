@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { domains, mailboxes, users } from "@/db/schema";
 import { getAwsConfig } from "@/lib/aws/config";
+import { describeDatabaseError } from "@/lib/database-errors";
 import { getOutboundProviderConfig, getResendKeyStatus } from "@/lib/email/outbound-provider";
 import type { OutboundProviderConfig } from "@/lib/email/outbound-provider-types";
 import { describeCredentials, type OwnCredentials } from "@/lib/payments/credentials";
@@ -250,7 +251,7 @@ async function guarded<T>(
 	try {
 		return await read();
 	} catch (error) {
-		const message = error instanceof Error ? error.message : String(error);
+		const message = describeDatabaseError(error);
 		problems[stage] = message;
 		console.error(`[billing] sending ${stage} unavailable:`, message);
 		return fallback;

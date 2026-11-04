@@ -1,5 +1,6 @@
 import { getEnv } from "@/lib/cloudflare";
 import { requireSessionUser } from "@/lib/api/auth";
+import { describeDatabaseError } from "@/lib/database-errors";
 import { getSendStatus, type SendStatusView } from "@/lib/payments/entitlement";
 import { listOrders, type OrderView } from "@/lib/payments/orders";
 
@@ -28,7 +29,7 @@ export async function GET(request: Request) {
 	try {
 		orders = await listOrders(env, auth.user.id, 5);
 	} catch (error) {
-		ordersError = error instanceof Error ? error.message : String(error);
+		ordersError = describeDatabaseError(error);
 		console.error("[billing] orders unavailable:", ordersError);
 	}
 
@@ -37,7 +38,7 @@ export async function GET(request: Request) {
 	try {
 		status = await getSendStatus(env, { userId: auth.user.id, openOrderId });
 	} catch (error) {
-		const detail = error instanceof Error ? error.message : String(error);
+		const detail = describeDatabaseError(error);
 		console.error("[billing] sending status failed:", detail);
 		return Response.json(
 			{ error: "Could not load sending settings", ...(isAdmin ? { detail } : {}) },

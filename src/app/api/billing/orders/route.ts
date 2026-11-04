@@ -1,6 +1,7 @@
 import { getEnv } from "@/lib/cloudflare";
 import { requireSessionUser } from "@/lib/api/auth";
 import { hasValidSessionMutationOrigin } from "@/lib/auth/origin";
+import { describeDatabaseError } from "@/lib/database-errors";
 import { getSystemProvider } from "@/lib/payments/entitlement";
 import { createOrder, listOrders, type CreateOrderOutcome } from "@/lib/payments/orders";
 
@@ -54,7 +55,7 @@ export async function POST(request: Request) {
  * administrator gets the reason, because they are the one who can fix a table.
  */
 function failure(error: unknown, isAdmin: boolean, message: string) {
-	const detail = error instanceof Error ? error.message : String(error);
+	const detail = describeDatabaseError(error);
 	console.error("[billing] orders:", detail);
 	return Response.json(
 		{ error: message, ...(isAdmin ? { detail } : {}) },
