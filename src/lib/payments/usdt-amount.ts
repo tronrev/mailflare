@@ -147,3 +147,21 @@ export function paidDaysLeft(paidUntil: Date | number | null | undefined, now: D
 	if (!Number.isFinite(until) || until <= nowMs) return 0;
 	return Math.ceil((until - nowMs) / (24 * 60 * 60 * 1000));
 }
+
+/**
+ * The expiry as an ISO string, or null.
+ *
+ * Deliberately tolerant of the driver value: the column is a timestamp, but a
+ * schema that has drifted from the migrations can hand back a plain number, and
+ * `new Date("…").toISOString` on a number is a TypeError. That TypeError used to
+ * be the difference between a settings page and a blank 500, so it is not allowed
+ * to be one any more.
+ */
+export function paidUntilIso(paidUntil: Date | number | null | undefined): string | null {
+	if (paidUntil instanceof Date) return Number.isFinite(paidUntil.getTime()) ? paidUntil.toISOString() : null;
+	// Timestamps are whole seconds everywhere else in this schema.
+	if (typeof paidUntil === "number" && Number.isFinite(paidUntil) && paidUntil > 0) {
+		return new Date(paidUntil * 1000).toISOString();
+	}
+	return null;
+}

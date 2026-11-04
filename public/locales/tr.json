@@ -366,6 +366,7 @@
 	"settings.sending.statusPaid": "{date} tarihine kadar ödendi ({days} gün kaldı).",
 	"settings.sending.statusOwn": "Kendi {provider} sağlayıcınızla gönderiliyor.",
 	"settings.sending.statusLocked": "Adresleriniz için gönderim henüz açık değil.",
+	"settings.sending.problems": "Bu bölümün bazı kısımları okunamadı:",
 	"settings.sending.buy": "Ödeme tutarını al",
 	"settings.sending.buyHint": "Ayda 1 USDT, 1 ile 12 ay. Her siparişin kendi tutarı var; böylece ödeme açıklama olmadan tanınır.",
 	"settings.sending.months": "Ay",

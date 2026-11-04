@@ -369,6 +369,7 @@
 	"settings.sending.statusPaid": "Đã trả đến {date} (còn {days} ngày).",
 	"settings.sending.statusOwn": "Đang gửi qua {provider} của bạn.",
 	"settings.sending.statusLocked": "Chưa bật gửi cho các địa chỉ của bạn.",
+	"settings.sending.problems": "Một số phần của mục này không đọc được:",
 	"settings.sending.buy": "Lấy số tiền cần trả",
 	"settings.sending.buyHint": "1 USDT mỗi tháng, từ 1 đến 12 tháng. Mỗi đơn có số tiền riêng để nhận ra khoản thanh toán mà không cần ghi chú.",
 	"settings.sending.months": "Số tháng",

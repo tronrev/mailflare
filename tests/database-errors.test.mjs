@@ -27,7 +27,7 @@ await build({
 });
 
 const load = (name) => import(pathToFileURL(join(outDir, `${name}.mjs`)).href);
-const { isMissingTableError, isUniqueConstraintError } = await load("errors");
+const { isMissingTableError, isUniqueConstraintError, describeDatabaseError } = await load("errors");
 const { getOpenCounts } = await load("tracking");
 const { SqliteDatabase } = await load("database");
 
@@ -38,6 +38,21 @@ test("driver errors are found through drizzle's wrapper", () => {
 	assert.equal(isMissingTableError(new Error("Failed query", { cause: new Error("database is locked") })), false);
 	assert.equal(isUniqueConstraintError(new Error("Failed query", { cause: new Error("UNIQUE constraint failed: domain_tracking_hosts.hostname") })), true);
 	assert.equal(isUniqueConstraintError(new Error("no such table")), false);
+});
+
+test("a wrapped driver error is reported in the driver's own words", () => {
+	const wrapped = new Error('Failed query: select "id" from "users" where "created_at" <= ? limit ?\nparams: 1793635208,25', {
+		cause: new Error("D1_ERROR: database is locked: SQLITE_BUSY"),
+	});
+	assert.equal(describeDatabaseError(wrapped), "D1_ERROR: database is locked: SQLITE_BUSY");
+	// Two layers, as node-postgres and Hyperdrive produce them.
+	const nested = new Error("Failed query: select 1\nparams: ", { cause: new Error("connect ECONNREFUSED", { cause: "socket hang up" }) });
+	assert.equal(describeDatabaseError(nested), "connect ECONNREFUSED — caused by: socket hang up");
+	// Already informative: keep it whole rather than the cause's "fetch failed".
+	assert.equal(describeDatabaseError(new Error("Resend rejected this API key")), "Resend rejected this API key");
+	// Not an Error at all.
+	assert.equal(describeDatabaseError("boom"), "boom");
+	assert.equal(describeDatabaseError(new Error("Failed query: select 1")), "Failed query: select 1");
 });
 
 test("message lists with sent mail keep working before migration 0068", async (t) => {

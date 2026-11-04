@@ -373,6 +373,7 @@
 	"settings.sending.statusPaid": "Imelipwa hadi {date} (siku {days} zimebaki).",
 	"settings.sending.statusOwn": "Inatuma kupitia {provider} yako mwenyewe.",
 	"settings.sending.statusLocked": "Kutuma hakujawashwa kwa anwani zako bado.",
+	"settings.sending.problems": "Ba a iya karanta wasu sassa na wannan kashi:",
 	"settings.sending.buy": "Pata kiasi cha malipo",
 	"settings.sending.buyHint": "USDT 1 kwa mwezi, miezi 1 hadi 12. Kila oda ina kiasi chake ili malipo yatambulike bila maelezo.",
 	"settings.sending.months": "Miezi",

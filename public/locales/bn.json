@@ -373,6 +373,7 @@
 	"settings.sending.statusPaid": "{date} পর্যন্ত পরিশোধিত ({days} দিন বাকি)।",
 	"settings.sending.statusOwn": "আপনার নিজের {provider} দিয়ে পাঠানো হচ্ছে।",
 	"settings.sending.statusLocked": "আপনার ঠিকানার জন্য পাঠানো এখনও চালু হয়নি।",
+	"settings.sending.problems": "এই অংশের কিছু অংশ পড়া যায়নি:",
 	"settings.sending.buy": "পরিশোধের পরিমাণ নিন",
 	"settings.sending.buyHint": "মাসে ১ USDT, ১ থেকে ১২ মাস। প্রতিটি অর্ডারের পরিমাণ আলাদা, তাই নোট ছাড়াই পেমেন্ট চেনা যায়।",
 	"settings.sending.months": "মাস",

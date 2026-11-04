@@ -373,6 +373,7 @@
 	"settings.sending.statusPaid": "An biya har {date} (sauran kwanaki {days}).",
 	"settings.sending.statusOwn": "Ana aikawa ta {provider} naka.",
 	"settings.sending.statusLocked": "Ba a kunna aikawa don adireshinka ba tukuna.",
+	"settings.sending.problems": "An kasa karanta wasu sassan wannan sashe:",
 	"settings.sending.buy": "Sami adadin biyan kuɗi",
 	"settings.sending.buyHint": "USDT 1 kowace wata, daga wata 1 zuwa 12. Kowace oda tana da adadinta don a gane biyan ba tare da rubutu ba.",
 	"settings.sending.months": "Watanni",

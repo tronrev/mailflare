@@ -1,5 +1,6 @@
 import { getEnv } from "@/lib/cloudflare";
 import { requireSessionUser } from "@/lib/api/auth";
+import { describeDatabaseError } from "@/lib/database-errors";
 import { getSendStatus, type SendStatusView } from "@/lib/payments/entitlement";
 
 /**
@@ -20,7 +21,7 @@ export async function GET(request: Request) {
 	try {
 		status = await getSendStatus(env, { userId: auth.user.id });
 	} catch (error) {
-		const detail = error instanceof Error ? error.message : String(error);
+		const detail = describeDatabaseError(error);
 		console.error("[billing] send access failed:", detail);
 		return Response.json(
 			{ error: "Could not load sending settings", ...(auth.user.role === "admin" ? { detail } : {}) },

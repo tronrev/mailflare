@@ -373,6 +373,7 @@
 	"settings.sending.statusPaid": "پرداخت‌شده تا {date} ({days} روز باقی مانده).",
 	"settings.sending.statusOwn": "ارسال با {provider} خودتان.",
 	"settings.sending.statusLocked": "ارسال برای نشانی‌های شما هنوز فعال نیست.",
+	"settings.sending.problems": "برخی بخش‌های این قسمت خوانده نشد:",
 	"settings.sending.buy": "دریافت مبلغ پرداخت",
 	"settings.sending.buyHint": "ماهی ۱ USDT، از ۱ تا ۱۲ ماه. هر سفارش مبلغ خودش را دارد تا پرداخت بدون یادداشت شناسایی شود.",
 	"settings.sending.months": "ماه",

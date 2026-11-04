@@ -373,6 +373,7 @@
 	"settings.sending.statusPaid": "{date} వరకు చెల్లించబడింది ({days} రోజులు మిగిలాయి).",
 	"settings.sending.statusOwn": "మీ సొంత {provider} ద్వారా పంపుతోంది.",
 	"settings.sending.statusLocked": "మీ చిరునామాలకు పంపడం ఇంకా ప్రారంభం కాలేదు.",
+	"settings.sending.problems": "ఈ విభాగంలోని కొన్ని భాగాలను చదవలేకపోయాం:",
 	"settings.sending.buy": "చెల్లింపు మొత్తాన్ని పొందండి",
 	"settings.sending.buyHint": "నెలకు 1 USDT, 1 నుండి 12 నెలలు. ప్రతి ఆర్డర్‌కు వేరే మొత్తం ఉంటుంది, కాబట్టి నోట్ లేకుండా చెల్లింపు గుర్తించబడుతుంది.",
 	"settings.sending.months": "నెలలు",

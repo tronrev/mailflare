@@ -381,6 +381,7 @@
 	"settings.sending.statusPaid": "Сплачено до {date} (залишилося {days} дн.).",
 	"settings.sending.statusOwn": "Надсилання через ваш {provider}.",
 	"settings.sending.statusLocked": "Надсилання для ваших адрес ще не ввімкнено.",
+	"settings.sending.problems": "Деякі частини цього розділу не вдалося прочитати:",
 	"settings.sending.buy": "Отримати суму до сплати",
 	"settings.sending.buyHint": "1 USDT на місяць, від 1 до 12 місяців. Кожне замовлення має власну суму, тож платіж розпізнається без коментаря.",
 	"settings.sending.months": "Місяців",

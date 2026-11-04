@@ -373,6 +373,7 @@
 	"settings.sending.statusPaid": "{date} तक भुगतान किया गया ({days} दिन शेष)।",
 	"settings.sending.statusOwn": "आपके अपने {provider} से भेजा जा रहा है।",
 	"settings.sending.statusLocked": "आपके पतों के लिए भेजना अभी चालू नहीं है।",
+	"settings.sending.problems": "इस अनुभाग के कुछ भाग पढ़े नहीं जा सके:",
 	"settings.sending.buy": "भुगतान राशि प्राप्त करें",
 	"settings.sending.buyHint": "प्रति माह 1 USDT, 1 से 12 महीने। हर ऑर्डर की राशि अलग होती है ताकि बिना नोट के भुगतान पहचाना जा सके।",
 	"settings.sending.months": "महीने",

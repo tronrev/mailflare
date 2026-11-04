@@ -373,6 +373,7 @@
 	"settings.sending.statusPaid": "{date} સુધી ચૂકવેલ ({days} દિવસ બાકી).",
 	"settings.sending.statusOwn": "તમારા પોતાના {provider} દ્વારા મોકલાઈ રહ્યું છે.",
 	"settings.sending.statusLocked": "તમારા સરનામાં માટે મોકલવું હજી ચાલુ નથી.",
+	"settings.sending.problems": "આ વિભાગના કેટલાક ભાગ વાંચી શકાયા નથી:",
 	"settings.sending.buy": "ચુકવણી રકમ મેળવો",
 	"settings.sending.buyHint": "દર મહિને 1 USDT, 1 થી 12 મહિના. દરેક ઓર્ડરની રકમ અલગ હોય છે, જેથી નોંધ વગર ચુકવણી ઓળખાય.",
 	"settings.sending.months": "મહિના",

@@ -373,6 +373,7 @@
 	"settings.sending.statusPaid": "{date} ਤੱਕ ਭੁਗਤਾਨ ਕੀਤਾ ({days} ਦਿਨ ਬਾਕੀ)।",
 	"settings.sending.statusOwn": "ਤੁਹਾਡੇ ਆਪਣੇ {provider} ਰਾਹੀਂ ਭੇਜਿਆ ਜਾ ਰਿਹਾ ਹੈ।",
 	"settings.sending.statusLocked": "ਤੁਹਾਡੇ ਪਤਿਆਂ ਲਈ ਭੇਜਣਾ ਹਾਲੇ ਚਾਲੂ ਨਹੀਂ ਹੈ।",
+	"settings.sending.problems": "ਇਸ ਭਾਗ ਦੇ ਕੁਝ ਹਿੱਸੇ ਪੜ੍ਹੇ ਨਹੀਂ ਜਾ ਸਕੇ:",
 	"settings.sending.buy": "ਭੁਗਤਾਨ ਰਕਮ ਲਵੋ",
 	"settings.sending.buyHint": "ਹਰ ਮਹੀਨੇ 1 USDT, 1 ਤੋਂ 12 ਮਹੀਨੇ। ਹਰ ਆਰਡਰ ਦੀ ਰਕਮ ਵੱਖਰੀ ਹੁੰਦੀ ਹੈ ਤਾਂ ਜੋ ਨੋਟ ਤੋਂ ਬਿਨਾਂ ਭੁਗਤਾਨ ਪਛਾਣਿਆ ਜਾ ਸਕੇ।",
 	"settings.sending.months": "ਮਹੀਨੇ",

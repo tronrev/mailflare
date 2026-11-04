@@ -373,6 +373,7 @@
 	"settings.sending.statusPaid": "{date} വരെ പണമടച്ചു ({days} ദിവസം ബാക്കി).",
 	"settings.sending.statusOwn": "നിങ്ങളുടെ സ്വന്തം {provider} വഴി അയക്കുന്നു.",
 	"settings.sending.statusLocked": "നിങ്ങളുടെ വിലാസങ്ങൾക്ക് അയക്കൽ ഇതുവരെ പ്രവർത്തനക്ഷമമല്ല.",
+	"settings.sending.problems": "ഈ വിഭാഗത്തിന്റെ ചില ഭാഗങ്ങൾ വായിക്കാനായില്ല:",
 	"settings.sending.buy": "പേയ്‌മെന്റ് തുക നേടുക",
 	"settings.sending.buyHint": "മാസത്തിന് 1 USDT, 1 മുതൽ 12 മാസം. ഓരോ ഓർഡറിനും വ്യത്യസ്ത തുകയാണ്, അതിനാൽ കുറിപ്പില്ലാതെ പേയ്‌മെന്റ് തിരിച്ചറിയാം.",
 	"settings.sending.months": "മാസങ്ങൾ",

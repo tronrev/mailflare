@@ -37,6 +37,12 @@ type SendStatus = {
 	orders?: Order[];
 	/** Only sent to an administrator: the orders table could not be read. */
 	ordersError?: string;
+	/**
+	 * Reads that failed, by name. The answer above is then missing their
+	 * contribution — the one thing a page must not do is present that as a fact,
+	 * so what broke is listed instead of hidden behind "not enabled".
+	 */
+	problems?: Record<string, string>;
 };
 
 type Order = {
@@ -200,6 +206,18 @@ export function SendingSettings() {
 				{error ? (
 					<CardContent>
 						<p className="pb-4 text-sm text-red-600">{error}</p>
+					</CardContent>
+				) : null}
+				{status?.problems ? (
+					<CardContent>
+						<p className="pb-2 text-xs font-medium text-amber-700">{t("settings.sending.problems")}</p>
+						<ul className="space-y-1 pb-4 font-mono text-xs text-neutral-500">
+							{Object.entries(status.problems).map(([stage, message]) => (
+								<li key={stage} className="break-words">
+									{stage}: {message}
+								</li>
+							))}
+						</ul>
 					</CardContent>
 				) : null}
 				{status?.ordersError ? (

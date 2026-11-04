@@ -377,6 +377,7 @@
 	"settings.sending.statusPaid": "Pagato fino al {date} ({days} giorni rimasti).",
 	"settings.sending.statusOwn": "Invio tramite il tuo {provider}.",
 	"settings.sending.statusLocked": "L'invio non è ancora attivo per i tuoi indirizzi.",
+	"settings.sending.problems": "Alcune parti di questa sezione non sono state lette:",
 	"settings.sending.buy": "Ottieni l'importo da pagare",
 	"settings.sending.buyHint": "1 USDT al mese, da 1 a 12 mesi. Ogni ordine chiede un importo proprio, così il pagamento si identifica senza causale.",
 	"settings.sending.months": "Mesi",
