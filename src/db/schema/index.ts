@@ -449,6 +449,7 @@ export const messageTriage = sqliteTable(
 		index("message_triage_retain_idx").on(t.retainUntil),
 		index("message_triage_user_idx").on(t.userId, t.category, t.createdAt),
 		index("message_triage_otp_idx").on(t.userId, t.otpCode),
+		index("message_triage_verify_idx").on(t.userId, t.verifyProvider, t.verifyExpiresAt),
 	],
 );
 
