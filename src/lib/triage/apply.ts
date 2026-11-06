@@ -1,13 +1,16 @@
 import { and, eq, isNull } from "drizzle-orm";
 import { getDb } from "@/db";
 import { messageTriage, messages, users } from "@/db/schema";
-import { classifyMessage } from "./classify";
+import { classifyMessage, type TriageVerdict } from "./classify";
 import { ensureCategoryFolder } from "./folders";
 import {
 	extractOtpCode,
-	guessOtpProvider,
+	extractVerificationLink,
+	guessProvider,
 	looksLikeOtp,
+	looksLikeVerify,
 	parseOtpLifetimeMinutes,
+	parseVerifyLifetimeMinutes,
 	splitSender,
 	triageFolderFor,
 	triageRetentionUntil,
@@ -53,22 +56,66 @@ export async function triageInboundMessage(env: CloudflareEnv, input: TriageInpu
 	if (owner && owner.enabled === false) return;
 
 	const sender = splitSender(input.fromAddr);
-	const verdict = looksLikeOtp(input.subject, input.text)
-		? { category: "otp" as TriageCategory, confidence: null, source: "heuristic" as const, model: null }
-		: await classifyMessage(env, input);
+
+	// A sign-up confirmation is defined by its link, not by its wording: the same
+	// wording appears in passcode mail ("verify your account with the code
+	// below"), and a message with neither a link nor a code is not actionable at
+	// all. So the link decides, and everything else falls through as before.
+	const verifyIntent = looksLikeVerify(input.subject, input.text, input.html);
+	let verifyUrl = verifyIntent
+		? extractVerificationLink({
+				subject: input.subject,
+				text: input.text,
+				html: input.html,
+				fromAddr: input.fromAddr,
+			})
+		: null;
+
+	let verdict: TriageVerdict = verifyUrl
+		? { category: "verify" as TriageCategory, confidence: null, source: "heuristic" as const, model: null }
+		: looksLikeOtp(input.subject, input.text)
+			? { category: "otp" as TriageCategory, confidence: null, source: "heuristic" as const, model: null }
+			: await classifyMessage(env, input);
+
+	if (verdict.category === "verify" && !verifyUrl) {
+		// The model can recognise the wording in a language the rules do not cover.
+		// It still has to produce a link: without one there is nothing to follow,
+		// and a "verify your address" notice is an announcement, not a sign-up.
+		verifyUrl = extractVerificationLink({
+			subject: input.subject,
+			text: input.text,
+			html: input.html,
+			fromAddr: input.fromAddr,
+		});
+		if (!verifyUrl) verdict = { ...verdict, category: "updates" };
+	}
 
 	const isOtp = verdict.category === "otp";
+	const isVerify = verdict.category === "verify";
+	const body = `${input.subject ?? ""}\n${input.text ?? ""}`;
+
 	const otpCode = isOtp ? extractOtpCode({ subject: input.subject, text: input.text }) : null;
-	const otpLifetime = isOtp ? parseOtpLifetimeMinutes(`${input.subject ?? ""}\n${input.text ?? ""}`) : null;
-	const otpProvider = isOtp ? guessOtpProvider(sender.address, sender.displayName) : null;
+	const otpLifetime = isOtp ? parseOtpLifetimeMinutes(body) : null;
+	const otpProvider = isOtp ? guessProvider(sender.address, sender.displayName) : null;
+
+	const verifyCode = isVerify ? extractOtpCode({ subject: input.subject, text: input.text }) : null;
+	const verifyLifetime = isVerify ? parseVerifyLifetimeMinutes(body) : null;
+	const verifyProvider = isVerify ? guessProvider(sender.address, sender.displayName) : null;
 
 	// A message that mentions a code but contains none is an announcement, not a
-	// passcode: keeping it forever is the honest answer.
-	const category: TriageCategory = isOtp && !otpCode ? "updates" : verdict.category;
-	const retainUntil = triageRetentionUntil(category, input.receivedAt, otpLifetime);
+	// passcode: keeping it forever is the honest answer. The same goes for a
+	// "verify" verdict whose link could not be found.
+	const category: TriageCategory =
+		isVerify && !verifyUrl ? "updates" : isOtp && !otpCode ? "updates" : verdict.category;
+	const retainUntil = triageRetentionUntil(
+		category,
+		input.receivedAt,
+		category === "verify" ? verifyLifetime : otpLifetime,
+	);
 
 	const folderId = await fileIntoFolder(db, input, category);
 	const otpExpiresAt = category === "otp" ? retainUntil : null;
+	const verifyExpiresAt = category === "verify" ? retainUntil : null;
 
 	await db
 		.insert(messageTriage)
@@ -83,6 +130,10 @@ export async function triageInboundMessage(env: CloudflareEnv, input: TriageInpu
 			otpProvider: category === "otp" ? otpProvider : null,
 			otpCode: category === "otp" ? otpCode : null,
 			otpExpiresAt,
+			verifyProvider: category === "verify" ? verifyProvider : null,
+			verifyUrl: category === "verify" ? verifyUrl : null,
+			verifyCode: category === "verify" ? verifyCode : null,
+			verifyExpiresAt,
 			retainUntil,
 		})
 		.onConflictDoNothing();
@@ -93,6 +144,9 @@ export async function triageInboundMessage(env: CloudflareEnv, input: TriageInpu
 		source: verdict.source,
 		folderId,
 		otp: category === "otp" ? { provider: otpProvider, expiresAt: otpExpiresAt?.toISOString() ?? null } : null,
+		verify: category === "verify"
+			? { provider: verifyProvider, hasLink: Boolean(verifyUrl), expiresAt: verifyExpiresAt?.toISOString() ?? null }
+			: null,
 	}));
 }
 

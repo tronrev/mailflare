@@ -23,11 +23,15 @@ await build({
 
 const {
 	extractOtpCode,
-	guessOtpProvider,
+	extractVerificationLink,
+	guessProvider,
 	heuristicTriageCategory,
 	looksLikeOtp,
+	looksLikeVerify,
 	normalizeTriageCategory,
 	parseOtpLifetimeMinutes,
+	parseVerifyLifetimeMinutes,
+	registrableDomain,
 	splitSender,
 	triageFolderFor,
 	triageRetentionUntil,
@@ -64,6 +68,10 @@ test("how long the code lasts is read from either language", () => {
 
 test("retention follows the category", () => {
 	const received = new Date("2026-11-05T10:00:00Z");
+	// A confirmation link is kept until it stops working, a week by default.
+	assert.equal(triageRetentionUntil("verify", received).getTime(), received.getTime() + 7 * 86_400_000);
+	assert.equal(triageRetentionUntil("verify", received, 30).getTime(), received.getTime() + 30 * MINUTE);
+	assert.equal(parseVerifyLifetimeMinutes("This link expires in 48 hours."), 48 * 60);
 	assert.equal(triageRetentionUntil("important", received), null);
 	assert.equal(triageRetentionUntil("other", received), null);
 	assert.equal(triageRetentionUntil("promo", received).getTime(), received.getTime() + 30 * 86_400_000);
@@ -73,7 +81,8 @@ test("retention follows the category", () => {
 	assert.equal(triageRetentionUntil("otp", received).getTime(), received.getTime() + 10 * MINUTE);
 });
 
-test("only four categories get a folder", () => {
+test("sign-up confirmations get a folder too", () => {
+	assert.equal(triageFolderFor("verify").name, "Verify");
 	assert.equal(triageFolderFor("otp").name, "OTP");
 	assert.equal(triageFolderFor("promo").name, "Promotions");
 	assert.equal(triageFolderFor("important"), null);
@@ -82,9 +91,9 @@ test("only four categories get a folder", () => {
 
 test("sender display name beats a generic one", () => {
 	assert.deepEqual(splitSender("GitHub <noreply@github.com>"), { displayName: "GitHub", address: "noreply@github.com" });
-	assert.equal(guessOtpProvider("GitHub <noreply@github.com>", "GitHub"), "GitHub");
-	assert.equal(guessOtpProvider("noreply@github.com", "no-reply"), "Github");
-	assert.equal(guessOtpProvider("noreply@accounts.steamcommunity.com"), "Steamcommunity");
+	assert.equal(guessProvider("GitHub <noreply@github.com>", "GitHub"), "GitHub");
+	assert.equal(guessProvider("noreply@github.com", "no-reply"), "Github");
+	assert.equal(guessProvider("noreply@accounts.steamcommunity.com"), "Steamcommunity");
 });
 
 test("model answers are normalized, garbage falls back", () => {
@@ -100,4 +109,54 @@ test("the heuristic fallback reads the obvious cases", () => {
 	assert.equal(heuristicTriageCategory("面试安排 - 后端工程师", "请确认周三下午的时间", "hr@company.com"), "important");
 	assert.equal(heuristicTriageCategory("LinkedIn", "You have a new follower", "notifications@linkedin.com"), "social");
 	assert.equal(heuristicTriageCategory("Lunch?", "See you at noon", "friend@example.com"), "other");
+});
+
+test("confirmation mail is recognised by its wording, passcode mail is not", () => {
+	assert.equal(looksLikeVerify("请验证您的邮箱", "点击下面的按钮完成验证"), true);
+	assert.equal(looksLikeVerify("Please confirm your email address", "Confirm now"), true);
+	assert.equal(looksLikeVerify("Verify your account", "Your verification code is 482913"), false);
+	assert.equal(looksLikeVerify("Your order has shipped", "Tracking number 1Z999"), false);
+	// The order of the words must not matter in Chinese.
+	assert.equal(looksLikeVerify("您的邮箱尚未验证", ""), true);
+	assert.equal(looksLikeVerify("验证码已发送至您的邮箱", ""), false);
+});
+
+test("the confirmation link beats the logo, the footer and the unsubscribe line", () => {
+	const html = [
+		'<a href="https://www.trip.com/"><img src="https://cdn.trip.com/logo.png"></a>',
+		'<a href="https://www.trip.com/unsubscribe?u=9f2a1c">Unsubscribe</a>',
+		'<a href="https://www.trip.com/privacy">Privacy policy</a>',
+		'<a href="https://account.trip.com/email/verify?token=8f2c41ab9d7e4c0e8b31">Verify email</a>',
+	].join("");
+	const link = extractVerificationLink({ subject: "请验证您的邮箱", html, fromAddr: "Trip.com <noreply@trip.com>" });
+	assert.equal(link, "https://account.trip.com/email/verify?token=8f2c41ab9d7e4c0e8b31");
+});
+
+test("a tracking domain still counts when the button says verify", () => {
+	const html = '<a href="https://click.mailflare.net/ls/click?upn=abc123def456ghi789">Confirm your email address</a>';
+	const link = extractVerificationLink({
+		subject: "Confirm your email address",
+		html,
+		fromAddr: "Mailflare <noreply@mailflare.net>",
+	});
+	assert.equal(link, "https://click.mailflare.net/ls/click?upn=abc123def456ghi789");
+});
+
+test("a plain-text link is found next to the words that introduce it", () => {
+	const text = ["Welcome aboard.", "To finish signing up, open this link:", "https://app.example.com/confirm/9f8e7d6c5b4a3210", "", "Thanks!"].join("\n");
+	const link = extractVerificationLink({ subject: "Complete your registration", text, fromAddr: "Example <hello@example.com>" });
+	assert.equal(link, "https://app.example.com/confirm/9f8e7d6c5b4a3210");
+});
+
+test("ordinary mail has no confirmation link", () => {
+	const html = '<p>Thanks for your order.</p><a href="https://shop.example.com/orders/1234">View order</a>';
+	assert.equal(extractVerificationLink({ subject: "Your order", html, fromAddr: "Shop <shop@example.com>" }), null);
+	assert.equal(extractVerificationLink({ subject: "Hello", text: "See you at noon.", fromAddr: "friend@example.com" }), null);
+});
+
+test("a sender domain is the part a company owns", () => {
+	assert.equal(registrableDomain("mailer.trip.com"), "trip.com");
+	assert.equal(registrableDomain("accounts.steamcommunity.com"), "steamcommunity.com");
+	assert.equal(registrableDomain("a.b.example.co.uk"), "example.co.uk");
+	assert.equal(registrableDomain(""), null);
 });

@@ -116,6 +116,7 @@ async function summariseOne(env: CloudflareEnv, userId: string, recoveryEmail: s
 	const counts = new Map(byCategory.map((row) => [row.category as TriageCategory, Number(row.count)]));
 	const labelled: Array<[string, number]> = [
 		["OTP", counts.get("otp") ?? 0],
+		["Verify", counts.get("verify") ?? 0],
 		["Promotions", counts.get("promo") ?? 0],
 		["Social", counts.get("social") ?? 0],
 		["Updates", counts.get("updates") ?? 0],
@@ -145,7 +146,7 @@ async function summariseOne(env: CloudflareEnv, userId: string, recoveryEmail: s
 	}
 	lines.push(
 		"",
-		"Passcodes are deleted once they stop working; promotions after " +
+		"Passcodes are deleted once they stop working, confirmation links once they expire; promotions after " +
 			`${CATEGORY_RETENTION_DAYS.promo} days, social and status mail after ${CATEGORY_RETENTION_DAYS.social} days. ` +
 			"Anything a person wrote to you is kept.",
 	);

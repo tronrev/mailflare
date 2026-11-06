@@ -354,6 +354,10 @@ export async function getMessageWithBodyForUser(env: CloudflareEnv, user: Sessio
 			otpProvider: messageTriage.otpProvider,
 			otpCode: messageTriage.otpCode,
 			otpExpiresAt: messageTriage.otpExpiresAt,
+			verifyProvider: messageTriage.verifyProvider,
+			verifyUrl: messageTriage.verifyUrl,
+			verifyCode: messageTriage.verifyCode,
+			verifyExpiresAt: messageTriage.verifyExpiresAt,
 			retainUntil: messageTriage.retainUntil,
 			createdAt: messageTriage.createdAt,
 		})
@@ -369,6 +373,7 @@ export async function getMessageWithBodyForUser(env: CloudflareEnv, user: Sessio
 			? {
 				...triage,
 				otpExpiresAt: triage.otpExpiresAt?.toISOString() ?? null,
+				verifyExpiresAt: triage.verifyExpiresAt?.toISOString() ?? null,
 				retainUntil: triage.retainUntil?.toISOString() ?? null,
 				createdAt: triage.createdAt.toISOString(),
 			}

@@ -323,7 +323,55 @@ which is usually the answer a script is looking for.
 
 `GET /api/messages/<id>` (session auth) carries the same verdict in a `triage`
 object: `category`, `confidence`, `source` (`ai` or `heuristic`), `otpProvider`,
-`otpCode`, `otpExpiresAt` and `retainUntil` (`null` means kept forever).
+`otpCode`, `otpExpiresAt`, `verifyProvider`, `verifyUrl`, `verifyCode`,
+`verifyExpiresAt` and `retainUntil` (`null` means kept forever).
+
+## Reading sign-up confirmation links
+
+A mail that asks you to confirm an email address at sign-up — "verify your email",
+"请验证您的邮箱", "confirm your email address" — is filed as `verify` and its
+confirmation link is read out of it, so a registration flow does not have to parse
+HTML:
+
+```
+curl "https://mail.example.com/api/v1/verify?provider=Trip.com&active=1" \
+  -H "Authorization: Bearer $MAIL_KEY"
+```
+
+```json
+{
+  "verify": [
+    {
+      "messageId": "msg_abc",
+      "mailboxId": "mbx_abc",
+      "provider": "Trip.com",
+      "url": "https://account.trip.com/email/verify?token=8f2c41ab9d7e4c0e8b31",
+      "code": null,
+      "expiresAt": "2026-11-13T10:02:00.000Z",
+      "expired": false,
+      "subject": "请验证您的邮箱",
+      "from": "Trip.com <noreply@trip.com>",
+      "receivedAt": "2026-11-06T10:02:00.000Z"
+    }
+  ]
+}
+```
+
+Same authentication, scopes and window as `/api/v1/otp`. `provider` narrows to one
+service, which is what a registration flow usually wants — the mail it just
+caused, not the newest one from anyone. `active=1` drops links whose lifetime has
+passed.
+
+Two things decide what ends up here, and both are deliberately conservative:
+
+- **The message must contain a confirmation link.** Anchor text ("Verify email")
+  counts most, the sender's own domain next, an opaque token in the path third;
+  unsubscribe, privacy, app-store and footer links are disqualified outright. A
+  mail that only carries a code stays an `otp`, and one with neither stays an
+  ordinary `updates` message.
+- **The link is kept in clear.** Following it is the point, so this takes a key
+  the user issued, and the messages are deleted permanently once the link
+  expires — a week after arrival unless the mail states its own lifetime.
 
 ## Searching
 
