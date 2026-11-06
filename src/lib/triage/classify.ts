@@ -1,5 +1,6 @@
 import {
 	heuristicTriageCategory,
+	htmlToText,
 	normalizeTriageCategory,
 	type TriageCategory,
 } from "./rules";
@@ -24,6 +25,7 @@ const SYSTEM_PROMPT = [
 	'{"category":"<name>","confidence":<0-100>}',
 	"Categories:",
 	"otp = a one-time passcode, sign-in code or verification code",
+	"verify = a sign-up mail asking to confirm an email address by clicking a link",
 	"promo = marketing, newsletters, advertising, sales",
 	"social = notifications from social networks (follows, mentions, comments)",
 	"updates = automated notices about an account or an order: receipts, shipping, invoices, statements, security alerts",
@@ -47,7 +49,7 @@ export async function classifyMessage(
 
 	if (!env.AI) return fallback();
 
-	const body = (input.text || stripHtml(input.html) || "").slice(0, BODY_LIMIT);
+	const body = (input.text || htmlToText(input.html) || "").slice(0, BODY_LIMIT);
 	const prompt = [
 		`From: ${input.fromAddr ?? "(unknown)"}`,
 		`Subject: ${input.subject ?? "(none)"}`,
@@ -88,15 +90,4 @@ function readVerdict(raw: unknown): { category: TriageCategory; confidence: numb
 	} catch {
 		return null;
 	}
-}
-
-function stripHtml(html: string | null | undefined): string {
-	if (!html) return "";
-	return html
-		.replace(/<(script|style)[\s\S]*?<\/\1>/gi, " ")
-		.replace(/<[^>]+>/g, " ")
-		.replace(/&nbsp;/gi, " ")
-		.replace(/&amp;/gi, "&")
-		.replace(/\s+/g, " ")
-		.trim();
 }

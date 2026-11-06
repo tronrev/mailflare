@@ -420,7 +420,7 @@ export const messageTriage = sqliteTable(
 			.notNull()
 			.references(() => users.id, { onDelete: "cascade" }),
 		mailboxId: text("mailbox_id").references(() => mailboxes.id, { onDelete: "set null" }),
-		category: text("category", { enum: ["otp", "promo", "social", "updates", "important", "other"] }).notNull(),
+		category: text("category", { enum: ["otp", "verify", "promo", "social", "updates", "important", "other"] }).notNull(),
 		/** How sure the classifier was, as whole percent. Null for rule-based answers. */
 		confidence: integer("confidence"),
 		/** "ai" when Workers AI answered, "heuristic" when the fallback did. */
@@ -430,6 +430,15 @@ export const messageTriage = sqliteTable(
 		otpProvider: text("otp_provider"),
 		otpCode: text("otp_code"),
 		otpExpiresAt: timestamp("otp_expires_at"),
+		/**
+		 * The same three things for a sign-up confirmation: who sent it, the link
+		 * that confirms the address, and the code when the service asks for one
+		 * instead of a click.
+		 */
+		verifyProvider: text("verify_provider"),
+		verifyUrl: text("verify_url"),
+		verifyCode: text("verify_code"),
+		verifyExpiresAt: timestamp("verify_expires_at"),
 		/** Null means keep forever. The sweep deletes everything older than now. */
 		retainUntil: timestamp("retain_until"),
 		createdAt: timestamp("created_at")
@@ -440,6 +449,7 @@ export const messageTriage = sqliteTable(
 		index("message_triage_retain_idx").on(t.retainUntil),
 		index("message_triage_user_idx").on(t.userId, t.category, t.createdAt),
 		index("message_triage_otp_idx").on(t.userId, t.otpCode),
+		index("message_triage_verify_idx").on(t.userId, t.verifyProvider, t.verifyExpiresAt),
 	],
 );
 

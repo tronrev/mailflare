@@ -139,11 +139,12 @@ handed over by letting people bring their own provider.
 ## Automatic triage, OTP extraction and retention
 
 Every inbound message is read once by Workers AI (`@cf/meta/llama-3.1-8b-instruct`,
-the `AI` binding in `wrangler.jsonc`) and filed into one of six categories:
+the `AI` binding in `wrangler.jsonc`) and filed into one of seven categories:
 
 | Category | Folder | Kept |
 |---|---|---|
 | `otp` | OTP | until the code stops working (5 minutes to 24 hours; the mail's own wording decides, 10 minutes when it says nothing) |
+| `verify` | Verify | until the confirmation link expires (5 minutes to 30 days; a week when the mail says nothing) |
 | `promo` | Promotions | 30 days |
 | `social` | Social | 90 days |
 | `updates` | Updates | 90 days |
@@ -155,13 +156,21 @@ the `AI` binding in `wrangler.jsonc`) and filed into one of six categories:
 - **A mailbox rule wins.** If a routing rule already filed the message, triage
   leaves it alone — the user's decision outranks a model's.
 - **Nothing is lost when the model is not there.** Without the `AI` binding, on
-  error, or on an answer that is not one of the six names, a keyword classifier
+  error, or on an answer that is not one of the seven names, a keyword classifier
   decides instead, and the message is filed the same way.
 - **Passcodes are read with rules, not with the model**: the code has to sit next
   to the words for it or be in the subject, its lifetime is parsed from the body
   (Chinese and English phrasing), and `GET /api/v1/otp` returns service, code and
   expiry to any key with the `read` scope. A code that was never stored is better
   than a wrong one.
+- **Sign-up confirmations are recognised by their link, not their wording.** The
+  same sentence appears in passcode mail ("verify your account with the code
+  below"), so a `verify` verdict needs an actual confirmation URL: anchor text
+  beats the sender's own domain, which beats an opaque token, and footer links
+  (unsubscribe, privacy, app stores) are disqualified outright. `GET
+  /api/v1/verify` returns the link, the service and the expiry. A message that
+  only has a code stays an OTP; one that has neither stays an ordinary `updates`
+  message and is kept.
 - **Deletion is permanent and silent** — those messages do not pass through Trash.
   The per-category lifetime is decided when the message is classified and stored
   on the row, so changing the table above affects future mail only.
