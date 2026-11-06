@@ -1,6 +1,6 @@
 import { and, eq, isNotNull } from "drizzle-orm";
 import { getDb } from "@/db";
-import { domains, mailboxAliases, mailboxes, messages, outboundJobs, users } from "@/db/schema";
+import { domains, mailboxAliases, mailboxes, messageTriage, messages, outboundJobs, users } from "@/db/schema";
 import { newId } from "@/lib/ids";
 import { buildSnippet, parseRawMime } from "@/lib/email/parse";
 import { resolveInboundAddress, resolveInboxRuleDestination } from "@/lib/email/routing";
@@ -27,6 +27,7 @@ import {
 	notifyUsersOfNewMessage,
 } from "@/lib/realtime/utils";
 import { scheduleAutoDraft } from "@/lib/agent/jobs/utils";
+import { triageInboundMessage } from "@/lib/triage/apply";
 
 export type InboundQueueMessage = {
 	from: string;
@@ -231,6 +232,24 @@ export async function processInboundMessage(
 	}
 
 	if (status === "received") {
+		// Triage files the message and decides when it can be deleted. Kept outside
+		// the insert's try block: a model outage must not roll back a delivered
+		// message, and triageInboundMessage already swallows its own failures.
+		try {
+			await triageInboundMessage(env, {
+				messageId,
+				userId: decision.mailbox.userId,
+				mailboxId: decision.mailbox.mailboxId,
+				fromAddr,
+				subject: parsed.subject,
+				text: parsed.text,
+				html: parsed.html,
+				receivedAt: new Date(),
+				folderId,
+			});
+		} catch (error) {
+			console.error(`[triage] ${messageId}:`, error instanceof Error ? error.message : String(error));
+		}
 		try {
 			await sendMailboxAutoReply(env, {
 				mailboxId: decision.mailbox.mailboxId,
@@ -327,7 +346,34 @@ export async function getMessageWithBodyForUser(env: CloudflareEnv, user: Sessio
 	const contactNames = await getMessageContactNames(env, message.userId, message.fromAddr, message.toAddr);
 	const attachments = await listMessageAttachments(env, messageId);
 	const unsubscribeUrl = await getUnsubscribeUrlFromRawR2Key(env, message.rawR2Key);
-	return { message: { ...message, ...contactNames }, body: message, attachments, unsubscribeUrl };
+	const [triage] = await db
+		.select({
+			category: messageTriage.category,
+			confidence: messageTriage.confidence,
+			source: messageTriage.source,
+			otpProvider: messageTriage.otpProvider,
+			otpCode: messageTriage.otpCode,
+			otpExpiresAt: messageTriage.otpExpiresAt,
+			retainUntil: messageTriage.retainUntil,
+			createdAt: messageTriage.createdAt,
+		})
+		.from(messageTriage)
+		.where(eq(messageTriage.messageId, messageId))
+		.limit(1);
+	return {
+		message: { ...message, ...contactNames },
+		body: message,
+		attachments,
+		unsubscribeUrl,
+		triage: triage
+			? {
+				...triage,
+				otpExpiresAt: triage.otpExpiresAt?.toISOString() ?? null,
+				retainUntil: triage.retainUntil?.toISOString() ?? null,
+				createdAt: triage.createdAt.toISOString(),
+			}
+			: null,
+	};
 }
 
 export async function getMessageMetadataForUser(env: CloudflareEnv, user: SessionUser, messageId: string) {
