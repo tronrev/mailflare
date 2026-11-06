@@ -58,6 +58,15 @@ export const users = sqliteTable("users", {
 	/** Sealed JSON credential blob; never returned to any client. */
 	sendCredentials: text("send_credentials"),
 	sendCredentialsAt: timestamp("send_credentials_at"),
+	// Automatic triage runs on every inbound message. Off is for a deployment
+	// that would rather pay nothing for Workers AI than read a clean Inbox.
+	autoTriageEnabled: bool("auto_triage_enabled").notNull().default(true),
+	/**
+	 * Local date (YYYY-MM-DD in `time_zone`) of the last daily summary posted to
+	 * `reset_email`. The five-minute cron sees the local midnight hour three
+	 * times, so this is what keeps it to one summary a day.
+	 */
+	dailySummaryOn: text("daily_summary_on"),
 	createdAt: timestamp("created_at")
 		.notNull()
 		.$defaultFn(() => new Date()),
@@ -389,6 +398,48 @@ export const messages = sqliteTable(
 			t.id,
 			t.snoozedUntil,
 		),
+	],
+);
+
+/**
+ * What automatic triage decided about a message, plus anything it read out of
+ * it. A separate table rather than columns on `messages` because only inbound
+ * mail has a verdict, and because the retention sweep needs to scan it by
+ * `retain_until` without touching the message indexes.
+ *
+ * The row goes when the message goes: a code that no longer works is not a
+ * record worth keeping.
+ */
+export const messageTriage = sqliteTable(
+	"message_triage",
+	{
+		messageId: text("message_id")
+			.primaryKey()
+			.references(() => messages.id, { onDelete: "cascade" }),
+		userId: text("user_id")
+			.notNull()
+			.references(() => users.id, { onDelete: "cascade" }),
+		mailboxId: text("mailbox_id").references(() => mailboxes.id, { onDelete: "set null" }),
+		category: text("category", { enum: ["otp", "promo", "social", "updates", "important", "other"] }).notNull(),
+		/** How sure the classifier was, as whole percent. Null for rule-based answers. */
+		confidence: integer("confidence"),
+		/** "ai" when Workers AI answered, "heuristic" when the fallback did. */
+		source: text("source", { enum: ["ai", "heuristic"] }).notNull(),
+		model: text("model"),
+		/** Service the code belongs to ("GitHub"), and the code itself. */
+		otpProvider: text("otp_provider"),
+		otpCode: text("otp_code"),
+		otpExpiresAt: timestamp("otp_expires_at"),
+		/** Null means keep forever. The sweep deletes everything older than now. */
+		retainUntil: timestamp("retain_until"),
+		createdAt: timestamp("created_at")
+			.notNull()
+			.$defaultFn(() => new Date()),
+	},
+	(t) => [
+		index("message_triage_retain_idx").on(t.retainUntil),
+		index("message_triage_user_idx").on(t.userId, t.category, t.createdAt),
+		index("message_triage_otp_idx").on(t.userId, t.otpCode),
 	],
 );
 

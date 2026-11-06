@@ -92,4 +92,11 @@ interface CloudflareEnv {
 	TRONGRID_API_KEY?: string;
 	/** Seals users' own provider credentials (AES-GCM). Without it, storing a key is refused. */
 	BILLING_SECRET?: string;
+	/**
+	 * `purge` removes accounts that have no recovery address. Unset (the default)
+	 * only reports how many there are, so a deployment can look before it deletes.
+	 * This is for cleaning up accounts that predate the requirement, not a
+	 * standing policy — turn it back off once the list is empty.
+	 */
+	RECOVERY_EMAIL_ENFORCE?: string;
 }

@@ -285,6 +285,46 @@ The account id is the user id. Each Mailflare mailbox appears as a top-level JMA
 
 When two-factor authentication is on, `POST /api/auth/login` returns `{ ok: true, mfaRequired: true, challengeToken }` instead of a session. `POST /api/auth/mfa/verify` with `{ challengeToken, code }` completes the sign-in; `code` is a 6-digit TOTP or one of the recovery codes. Challenges expire after 5 minutes. Enrolment, recovery codes and turning it off are under `/api/settings/mfa/*` (session auth) and always re-check the password.
 
+## Reading one-time passcodes
+
+Inbound mail is classified automatically, and a message that carries a sign-in
+code has the service, the code and the expiry read out of it. `GET /api/v1/otp`
+returns them, so a script that fills a login form does not have to parse HTML:
+
+```
+curl "https://mail.example.com/api/v1/otp?limit=5&active=1" \
+  -H "Authorization: Bearer $MAIL_KEY"
+```
+
+```json
+{
+  "otp": [
+    {
+      "messageId": "msg_abc",
+      "mailboxId": "mbx_abc",
+      "provider": "GitHub",
+      "code": "482913",
+      "expiresAt": "2026-11-06T10:12:00.000Z",
+      "expired": false,
+      "subject": "[GitHub] Please verify your device",
+      "from": "GitHub <noreply@github.com>",
+      "receivedAt": "2026-11-06T10:02:00.000Z"
+    }
+  ]
+}
+```
+
+It needs the `read` scope and only looks at mailboxes the key can already read.
+`since` and `until` take an ISO timestamp or epoch milliseconds; the default
+window is the last 24 hours, `limit` is 20 by default and 100 at most. `active=1`
+drops codes whose lifetime has passed. Codes are deleted with their message once
+the lifetime ends, so a passcode that is no longer in the list no longer works —
+which is usually the answer a script is looking for.
+
+`GET /api/messages/<id>` (session auth) carries the same verdict in a `triage`
+object: `category`, `confidence`, `source` (`ai` or `heuristic`), `otpProvider`,
+`otpCode`, `otpExpiresAt` and `retainUntil` (`null` means kept forever).
+
 ## Searching
 
 `GET /api/messages?q=...` (session) and `GET /api/v1/messages?q=...` (API key, `read` scope) accept the same query grammar, backed by an FTS5 index over subject, sender, recipients and body:

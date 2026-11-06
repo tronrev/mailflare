@@ -24,7 +24,10 @@ import { processAgentDraftJob } from "./src/lib/agent/jobs/utils";
 import { runAgentMaintenance } from "./src/lib/agent/maintenance";
 import { runTrashRetention } from "./src/lib/email/trash-retention";
 import { runDriveTrashRetention } from "./src/lib/drive/retention";
-import { runAccountRetention, runUnverifiedSignupPurge } from "./src/lib/accounts/deletion";
+import { runUnverifiedSignupPurge, runAccountRetention } from "./src/lib/accounts/deletion";
+import { runTriageRetention } from "./src/lib/triage/retention";
+import { runDailySummaries } from "./src/lib/triage/daily-summary";
+import { runRecoveryEmailEnforcement } from "./src/lib/accounts/recovery-enforcement";
 import { sweepUsdtOrders } from "./src/lib/payments/orders";
 import { runJmapChangeRetention } from "./src/lib/jmap/changes";
 import { runFollowUpReminders } from "./src/lib/follow-ups/service";
@@ -148,7 +151,16 @@ export default {
 		// Every five minutes: a name held by an abandoned sign-up should come back
 		// long before the person who wanted it tries again.
 		ctx.waitUntil(runUnverifiedSignupPurge(env, new Date(controller.scheduledTime)));
+		// Passcodes go the moment they stop working; promotions and notifications
+		// follow the retention each category was filed with.
+		ctx.waitUntil(runTriageRetention(env, new Date(controller.scheduledTime)));
+		// One summary a day per user, posted at their own midnight. The five-minute
+		// cron looks in every tick, and `daily_summary_on` keeps it to one.
+		ctx.waitUntil(runDailySummaries(env, new Date(controller.scheduledTime)));
 		if (controller.cron === "0 2 * * *") ctx.waitUntil(runAccountRetention(env, new Date(controller.scheduledTime)));
+		// One-off cleanup of accounts that predate "every account needs a recovery
+		// address". Reports by default; deletes only with RECOVERY_EMAIL_ENFORCE=purge.
+		if (controller.cron === "0 2 * * *") ctx.waitUntil(runRecoveryEmailEnforcement(env));
 		// Drive trash is emptied once a day, with the 02:00 UTC cron; the 5-minute cron is for queue-like upkeep.
 		if (controller.cron === "0 2 * * *") ctx.waitUntil(runDriveTrashRetention(env, new Date(controller.scheduledTime)));
 		if (controller.cron === "0 2 * * *") ctx.waitUntil(runJmapChangeRetention(env, new Date(controller.scheduledTime)));

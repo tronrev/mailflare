@@ -136,6 +136,54 @@ handed over by letting people bring their own provider.
 | `TRONGRID_API_KEY` | Optional. The free tier covers the five-minute polling; a key raises the ceiling. |
 | `BILLING_SECRET` | Seals users' own provider credentials. Any long random string; rotating it invalidates stored keys (they are treated as absent). |
 
+## Automatic triage, OTP extraction and retention
+
+Every inbound message is read once by Workers AI (`@cf/meta/llama-3.1-8b-instruct`,
+the `AI` binding in `wrangler.jsonc`) and filed into one of six categories:
+
+| Category | Folder | Kept |
+|---|---|---|
+| `otp` | OTP | until the code stops working (5 minutes to 24 hours; the mail's own wording decides, 10 minutes when it says nothing) |
+| `promo` | Promotions | 30 days |
+| `social` | Social | 90 days |
+| `updates` | Updates | 90 days |
+| `important` | — (stays in the Inbox) | forever |
+| `other` | — (stays in the Inbox) | forever |
+
+- **Folders are created on demand** and shared by the whole mailbox; their names
+  are fixed English words because they show up in IMAP and JMAP clients too.
+- **A mailbox rule wins.** If a routing rule already filed the message, triage
+  leaves it alone — the user's decision outranks a model's.
+- **Nothing is lost when the model is not there.** Without the `AI` binding, on
+  error, or on an answer that is not one of the six names, a keyword classifier
+  decides instead, and the message is filed the same way.
+- **Passcodes are read with rules, not with the model**: the code has to sit next
+  to the words for it or be in the subject, its lifetime is parsed from the body
+  (Chinese and English phrasing), and `GET /api/v1/otp` returns service, code and
+  expiry to any key with the `read` scope. A code that was never stored is better
+  than a wrong one.
+- **Deletion is permanent and silent** — those messages do not pass through Trash.
+  The per-category lifetime is decided when the message is classified and stored
+  on the row, so changing the table above affects future mail only.
+- **Turn it off per account** with `UPDATE users SET auto_triage_enabled = 0 WHERE
+  email = '...'`: the message stays in the Inbox and nothing is ever deleted.
+
+At the user's own midnight (`users.time_zone`), the five-minute cron posts one
+summary of the last 24 hours to their recovery address: counts per category, the
+services that sent codes, and the subjects worth opening. `users.daily_summary_on`
+holds the local date already summarised, so the several ticks inside that hour
+produce one mail. A day with no new mail sends nothing.
+
+| Variable | Purpose |
+|---|---|
+| `RECOVERY_EMAIL_ENFORCE` | Set to `purge` to delete accounts that have **no recovery address** (`reset_email`), skipping administrators and the primary admin. Unset, the daily job only logs how many there are. This is for cleaning up accounts that predate the requirement — turn it back off once `scripts/sql/list-accounts-without-recovery.sql` comes back empty. |
+
+Every path that creates a login account by hand already asks for one: `/signup`
+(`checkRecoveryEmail`), the setup wizard (`firstRunRegisterSchema`) and the
+admin account form (`createAccountSchema`) all reject an empty value. Accounts
+created through the provisioning API (`POST /api/v1/accounts`) can still omit it;
+those are the rows `RECOVERY_EMAIL_ENFORCE` exists to find.
+
 ## Cloudflare zone management (optional)
 
 If `CF_TOKEN` can also edit DNS and Email Routing on your zones, adding a
