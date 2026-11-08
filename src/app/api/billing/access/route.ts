@@ -34,6 +34,8 @@ export async function GET(request: Request) {
 			allowed: status.allowed,
 			reason: status.reason,
 			admin: status.admin,
+			/** The free allowance, so the composer can say "2 left" before it refuses. */
+			free: status.free,
 			own: status.own,
 			buyingOffered: status.buyingOffered,
 			canStoreCredentials: status.canStoreCredentials,

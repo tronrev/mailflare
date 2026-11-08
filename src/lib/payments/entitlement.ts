@@ -8,6 +8,8 @@ import type { OutboundProviderConfig } from "@/lib/email/outbound-provider-types
 import { describeCredentials, type OwnCredentials } from "@/lib/payments/credentials";
 import { openJson, secretHint } from "@/lib/payments/secret-box";
 import { paymentAddress } from "@/lib/payments/orders";
+import { claimFreeSend, readFreeSendState } from "@/lib/payments/free-sends";
+import { FREE_SENDS_PER_WINDOW, SEND_QUOTA_MESSAGE, type FreeSendState } from "@/lib/payments/free-send-rules";
 import { sendAccess, type SendReason } from "@/lib/payments/send-access-rules";
 import { ORDER_MAX_MONTHS, ORDER_MIN_MONTHS, isPaidActive, paidDaysLeft, paidUntilIso } from "@/lib/payments/usdt-amount";
 
@@ -162,39 +164,69 @@ export async function getAccountSending(env: CloudflareEnv, userId: string): Pro
  *
  * In order: a domain that sends for everyone; the account's own credentials; a
  * paid month, spent through whichever provider the domain names (or the
- * deployment's own key when the domain names none). A domain that names a
- * provider but has no key is a misconfiguration and surfaces as itself rather
- * than as "buy sending".
+ * deployment's own key when the domain names none); and finally the free
+ * allowance, which is the deployment's provider for a few messages a day. A
+ * domain that names a provider but has no key is a misconfiguration and surfaces
+ * as itself rather than as "buy sending".
+ *
+ * The two free ways in spend a slot of the allowance before the message goes
+ * out, so the answer carries the slot's id: a send that the provider then refuses
+ * gives it back (`releaseFreeSend`).
  */
+export type ResolvedOutboundProvider = {
+	config: OutboundProviderConfig;
+	/** Set when this send spent one of the free allowance's slots. */
+	freeUseId?: string;
+};
+
+async function spendFreeSlot(
+	env: CloudflareEnv,
+	options: { userId: string },
+	config: OutboundProviderConfig,
+): Promise<ResolvedOutboundProvider> {
+	const claim = await claimFreeSend(env, { userId: options.userId, provider: config.provider });
+	if (!claim) throw new Error(SEND_QUOTA_MESSAGE);
+	return { config, freeUseId: claim.id };
+}
+
 export async function resolveOutboundProvider(
 	env: CloudflareEnv,
 	options: { userId: string; from: string },
-): Promise<OutboundProviderConfig> {
+): Promise<ResolvedOutboundProvider> {
 	const domain = await getDomainSending(env, options.from);
 	const domainSends = !!domain && domain.provider !== "none";
-	if (domainSends && domain.enabled) return getOutboundProviderConfig(env, options.from);
+	if (domainSends && domain.enabled) {
+		const config = await getOutboundProviderConfig(env, options.from);
+		const owner = await getAccountSending(env, options.userId);
+		// An administrator owns the switch that decides whether a domain is metered,
+		// so it does not meter them. Without this the person who set the deployment
+		// up could not send from their own address until they bought time from
+		// themselves, which is not a thing.
+		if (owner?.role === "admin") return { config };
+		return spendFreeSlot(env, options, config);
+	}
 
 	const account = await getAccountSending(env, options.userId);
 	if (!account) throw new Error(SEND_LOCKED_MESSAGE);
 
-	// An administrator owns the switch that decides whether a domain is metered,
-	// so it does not meter them. Without this the person who set the deployment up
-	// could not send from their own address until they bought time from
-	// themselves, which is not a thing.
-	if (domainSends && account.role === "admin") return getOutboundProviderConfig(env, options.from);
+	if (domainSends && account.role === "admin") return { config: await getOutboundProviderConfig(env, options.from) };
 
 	if (account.sendProvider && account.sendCredentials) {
 		const credentials = await openJson<OwnCredentials>(env.BILLING_SECRET ?? "", account.sendCredentials);
-		if (credentials?.provider === account.sendProvider) return configFromOwn(credentials);
+		if (credentials?.provider === account.sendProvider) return { config: configFromOwn(credentials) };
 	}
 
 	if (isPaidActive(account.sendPaidUntil, Date.now())) {
 		// A metered domain already says which provider it wants; use that one, so a
 		// paid month sends the same way the domain would.
-		if (domainSends) return getOutboundProviderConfig(env, options.from);
+		if (domainSends) return { config: await getOutboundProviderConfig(env, options.from) };
 		const paid = await configFromSystem(env);
-		if (paid) return paid;
+		if (paid) return { config: paid };
 	}
+
+	// The free allowance: the deployment's own provider, a few messages a day.
+	const free = await configFromSystem(env);
+	if (free) return spendFreeSlot(env, options, free);
 	throw new Error(SEND_LOCKED_MESSAGE);
 }
 
@@ -213,6 +245,11 @@ export type SendStatusView = {
 	own: { provider: "resend" | "ses"; description: string } | null;
 	/** The provider a paid month spends the deployment's own credentials on. */
 	systemProvider: SystemProvider;
+	/**
+	 * The free allowance — messages a day out of the deployment's own provider.
+	 * Null when it could not be read, which is not the same as "none left".
+	 */
+	free: FreeSendState | null;
 	/** Buying needs both a provider to spend the money on and an address to send it to. */
 	buyingOffered: boolean;
 	/** Whether credentials can be sealed at all (`BILLING_SECRET` set). */
@@ -280,6 +317,12 @@ export async function getSendStatus(
 	const paid = isPaidActive(account?.sendPaidUntil, Date.now());
 	const systemProvider = await guarded(problems, "provider", null as SystemProvider, () => getSystemProvider(env));
 	const address = await guarded(problems, "address", "", async () => paymentAddress(env));
+	// A failed read must not read as "you are out": the allowance is unknown, so it
+	// is reported as unknown (null) and the rule is told the full limit — `/api/send`
+	// refuses on its own when the read works and there is nothing left.
+	const free = await guarded(problems, "allowance", null as FreeSendState | null, () =>
+		readFreeSendState(env, options.userId),
+	);
 	const access = sendAccess({
 		admin: account?.role === "admin",
 		domainHasProvider: ownDomains.hasProvider,
@@ -287,6 +330,7 @@ export async function getSendStatus(
 		own: !!own,
 		paid,
 		hasSystemProvider: !!systemProvider,
+		freeRemaining: free ? free.remaining : FREE_SENDS_PER_WINDOW,
 	});
 	return {
 		allowed: access.allowed,
@@ -296,6 +340,7 @@ export async function getSendStatus(
 		paidDaysLeft: paidDaysLeft(account?.sendPaidUntil, Date.now()),
 		own,
 		systemProvider,
+		free,
 		buyingOffered: !!systemProvider && address !== "",
 		canStoreCredentials: !!env.BILLING_SECRET?.trim(),
 		pricePerMonth: 1,

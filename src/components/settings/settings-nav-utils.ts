@@ -27,6 +27,9 @@ export const settingsNavSections: SettingsNavSection[] = [
 			{
 				href: "/settings/sending",
 				labelKey: "settings.nav.sending",
+				// Never metered, never sold anything: see `sending-settings.tsx`,
+				// which sends an administrator to the first section instead.
+				adminHidden: true,
 			},
 			{
 				href: "/settings/rules",

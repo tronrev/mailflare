@@ -14,6 +14,7 @@ import { useSelectedMailbox } from "@/components/mailbox-provider";
 import { authFetch } from "@/lib/auth/client";
 import { formatEmailAddress, getEmailAddress } from "@/lib/email/address";
 import { useCompose } from "@/components/compose/compose-context";
+import { useSendAccess } from "@/components/compose/send-access";
 import { cn } from "@/lib/utils";
 import { SendReview } from "@/components/agent/send-review";
 import type { ReviewSnapshot } from "@/components/agent/send-review-types";
@@ -53,6 +54,9 @@ export function ComposeForm({
 	const { t } = useLanguage();
 	const router = useRouter();
 	const { showNotice, openDraftComposer } = useCompose();
+	// Only for the refusal case: "you are out of sending" is answered with the two
+	// ways out, which live in this provider's dialog rather than in a toast.
+	const sendAccess = useSendAccess();
 	const { selectedMailbox, setSelectedMailbox, mailboxes } = useSelectedMailbox();
 	const [draftId, setDraftId] = useState<string | null>(null);
 	const [agentRevision, setAgentRevision] = useState<number | null>(null);
@@ -413,6 +417,11 @@ export function ComposeForm({
 
 		if (!res.ok) {
 			setToast({ type: "error", message: data.error ?? t("compose.error.sendFailed") });
+			// 402: the free allowance is spent, or this address never qualified. The
+			// message says which; the dialog says what to do about it.
+			if (res.status === 402 && sendAccess) {
+				void sendAccess.refresh().then(() => sendAccess.openGuide());
+			}
 			return;
 		}
 

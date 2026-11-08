@@ -512,6 +512,13 @@
       "when": 1793964977719,
       "tag": "0081_add_verify_extraction",
       "breakpoints": true
+    },
+    {
+      "idx": 74,
+      "version": "6",
+      "when": 1794050000000,
+      "tag": "0082_add_send_allowance",
+      "breakpoints": true
     }
   ]
 }

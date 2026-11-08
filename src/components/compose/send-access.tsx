@@ -22,10 +22,15 @@ import { needsSendGuide, type SendAccessView } from "@/lib/payments/send-guide";
  */
 
 export type SendAccess = SendAccessView & {
-	reason: "domain" | "admin" | "own" | "paid" | null;
+	reason: "domain" | "admin" | "own" | "paid" | "free" | null;
 	buyingOffered: boolean;
 	canStoreCredentials: boolean;
 	pricePerMonth: number;
+	/**
+	 * The free allowance: a few messages a day out of this server's provider.
+	 * Null when it could not be read — unknown is not "none left".
+	 */
+	free?: { limit: number; used: number; remaining: number; exhausted: boolean; nextSlotAt: string | null } | null;
 };
 
 type SendAccessContextValue = {
@@ -99,8 +104,17 @@ export function SendGuideBody({ access }: { access: SendAccess | null }) {
 	const buy = access?.buyingOffered ?? false;
 	const ownKey = access?.canStoreCredentials ?? false;
 	if (!buy && !ownKey) return <p className="text-sm text-neutral-600">{t("compose.locked.unavailable")}</p>;
+	const quota = access?.free?.exhausted ? access.free : null;
 	return (
 		<div className="space-y-3">
+			{/* Why the composer opened earlier and refuses now: the allowance, not a
+			    settings change. Said first, because "one of the two below" is only
+			    true after it is used up. */}
+			{quota ? (
+				<p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900">
+					{t("compose.locked.quota", { limit: quota.limit, remaining: quota.remaining })}
+				</p>
+			) : null}
 			<p className="text-sm text-neutral-600">{t("compose.locked.body")}</p>
 			{buy ? (
 				<div className="rounded-xl border border-neutral-200 p-4">
