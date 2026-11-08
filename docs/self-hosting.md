@@ -107,15 +107,29 @@ handed over by letting people bring their own provider.
   credentials, sealed with AES-GCM under `BILLING_SECRET` and never read back to
   a client. Without `BILLING_SECRET` the server refuses to store them rather than
   keep them in the clear.
+- **The free allowance comes first.** Every account may send three messages per
+  rolling 24 hours through the deployment's own provider — the shared Resend key
+  or the Amazon SES credentials — whether it gets there through an open domain or
+  straight through that key. A slot comes back 24 hours after it was spent, not
+  at midnight. Counted in `send_allowance_uses`, one row per message, written
+  before the send and deleted again if the provider refuses it, so a failed send
+  does not eat one of the three. Constants: `FREE_SENDS_PER_WINDOW` and
+  `FREE_SEND_WINDOW_MS` in `src/lib/payments/free-send-rules.ts`.
+- **Past that, two ways out.** `POST /api/send` answers 402 with the limit in the
+  message, and the composer opens the same dialog as a locked account: buy time,
+  or bring a provider key. Nothing about receiving changes.
 - **Where it applies.** On the Domains page, `sendingEnabled` is the switch:
-  with it on, the domain sends for every account on it, free, exactly as before.
-  With it off, the domain names a provider but each account has to qualify for it
-  — that is the metered case this section sells. Wording for the operator: turn
-  the switch off when you want sending to be per account.
+  with it on, the domain's provider is the pool every account draws its free
+  allowance from. With it off, the domain names a provider but each account has
+  to qualify for it. Either way the allowance is what a free account has; wording
+  for the operator: the switch decides *whose* provider, the allowance decides
+  *how much*.
 - **Administrators are never metered.** They own the switch above, so an address
-  on a metered domain still sends for them, and the settings page says so instead
-  of offering them a price. Without this the person who set the deployment up
-  would have to buy sending time from themselves.
+  on a metered domain still sends for them — unlimited, and without spending an
+  allowance slot. `/settings/sending` is hidden from them: every card on it is an
+  offer they cannot accept, so the page redirects to the first settings section
+  and the nav does not list it. Without the exemption the person who set the
+  deployment up would have to buy sending time from themselves.
 - **What is not sold.** Inbound is free and unaffected; nothing here limits
   receiving or creates an invoice.
 - **The address is yours, not the repository's.** It comes from

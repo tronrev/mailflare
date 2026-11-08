@@ -14,6 +14,7 @@ import type { AttachmentContent } from "@/lib/email/attachment-types";
 import { getOutboundAttachmentMaxMb } from "@/lib/email/attachment-policy";
 import { sendThroughProvider } from "@/lib/email/outbound-provider";
 import { resolveOutboundProvider } from "@/lib/payments/entitlement";
+import { releaseFreeSend } from "@/lib/payments/free-sends";
 import { prepareCloudflareAttachments } from "@/lib/email/cloud-attachment-utils";
 import { ensureTrackingToken, getTrackingHostForSender } from "@/lib/tracking/open-tracking";
 import { setFollowUp } from "@/lib/follow-ups/service";
@@ -199,10 +200,16 @@ async function deliverEmail(env: CloudflareEnv, delivery: PreparedDelivery): Pro
 	const { input, messageId, jobId, from, mailboxId, to, cc, bcc, headers, attachments } = delivery;
 	const db = getDb(env);
 	const toAddr = joinEmailAddressList(to);
+	// Set once the free allowance has spent a slot, so a send the provider refuses
+	// can hand it back instead of eating one of the account's three.
+	let freeUseId: string | undefined;
 	try {
 		// The domain's own sending setup, or this account's own: its provider
-		// credentials, or sending time it has paid for. See lib/payments/entitlement.
-		const provider = await resolveOutboundProvider(env, { userId: input.userId, from });
+		// credentials, sending time it has paid for, or the free allowance. See
+		// lib/payments/entitlement.
+		const resolved = await resolveOutboundProvider(env, { userId: input.userId, from });
+		const provider = resolved.config;
+		freeUseId = resolved.freeUseId;
 		// Cloudflare's 5 MiB cap forces big files into download links; Resend takes
 		// the attachments directly (the admin's outgoing limit still applies).
 		const prepared = provider.provider === "cloudflare"
@@ -272,6 +279,8 @@ async function deliverEmail(env: CloudflareEnv, delivery: PreparedDelivery): Pro
 		});
 	} catch (err) {
 		const error = err instanceof Error ? err.message : "Send failed";
+		// The message never left, so the slot it reserved goes back.
+		if (freeUseId) await releaseFreeSend(env, freeUseId);
 		await db.update(messages).set({ status: "failed" }).where(eq(messages.id, messageId));
 		await db
 			.update(outboundJobs)

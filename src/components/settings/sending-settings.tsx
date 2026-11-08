@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Copy } from "lucide-react";
 import { useLanguage } from "@/components/language-provider";
+import { useCurrentUser } from "@/hooks/use-current-user";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +15,10 @@ import { Select } from "@/components/ui/select";
 /**
  * Sending, from the account's point of view.
  *
+ * Administrators never see this page: they own the switch and are never metered,
+ * so every card here (buy time, bring a key) would be an offer to sell somebody
+ * their own server. They are redirected to the first settings section instead.
+ *
  * Two ways to qualify, drawn in the order they cost the person: the domain may
  * already send (nothing to do), or they bring their own provider, or they buy
  * time. The page never claims one of those is true — it renders what
@@ -22,8 +28,10 @@ import { Select } from "@/components/ui/select";
 
 type SendStatus = {
 	allowed: boolean;
-	reason: "domain" | "admin" | "own" | "paid" | null;
+	reason: "domain" | "admin" | "own" | "paid" | "free" | null;
 	admin: boolean;
+	/** The free allowance — a few messages a day out of this server's provider. */
+	free?: { limit: number; used: number; remaining: number; exhausted: boolean; nextSlotAt: string | null } | null;
 	paidUntil: string | null;
 	paidDaysLeft: number;
 	own: { provider: "resend" | "ses"; description: string } | null;
@@ -70,6 +78,11 @@ function failureMessage(body: { error?: unknown; detail?: unknown } | null, fall
 
 export function SendingSettings() {
 	const { t } = useLanguage();
+	const router = useRouter();
+	const user = useCurrentUser();
+	// Unknown (null) is not "not an administrator": redirecting before the session
+	// arrives would bounce every administrator for a frame on every visit.
+	const admin = user?.role === "admin";
 	const [status, setStatus] = useState<SendStatus | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [months, setMonths] = useState(1);
@@ -81,6 +94,7 @@ export function SendingSettings() {
 	const pollTimer = useRef<number | null>(null);
 
 	const load = useCallback(async () => {
+		if (admin) return null;
 		const response = await fetch("/api/billing", { cache: "no-store" });
 		const body = await response.json().catch(() => null);
 		if (!response.ok) throw new Error(failureMessage(body, "Could not load sending settings"));
@@ -88,7 +102,11 @@ export function SendingSettings() {
 		const pending = (body.orders as Order[] | undefined)?.find((item) => item.status === "pending");
 		if (pending) setOrder(pending);
 		return body as SendStatus;
-	}, [t]);
+	}, [t, admin]);
+
+	useEffect(() => {
+		if (admin) router.replace("/settings/account");
+	}, [admin, router]);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -177,6 +195,17 @@ export function SendingSettings() {
 		}
 	}
 
+	// One sentence for two states: "2 of 3 left" and "0 of 3 left" are the same
+	// fact read at different times, and the second is the explanation a locked
+	// page needs (the addresses are set up; the allowance is spent).
+	const freeLine =
+		status?.free && status.systemProvider
+			? t("settings.sending.statusFree", { remaining: status.free.remaining, limit: status.free.limit })
+			: null;
+
+	// Hidden, not disabled: an administrator has nothing to do here, and the nav
+	// does not offer it either (see `settings-nav-utils`).
+	if (admin) return null;
 	if (!status && !error) return <p className="py-6 text-sm text-neutral-500">{t("common.loading")}</p>;
 
 	return (
@@ -200,8 +229,19 @@ export function SendingSettings() {
 													date: status.paidUntil.slice(0, 10),
 													days: status.paidDaysLeft,
 												})
-											: t("settings.sending.statusLocked")}
+											: status.reason === "free" && status.free
+												? freeLine
+												: status.free?.exhausted && status.systemProvider
+													? freeLine
+													: t("settings.sending.statusLocked")}
 					</CardDescription>
+					{/* An open domain says "Included", which is true but does not say how
+					    often: the allowance line is what turns it into a number. */}
+					{status?.free && status.reason === "domain" && freeLine ? (
+						<p className="pt-1 text-xs text-neutral-500">
+							{freeLine}
+						</p>
+					) : null}
 				</CardHeader>
 				{error ? (
 					<CardContent>

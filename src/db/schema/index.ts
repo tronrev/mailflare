@@ -453,6 +453,32 @@ export const messageTriage = sqliteTable(
 	],
 );
 
+/**
+ * One row per message sent on the free allowance — the few a day the deployment
+ * pays for out of its own Resend or SES credentials.
+ *
+ * A row rather than a counter because the window slides: "three in the last 24
+ * hours" needs the moment of each send, and a counter would have to reset at
+ * midnight, which hands out six messages around the boundary. Sent mail through
+ * an account's own key or a paid month is not recorded here: it neither spends
+ * the allowance nor waits for it to come back.
+ */
+export const sendAllowanceUses = sqliteTable(
+	"send_allowance_uses",
+	{
+		id: text("id").primaryKey(),
+		userId: text("user_id")
+			.notNull()
+			.references(() => users.id, { onDelete: "cascade" }),
+		/** Which provider carried it — for the question "what did this cost us?". */
+		provider: text("provider"),
+		createdAt: timestamp("created_at")
+			.notNull()
+			.$defaultFn(() => new Date()),
+	},
+	(t) => [index("send_allowance_uses_user_time_idx").on(t.userId, t.createdAt)],
+);
+
 export const spamTokenStats = sqliteTable(
 	"spam_token_stats",
 	{

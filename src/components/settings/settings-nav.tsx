@@ -13,9 +13,14 @@ export function SettingsNav() {
 	const pathname = usePathname();
 	const user = useCurrentUser();
 	const canManageMailboxes = user?.canManageMailboxes === true;
+	// Unknown role (null) keeps everything visible: a nav that rearranges itself
+	// while the session loads is worse than one link that redirects.
+	const isAdmin = user?.role === "admin";
 	const sections = settingsNavSections.map((section) => ({
 		...section,
-		items: section.items.filter((item) => !item.requiresMailboxAccess || canManageMailboxes),
+		items: section.items.filter(
+			(item) => (!item.requiresMailboxAccess || canManageMailboxes) && !(item.adminHidden && isAdmin),
+		),
 	}));
 	const currentItem = sections.flatMap((section) => section.items).find((item) => isActiveSettingsPath(pathname, item.href));
 	const currentLabel = t(currentItem?.labelKey ?? "settings.nav.settings");
