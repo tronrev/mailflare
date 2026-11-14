@@ -1,10 +1,13 @@
 const csp = [
 	"default-src 'self'",
-	"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com",
+	// Cloudflare injects its Web Analytics beacon on Workers deployments; without
+	// these two hosts the browser blocks the script and logs a CSP violation on
+	// every page load.
+	"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://static.cloudflareinsights.com",
 	"style-src 'self' 'unsafe-inline'",
 	"img-src 'self' data: blob: https:",
 	"font-src 'self' data:",
-	"connect-src 'self' ws: wss: https://challenges.cloudflare.com",
+	"connect-src 'self' ws: wss: https://challenges.cloudflare.com https://cloudflareinsights.com",
 	// 'self' lets the Drive preview show PDFs and text files in an iframe.
 	"frame-src 'self' https://challenges.cloudflare.com",
 	"object-src 'none'",

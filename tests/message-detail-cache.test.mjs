@@ -20,7 +20,12 @@ await build({
 });
 const cache = await import(pathToFileURL(target).href);
 const data = id => ({ message: { id, read: false }, body: { textBody: id, htmlBody: null } });
-const response = (value, ok = true) => ({ ok, json: async () => value });
+const response = (value, ok = true, status = ok ? 200 : 500) => ({
+	ok,
+	status,
+	json: async () => value,
+	text: async () => JSON.stringify(value),
+});
 after(() => { rmSync(temporary, { recursive: true, force: true }); delete globalThis.detailFetch; });
 
 test("concurrent detail and forced refresh callers share one request; cached reopen needs none", async () => {
@@ -42,11 +47,12 @@ test("cache invalidation blocks old account data and preserves a newer pending r
 	cache.clearMessageDetailCache(); let resolveOld, resolveNew; let requests = 0;
 	globalThis.detailFetch = () => new Promise(done => { requests++; resolveOld = done; });
 	const old = cache.fetchCachedMessageDetail("one");
-	const rejected = assert.rejects(old, /invalidated/);
 	cache.clearMessageDetailCache();
 	globalThis.detailFetch = () => new Promise(done => { requests++; resolveNew = done; });
 	const fresh = cache.fetchCachedMessageDetail("one");
-	resolveOld(response(data("old"))); await rejected;
+	resolveOld(response(data("old")));
+	// The stale request still settles for its own caller; it just must not cache.
+	assert.deepEqual(await old, data("old"));
 	assert.equal(cache.getCachedMessageDetail("one"), undefined);
 	const concurrent = cache.fetchCachedMessageDetail("one");
 	assert.equal(requests, 2);
@@ -55,15 +61,30 @@ test("cache invalidation blocks old account data and preserves a newer pending r
 	assert.equal(cache.getCachedMessageDetail("one").message.id, "new");
 });
 
-test("failed HTTP responses and network errors are retried rather than cached", async () => {
+test("failed HTTP responses and network errors are not cached", async () => {
 	cache.clearMessageDetailCache(); let requests = 0;
 	globalThis.detailFetch = async () => { requests++; return response({ error: "Forbidden" }, false); };
-	await cache.fetchCachedMessageDetail("one"); await cache.fetchCachedMessageDetail("one");
+	assert.equal((await cache.fetchCachedMessageDetail("one")).error, "Forbidden");
+	await cache.fetchCachedMessageDetail("one");
 	assert.equal(requests, 2); assert.equal(cache.getCachedMessageDetail("one"), undefined);
+	// The reader has to be able to stop waiting even when the request never
+	// produced a response at all.
 	globalThis.detailFetch = async () => { throw new Error("offline"); };
-	await assert.rejects(cache.fetchCachedMessageDetail("one"), /offline/);
+	assert.match((await cache.fetchCachedMessageDetail("one")).error, /Could not load/);
 	globalThis.detailFetch = async () => response(data("one"));
 	assert.equal((await cache.fetchCachedMessageDetail("one")).message.id, "one");
+});
+
+test("an empty 5xx body resolves to an error instead of throwing on JSON", async () => {
+	cache.clearMessageDetailCache();
+	globalThis.detailFetch = async () => ({
+		ok: false,
+		status: 500,
+		text: async () => "",
+		json: async () => { throw new SyntaxError("Unexpected end of JSON input"); },
+	});
+	assert.match((await cache.fetchCachedMessageDetail("one")).error, /Could not load/);
+	assert.equal(cache.getCachedMessageDetail("one"), undefined);
 });
 
 test("details expire after five minutes; storage is bounded and read-state updates still work", async () => {

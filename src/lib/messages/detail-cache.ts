@@ -4,9 +4,30 @@ import type { CachedMessageDetail } from "./detail-cache-types";
 
 const CACHE_TTL_MS = 5 * 60_000;
 const CACHE_LIMIT = 50;
+export const MESSAGE_DETAIL_LOAD_FAILED = "Could not load this message. Please try again.";
 const detailCache = new Map<string, { data: CachedMessageDetail; expiresAt: number }>();
 const detailRequests = new Map<string, Promise<CachedMessageDetail>>();
 let generation = 0;
+
+/**
+ * A failed Worker request can arrive with no body at all. `response.json()`
+ * throws on that, and the reader — which has no other way to learn the request
+ * finished — keeps showing its skeleton. Every non-JSON or failed response
+ * becomes an error payload the page can render instead.
+ */
+async function readDetailPayload(response: Response): Promise<CachedMessageDetail> {
+	const text = await response.text();
+	if (text) {
+		try {
+			return JSON.parse(text) as CachedMessageDetail;
+		} catch {
+			// Not JSON: fall through to the error payload below.
+		}
+	}
+	return {
+		error: response.status === 401 ? "Your session expired. Sign in again." : MESSAGE_DETAIL_LOAD_FAILED,
+	};
+}
 
 function cacheDetail(messageId: string, data: CachedMessageDetail) {
 	detailCache.delete(messageId);
@@ -55,11 +76,12 @@ export async function fetchCachedMessageDetail(messageId: string, force = false)
 	const requestGeneration = generation;
 	const request = authFetch(`/api/messages/${messageId}`, { cache: "no-store" })
 		.then(async (response) => {
-			const data = await response.json() as CachedMessageDetail;
-			if (requestGeneration !== generation) throw new Error("Message request invalidated");
+			const data = await readDetailPayload(response);
+			if (requestGeneration !== generation) return data;
 			if (response.ok && !data.error) cacheDetail(messageId, data);
 			return data;
 		})
+		.catch(() => ({ error: MESSAGE_DETAIL_LOAD_FAILED } as CachedMessageDetail))
 		.finally(() => { if (detailRequests.get(messageId) === request) detailRequests.delete(messageId); });
 	detailRequests.set(messageId, request);
 	return request;

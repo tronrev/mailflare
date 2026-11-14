@@ -28,6 +28,7 @@ import { useMessageListVisibility } from "@/components/messages/message-list-vis
 import { splitEmailAddressList } from "@/lib/email/address";
 import { RecipientList } from "@/components/messages/recipient-list";
 import { useShowFullRecipientAddresses } from "@/components/messages/use-show-full-recipient-addresses";
+import { MESSAGE_DETAIL_LOAD_FAILED } from "@/lib/messages/detail-cache";
 import type { MessageAttachment, MessageDetailResponse } from "./types";
 import {
   fetchMessageDetail,
@@ -88,10 +89,15 @@ export default function MessageDetailPage() {
         return;
       }
       setLoading(true);
-      const nextData = await fetchMessageDetail(messageId);
-      if (!cancelled) {
-        setData(nextData);
-        setLoading(false);
+      try {
+        const nextData = await fetchMessageDetail(messageId);
+        if (!cancelled) setData(nextData);
+      } catch {
+        // A request that fails hard must still end the loading state, or the
+        // reader sits on the skeleton with nothing to retry.
+        if (!cancelled) setData({ error: MESSAGE_DETAIL_LOAD_FAILED });
+      } finally {
+        if (!cancelled) setLoading(false);
       }
     }
 
