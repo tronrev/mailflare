@@ -3,7 +3,8 @@ import type { DatabaseDialect } from "@/db/dialect";
 import sqliteBundle from "./bundle.json";
 import mysqlBundle from "./bundle-mysql.json";
 import postgresBundle from "./bundle-postgres.json";
-import type { BundledMigration, MigrationNameRow, MigrationResult, MigrationStatus } from "./types";
+import type { BundledMigration, MigrationNameFix, MigrationNameRow, MigrationResult, MigrationStatus } from "./types";
+import { matchBundledName } from "./names";
 
 const BUNDLES: Record<DatabaseDialect, BundledMigration[]> = {
 	sqlite: sqliteBundle.migrations as BundledMigration[],
@@ -44,13 +45,42 @@ async function getAppliedMigrationNames(db: D1Database): Promise<string[]> {
 }
 
 export async function getMigrationStatus(db: D1Database): Promise<MigrationStatus> {
-	const migrations = BUNDLES[migrationDialect(db)];
-	const applied = new Set(await getAppliedMigrationNames(db));
+	const dialect = migrationDialect(db);
+	const migrations = BUNDLES[dialect];
 	const committed = new Set(migrations.map((migration) => migration.name));
-	const pending = migrations.filter((migration) => !applied.has(migration.name)).map((migration) => migration.name);
-	const unknown = [...applied].filter((name) => !committed.has(name)).sort();
+	const records = await getAppliedMigrationNames(db);
 
-	return { ready: pending.length === 0 && unknown.length === 0, pending, unknown };
+	const applied = new Set<string>();
+	const legacy: MigrationNameFix[] = [];
+	const unknown: string[] = [];
+
+	for (const record of records) {
+		const matched = matchBundledName(record, committed);
+		if (!matched) {
+			unknown.push(record);
+			continue;
+		}
+
+		applied.add(matched);
+		// Only rewrite a name when the correct one is missing, so a database that already has both
+		// the legacy and the canonical row is not asked to duplicate it.
+		if (matched !== record && !records.includes(matched)) legacy.push({ from: record, to: matched });
+	}
+
+	legacy.sort((left, right) => left.from.localeCompare(right.from));
+	unknown.sort();
+
+	const pending = migrations.filter((migration) => !applied.has(migration.name)).map((migration) => migration.name);
+
+	return {
+		ready: pending.length === 0 && unknown.length === 0,
+		pending,
+		unknown,
+		legacy,
+		bundledCount: migrations.length,
+		appliedCount: applied.size,
+		table: MIGRATION_TABLES[dialect].table,
+	};
 }
 
 export async function applyPendingMigrations(db: D1Database): Promise<MigrationResult> {
@@ -63,6 +93,12 @@ export async function applyPendingMigrations(db: D1Database): Promise<MigrationR
 	}
 
 	await db.prepare(create).run();
+
+	// Normalise hand-written records first, so the pending list below matches what is actually stored.
+	if (initial.legacy.length > 0) {
+		await db.batch(initial.legacy.map(({ from, to }) => db.prepare(`UPDATE ${table} SET name = ? WHERE name = ?`).bind(to, from)));
+	}
+
 	const applied: string[] = [];
 
 	for (const name of initial.pending) {

@@ -164,27 +164,47 @@ export function AdminUpdateCard() {
 							</div>
 						)}
 
-						{!isCheckingMigrations && !!migrationStatus?.pending.length && !migrationStatus.unknown.length && (
-							<div className="flex items-center gap-3 px-4 py-4">
-								<Database className={`h-4 w-4 shrink-0 text-amber-600 ${isMigrating ? "animate-pulse" : ""}`} />
-								<p className="text-sm text-neutral-700">
-									{t("update.pendingMigrations", { count: migrationStatus.pending.length })}
-								</p>
-								<button
-									type="button"
-									onClick={handleMigrate}
-									disabled={isMigrating}
-									className="ml-auto shrink-0 text-sm font-medium text-blue-700 hover:underline disabled:pointer-events-none disabled:opacity-50"
-								>
-									{isMigrating ? t("update.updatingDatabase") : t("update.updateDatabase")}
-								</button>
+						{!isCheckingMigrations && !!migrationStatus?.pending.length && (
+							<div className="space-y-3 px-4 py-4">
+								<div className="flex items-center gap-3">
+									<Database className={`h-4 w-4 shrink-0 text-amber-600 ${isMigrating ? "animate-pulse" : ""}`} />
+									<p className="text-sm text-neutral-700">
+										{t("update.pendingMigrations", { count: migrationStatus.pending.length })}
+									</p>
+									{!migrationStatus.unknown.length && (
+										<button
+											type="button"
+											onClick={handleMigrate}
+											disabled={isMigrating}
+											className="ml-auto shrink-0 text-sm font-medium text-blue-700 hover:underline disabled:pointer-events-none disabled:opacity-50"
+										>
+											{isMigrating ? t("update.updatingDatabase") : t("update.updateDatabase")}
+										</button>
+									)}
+								</div>
+								<ul className="space-y-1 pl-7">
+									{migrationStatus.pending.map((name) => (
+										<li key={name} className="text-xs text-neutral-500">
+											<code>{name}</code>
+										</li>
+									))}
+								</ul>
 							</div>
 						)}
 
 						{!isCheckingMigrations && !!migrationStatus?.unknown.length && (
-							<div className="flex items-center gap-3 px-4 py-4 text-sm text-red-600">
-								<CircleX className="h-4 w-4 shrink-0" />
-								{t("update.deployMatching")}
+							<div className="space-y-3 px-4 py-4">
+								<div className="flex items-start gap-3">
+									<CircleX className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
+									<p className="text-sm text-red-600">{t("update.deployMatching")}</p>
+								</div>
+								<ul className="space-y-1 pl-7">
+									{migrationStatus.unknown.map((name) => (
+										<li key={name} className="text-xs text-neutral-500">
+											<code>{name}</code>
+										</li>
+									))}
+								</ul>
 							</div>
 						)}
 

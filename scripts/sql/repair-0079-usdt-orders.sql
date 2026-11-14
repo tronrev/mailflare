@@ -36,4 +36,6 @@ CREATE UNIQUE INDEX IF NOT EXISTS `usdt_orders_tx_idx` ON `usdt_orders` (`tx_id`
 CREATE INDEX IF NOT EXISTS `usdt_orders_user_idx` ON `usdt_orders` (`user_id`);
 CREATE INDEX IF NOT EXISTS `usdt_orders_status_idx` ON `usdt_orders` (`status`, `expires_at`);
 
-INSERT OR IGNORE INTO `d1_migrations` (`name`) VALUES ('0079_add_send_entitlements_and_usdt_orders');
+-- The name must match the bundled file (`0079_...sql`) exactly: a record without the suffix leaves
+-- the in-app updater reporting this migration as unknown *and* as pending at the same time.
+INSERT OR IGNORE INTO `d1_migrations` (`name`) VALUES ('0079_add_send_entitlements_and_usdt_orders.sql');
