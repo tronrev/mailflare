@@ -9,6 +9,7 @@ import { getMessageContactNames, upsertContactFromAddress } from "@/lib/contacts
 import { getEmailAddress } from "@/lib/email/address";
 import { sendMailboxAutoReply } from "@/lib/email/auto-reply";
 import { getMailboxAccessLevel } from "@/lib/mailboxes/access";
+import { describeDatabaseError } from "@/lib/database-errors";
 import { listMessageAttachments, storeMessageAttachments } from "@/lib/email/attachments";
 import { inboundAttachmentLimitReason } from "@/lib/email/inbound-attachments";
 import { inboundMessageId } from "@/lib/email/inbound-id";
@@ -337,33 +338,60 @@ export async function getMessageWithBody(env: CloudflareEnv, userId: string, mes
 	};
 }
 
+/**
+ * Reading a message must not depend on the data that decorates it. Contact
+ * names, attachments, the unsubscribe header and the triage verdict each come
+ * from a table or a column that a deployment can be missing while a migration
+ * is pending, and a missing one used to fail the whole request with an empty
+ * 500. The message row and its mailbox permission stay fatal; everything here
+ * degrades to the fallback and says so in the log.
+ */
+function settle<T>(label: string, promise: Promise<T>, fallback: T): Promise<T> {
+	return promise.catch((error: unknown) => {
+		console.error(`Message detail: ${label} unavailable`, describeDatabaseError(error));
+		return fallback;
+	});
+}
+
 export async function getMessageWithBodyForUser(env: CloudflareEnv, user: SessionUser, messageId: string) {
 	const db = getDb(env);
 	const [message] = await db.select().from(messages).where(eq(messages.id, messageId)).limit(1);
 	if (!message?.mailboxId) return null;
 	const access = await getMailboxAccessLevel(db, user, message.mailboxId);
 	if (!access?.canRead) return null;
-	const contactNames = await getMessageContactNames(env, message.userId, message.fromAddr, message.toAddr);
-	const attachments = await listMessageAttachments(env, messageId);
-	const unsubscribeUrl = await getUnsubscribeUrlFromRawR2Key(env, message.rawR2Key);
-	const [triage] = await db
-		.select({
-			category: messageTriage.category,
-			confidence: messageTriage.confidence,
-			source: messageTriage.source,
-			otpProvider: messageTriage.otpProvider,
-			otpCode: messageTriage.otpCode,
-			otpExpiresAt: messageTriage.otpExpiresAt,
-			verifyProvider: messageTriage.verifyProvider,
-			verifyUrl: messageTriage.verifyUrl,
-			verifyCode: messageTriage.verifyCode,
-			verifyExpiresAt: messageTriage.verifyExpiresAt,
-			retainUntil: messageTriage.retainUntil,
-			createdAt: messageTriage.createdAt,
-		})
-		.from(messageTriage)
-		.where(eq(messageTriage.messageId, messageId))
-		.limit(1);
+	const contactNames = await settle(
+		"contact names",
+		getMessageContactNames(env, message.userId, message.fromAddr, message.toAddr),
+		{ fromContactName: null, toContactName: null },
+	);
+	const attachments = await settle("attachments", listMessageAttachments(env, messageId), []);
+	const unsubscribeUrl = await settle(
+		"unsubscribe header",
+		getUnsubscribeUrlFromRawR2Key(env, message.rawR2Key),
+		null,
+	);
+	const [triage] = await settle(
+		"triage verdict",
+		db
+			.select({
+				category: messageTriage.category,
+				confidence: messageTriage.confidence,
+				source: messageTriage.source,
+				otpProvider: messageTriage.otpProvider,
+				otpCode: messageTriage.otpCode,
+				otpExpiresAt: messageTriage.otpExpiresAt,
+				verifyProvider: messageTriage.verifyProvider,
+				verifyUrl: messageTriage.verifyUrl,
+				verifyCode: messageTriage.verifyCode,
+				verifyExpiresAt: messageTriage.verifyExpiresAt,
+				retainUntil: messageTriage.retainUntil,
+				createdAt: messageTriage.createdAt,
+			})
+			.from(messageTriage)
+			.where(eq(messageTriage.messageId, messageId))
+			.limit(1),
+		[],
+	);
 	return {
 		message: { ...message, ...contactNames },
 		body: message,
