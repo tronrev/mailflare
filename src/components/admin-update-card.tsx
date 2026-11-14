@@ -196,12 +196,7 @@ export function AdminUpdateCard() {
 							<div className="space-y-3 px-4 py-4">
 								<div className="flex items-start gap-3">
 									<CircleX className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
-									<div className="space-y-1">
-										<p className="text-sm text-red-600">{t("update.deployMatching")}</p>
-										<p className="text-xs text-neutral-500">
-											{t("update.unknownMigrations", { count: migrationStatus.unknown.length })}
-										</p>
-									</div>
+									<p className="text-sm text-red-600">{t("update.deployMatching")}</p>
 								</div>
 								<ul className="space-y-1 pl-7">
 									{migrationStatus.unknown.map((name) => (
@@ -218,16 +213,6 @@ export function AdminUpdateCard() {
 								<CheckCircle2 className="h-4 w-4 shrink-0 text-green-600" />
 								<p className="text-sm text-neutral-700">{t("update.databaseUpToDate")}</p>
 							</div>
-						)}
-
-						{!isCheckingMigrations && migrationStatus && !migrationStatus.ready && (
-							<p className="px-4 py-2 text-xs text-neutral-400">
-								{t("update.migrationCounts", {
-									bundled: migrationStatus.bundledCount ?? 0,
-									applied: migrationStatus.appliedCount ?? 0,
-									table: migrationStatus.table ?? "d1_migrations",
-								})}
-							</p>
 						)}
 					</div>
 				)}

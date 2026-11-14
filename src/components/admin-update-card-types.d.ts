@@ -27,6 +27,7 @@ export interface MigrationStatusResponse {
 	appliedCount?: number;
 	bundledCount?: number;
 	error?: string;
+	legacy?: Array<{ from: string; to: string }>;
 	pending: string[];
 	ready: boolean;
 	table?: string;
