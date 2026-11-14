@@ -24,8 +24,11 @@ export interface UpdateWorkflowResponse {
 
 export interface MigrationStatusResponse {
 	applied?: string[];
+	appliedCount?: number;
+	bundledCount?: number;
 	error?: string;
 	pending: string[];
 	ready: boolean;
+	table?: string;
 	unknown: string[];
 }

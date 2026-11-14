@@ -44,13 +44,21 @@ async function getAppliedMigrationNames(db: D1Database): Promise<string[]> {
 }
 
 export async function getMigrationStatus(db: D1Database): Promise<MigrationStatus> {
-	const migrations = BUNDLES[migrationDialect(db)];
+	const dialect = migrationDialect(db);
+	const migrations = BUNDLES[dialect];
 	const applied = new Set(await getAppliedMigrationNames(db));
 	const committed = new Set(migrations.map((migration) => migration.name));
 	const pending = migrations.filter((migration) => !applied.has(migration.name)).map((migration) => migration.name);
 	const unknown = [...applied].filter((name) => !committed.has(name)).sort();
 
-	return { ready: pending.length === 0 && unknown.length === 0, pending, unknown };
+	return {
+		ready: pending.length === 0 && unknown.length === 0,
+		pending,
+		unknown,
+		bundledCount: migrations.length,
+		appliedCount: applied.size,
+		table: MIGRATION_TABLES[dialect].table,
+	};
 }
 
 export async function applyPendingMigrations(db: D1Database): Promise<MigrationResult> {
