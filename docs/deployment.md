@@ -42,6 +42,54 @@ Paste only the token secret into the `CF_TOKEN` field in step 2. Do not include 
 4. Add `CF_TOKEN` when Cloudflare asks for the app's runtime variables or secrets. This is different from the CF_TOKEN that Cloudflare uses to deploy the app.
 5. Start the deployment and wait for Cloudflare to finish provisioning and deploying the Worker.
 
+### Deploying from a repository you already own
+
+The Deploy to Cloudflare button copies this repository into your account, because it needs a
+repository it can rewrite (resource IDs, and later the in-app updater) without touching the
+upstream one. To deploy from a repository you already control instead, skip the button and connect
+that repository to Workers Builds yourself. A push to the connected branch then builds and deploys
+the Worker; no GitHub Actions workflow is involved.
+
+1. Create the resources `wrangler.jsonc` declares, once, in the target account:
+
+   ```bash
+   npx wrangler login
+   npx wrangler d1 create mailflare
+   npx wrangler r2 bucket create mailflare-raw
+   npx wrangler queues create mailflare-inbound
+   npx wrangler queues create mailflare-outbound
+   npx wrangler queues create mailflare-agent
+   ```
+
+   `wrangler deploy` resolves the binding by `database_name`, so `database_id` can stay out of the
+   repository as the manual deployment notes below require.
+
+2. In the Cloudflare dashboard, open **Workers & Pages** → **Create application** → **Connect to
+   Git**, or connect an existing Worker under **Settings** → **Builds** → **Connect**. Choose the
+   repository and the branch to deploy.
+
+3. Set the build settings:
+
+   | Setting | Value |
+   | --- | --- |
+   | Build command | `npm run build` |
+   | Deploy command | `npx wrangler deploy` |
+   | Root directory | empty (the repository root) |
+
+   `npm run deploy` also builds before deploying, so leaving it as the deploy command builds twice.
+   Add the build variable `NODE_VERSION=22` if the build image reports an older Node.js version.
+
+4. Add the runtime variables and secrets the button asks for under **Settings** → **Variables &
+   Secrets**, at least `CF_TOKEN`. `NEXT_PUBLIC_TURNSTILE_SITE_KEY` has to be available at build
+   time, so set it before the first build.
+
+5. Push a commit to the connected branch. The build deploys the Worker, and later pushes repeat
+   that. The Worker in the dashboard must be named `mailflare`; the build fails when it differs from
+   `name` in `wrangler.jsonc`.
+
+Deploying does not migrate the database: open `/setup` after the first deployment, and **Admin
+settings → Update database** after a release that adds migrations. Use either Workers Builds or a
+GitHub Actions deploy workflow for a repository, never both, or every push deploys twice.
 
 ### Optional Web Push configuration
 
