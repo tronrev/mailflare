@@ -1,5 +1,5 @@
 import type { TranslationKey } from "@/lib/i18n/types";
-import type { LucideIcon } from "lucide-react";
+import type { LucideIcon } from "@/components/icons";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import type { Message, MessageFolder } from "@/hooks/types";
 import type { BulkMessageAction } from "@/app/api/messages/bulk/types";
@@ -24,11 +24,14 @@ export type MessageListRowProps = {
 	config: MessageFolderConfig;
 	selected: boolean;
 	active?: boolean;
+	opening?: boolean;
 	compact?: boolean;
 	currentAccountName?: string;
 	onSelectedChange: (messageId: string, selected: boolean) => void;
 	onMessageAction: (messageId: string, action: RowMessageAction) => Promise<void>;
-	dragMessageIds: string[];
+	onOpening?: (messageId: string) => void;
+	dragMessageIds?: string[];
+	todayKey: string;
 };
 
 export type RowMessageAction = "archive" | "trash" | "read" | "unread";
@@ -42,7 +45,6 @@ export type MessageFolderPageProps = {
 	config: MessageFolderConfig;
 	compact?: boolean;
 	selectedMessageId?: string;
-	selection?: MessageSelectionControl;
 };
 
 export type MessageSplitLayoutProps = {
@@ -71,12 +73,16 @@ export type BulkMessageToolbarProps = {
 
 export type SelectedMessage = Pick<Message, "id" | "read">;
 
-export type MessageSelectionControl = {
+export type MessageListStateControl = {
 	selectedMessages: SelectedMessage[];
 	setSelectedMessages: Dispatch<SetStateAction<SelectedMessage[]>>;
+	offset: number;
+	setOffset: Dispatch<SetStateAction<number>>;
+	unreadOnly: boolean;
+	setUnreadOnly: Dispatch<SetStateAction<boolean>>;
 };
 
-export type BulkMessageSelectionPaneProps = {
+export type BulkMessageActionBarProps = {
 	folder?: MessageFolder;
 	selectedMessages: SelectedMessage[];
 	onClearSelection: () => void;

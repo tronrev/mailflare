@@ -1,9 +1,10 @@
 "use client";
 
 import { mobilePrimaryActionClass } from "@/components/page-header-utils";
+import { confirmDialog } from "@/components/ui/confirm-dialog";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Activity, Plus, RefreshCw, Send, Trash2 } from "lucide-react";
+import { Activity, Plus, RefreshCw, Send, Trash2 } from "@/components/icons";
 import { useLanguage } from "@/components/language-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ import {
 	updateWebhook,
 } from "./utils";
 import { WebhookDeliveries } from "./deliveries";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function WebhooksPage() {
 	const { t } = useLanguage();
@@ -215,8 +217,8 @@ export default function WebhooksPage() {
 									<Button
 										variant="ghost"
 										size="sm"
-										onClick={() => {
-											if (window.confirm(t("webhooks.rotateConfirm"))) rotate.mutate(hook.id);
+										onClick={async () => {
+											if (await confirmDialog(t("webhooks.rotateConfirm"))) rotate.mutate(hook.id);
 										}}
 										disabled={rotate.isPending}
 									>
@@ -288,9 +290,7 @@ export default function WebhooksPage() {
 										<span className="block text-sm font-medium">{t(event.labelKey)}</span>
 										<span className="block text-xs text-neutral-500">{t(event.hintKey)}</span>
 									</span>
-									<input
-										type="checkbox"
-										className="h-4 w-4"
+									<Checkbox
 										checked={events.includes(event.value)}
 										onChange={() => toggleEvent(event.value)}
 									/>

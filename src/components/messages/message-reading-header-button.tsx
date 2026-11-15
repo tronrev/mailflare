@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Columns2 } from "lucide-react";
+import { ArrowLeft, Columns2 } from "@/components/icons";
 import clsx from "clsx";
 import { useLanguage } from "@/components/language-provider";
 import { Tooltip } from "@/components/ui/tooltip";
@@ -31,7 +31,7 @@ export function MessageReadingHeaderButton({ assistantVisible }: MessageReadingH
 				aria-label={label ?? t("message.nav.listUnavailable")}
 				aria-pressed={singleColumn ? undefined : visible}
 			>
-				{singleColumn ? <ArrowLeft size={18} /> : <Columns2 size={18} />}
+				{singleColumn ? <ArrowLeft size={16} /> : <Columns2 size={16} />}
 			</button>
 		</Tooltip>
 	);

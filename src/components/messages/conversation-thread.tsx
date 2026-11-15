@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { formatUserDate } from "@/lib/time/utils";
-import { ChevronsUpDown, Paperclip } from "lucide-react";
+import { ChevronsUpDown, Paperclip } from "@/components/icons";
 import { ContactAvatar } from "@/components/contacts/contact-avatar";
 import { QuotedEmailToggle } from "@/components/messages/quoted-email-toggle";
 import { runSingleMessageAction } from "@/components/message-actions/utils";
@@ -14,6 +14,8 @@ import { useLanguage } from "@/components/language-provider";
 import { cn } from "@/lib/utils";
 import type { ConversationMessageCardProps, ConversationThreadProps } from "./conversation-thread-types";
 import { ThreadMessageActions } from "./thread-message-actions";
+import { MessageDetailsPanel } from "./message-details-panel";
+import { SenderCheckBadge, SenderCheckNotice } from "./sender-check-notice";
 import { MessageOpenStatus } from "./message-open-status";
 import { MessageFollowUpStatus } from "@/components/follow-ups/message-follow-up-status";
 import {
@@ -45,6 +47,29 @@ export function ConversationThread({
 }: ConversationThreadProps) {
 	const { t } = useLanguage();
 	const slice = partitionThread(messages, currentMessageId, position, latestMessagesFirst);
+	const revealTarget = useRef<string | null>(null);
+
+	// A note chip can point at an email hidden inside the collapsed middle.
+	useEffect(() => {
+		function reveal(event: Event) {
+			const id = (event as CustomEvent<string>).detail;
+			if (expandedAll) return;
+			const hidden = partitionThread(messages, currentMessageId, position, latestMessagesFirst).slice(1, -1);
+			if (!hidden.some((message) => message.id === id)) return;
+			revealTarget.current = id;
+			onExpandedAllChange(true);
+		}
+		window.addEventListener("mailflare:reveal-message", reveal);
+		return () => window.removeEventListener("mailflare:reveal-message", reveal);
+	}, [expandedAll, messages, currentMessageId, position, latestMessagesFirst, onExpandedAllChange]);
+
+	useEffect(() => {
+		if (!expandedAll || revealTarget.current === null) return;
+		const id = revealTarget.current;
+		revealTarget.current = null;
+		document.querySelector(`[data-message-id="${CSS.escape(id)}"]`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+	}, [expandedAll]);
+
 	if (slice.length === 0) return null;
 	const firstMessage = slice[0];
 	const lastMessage = slice.at(-1)!;
@@ -57,7 +82,7 @@ export function ConversationThread({
 			aria-label={position === "before" ? t("thread.earlier") : t("thread.later")}
 			className={cn(position === (latestMessagesFirst ? "before" : "after") ? "pb-6" : "")}
 		>
-			<ol className={cn(!collapsed && "divide-y divide-neutral-200/50", latestMessagesFirst ? "border-t" : "border-b", "border-neutral-200")}>
+			<ol className={cn(!collapsed && "divide-y divide-neutral-200/50", latestMessagesFirst ? "border-y" : "border-t", "border-neutral-200/50")}>
 				<li className={"border-t-0"}>
 					<ConversationMessageCard
 						message={firstMessage}
@@ -139,23 +164,36 @@ export function ConversationMessageCard({
 	const isAssistantOpen = useAssistantOpen();
 	const isAnyPanelVisible = messageListVisible || isAssistantOpen;
 
-	useEffect(() => setLocallyRead(message.read), [message.read]);
+	const [prevRead, setPrevRead] = useState(message.read);
+	if (message.read !== prevRead) {
+		setPrevRead(message.read);
+		setLocallyRead(message.read);
+	}
 
-	let body: { html: string | null; text: string; quotedHtml: string | null } | null = null;
-	if (expanded) {
+	// A note chip can point at this email while the card is collapsed.
+	useEffect(() => {
+		function reveal(event: Event) {
+			if ((event as CustomEvent<string>).detail === message.id) setLocallyExpanded(true);
+		}
+		window.addEventListener("mailflare:reveal-message", reveal);
+		return () => window.removeEventListener("mailflare:reveal-message", reveal);
+	}, [message.id]);
+
+	const body = useMemo(() => {
+		if (!expanded) return null;
 		const display = getMessageBodyDisplay(message.textBody, message.htmlBody, message.snippet);
-		body = {
+		return {
 			html: resolveInlineAttachmentUrls(display.htmlBody, message.id, message.attachments),
 			text: display.latestContent,
 			quotedHtml: resolveInlineAttachmentUrls(display.quotedHtml, message.id, message.attachments),
 		};
-	}
+	}, [expanded, message.id, message.htmlBody, message.snippet, message.textBody, message.attachments]);
 
 
 	return (
-		<article className={cn("bg-white transition-colors px-3 sm:px-6", !expanded && "hover:bg-neutral-50", !isAnyPanelVisible && "sm:pl-12")}>
+		<article data-message-id={message.id} className={cn("bg-white transition-colors px-3 sm:pl-0 sm:pr-6", !expanded && "hover:bg-neutral-50")}>
 			<div className="w-full">
-				<div className="flex w-full flex-wrap items-start gap-x-3 py-3 sm:pl-4">
+				<div className="flex w-full flex-wrap items-start gap-x-3 py-3 sm:pl-[78px]">
 					<button
 						type="button"
 						onClick={() => {
@@ -174,7 +212,7 @@ export function ConversationMessageCard({
 							name={sender}
 							hasManagedAvatar={message.fromContactHasAvatar}
 							managedAvatarUrl={outbound && mailboxId ? `/api/mailboxes/${mailboxId}/avatar` : undefined}
-							className={expanded ? "mt-1" : ""}
+							className={cn("sm:-ml-12", expanded && "mt-1")}
 						/>
 						<span className="min-w-0 flex-1">
 							<div className="flex flex-col">
@@ -187,6 +225,7 @@ export function ConversationMessageCard({
 							{!expanded && (
 								<span className={clsx(!locallyRead ? "font-semibold" : "text-neutral-500", "block truncate text-[13px]")}>{message.snippet || t("thread.noPreview")}</span>
 							)}
+							{!expanded && <SenderCheckBadge message={message} />}
 						</span>
 					</button>
 					<span className={clsx(!locallyRead ? "font-semibold" : "", "shrink-0 items-center gap-2 text-xs mr-2 mt-2", "hidden sm:flex")}>
@@ -199,24 +238,29 @@ export function ConversationMessageCard({
 						ownAddress={ownAddress}
 						ownAddresses={ownAddresses}
 						starOnly={!expanded}
+						detailsOpen={detailsOpen}
+						onToggleDetails={() => setDetailsOpen((open) => !open)}
 					/>
 					<div className={clsx("sm:hidden flex w-full items-center gap-2 pl-12 text-xs", locallyRead ? "text-neutral-500" : "font-semibold text-neutral-700")}>
 						{attachments.length > 0 && <Paperclip className="h-3.5 w-3.5" aria-label={t("thread.attachmentCount", { count: attachments.length })} />}
 						<span>{formatUserDate(message.createdAt, { month: "short", day: "2-digit", year: "numeric" })}</span>
-							<button type="button" className="text-blue-600 hover:underline" aria-expanded={detailsOpen} onClick={() => setDetailsOpen((open) => !open)}>
-							{t("message.details")}
-						</button>
 					</div>
-					{detailsOpen && (
-						<dl className="sm:hidden w-full space-y-0.5 break-words pt-2 text-xs text-neutral-500">
-							<div><dt className="inline font-medium">{t("source.from")}:</dt> <dd className="inline">{sender} &lt;{senderEmail}&gt;</dd></div>
-							{recipients && <div><dt className="inline font-medium">{t("source.to")}:</dt> <dd className="inline">{recipients}</dd></div>}
-							<div><dt className="inline font-medium">{t("message.date")}:</dt> <dd className="inline">{formatUserDate(message.createdAt, { month: "short", day: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}</dd></div>
-						</dl>
-					)}
 				</div>
+				{expanded && (
+					<SenderCheckNotice
+						message={message}
+						detailsOpen={detailsOpen}
+						onViewDetails={() => setDetailsOpen((open) => !open)}
+						className="mb-3 sm:ml-[78px]"
+					/>
+				)}
+				{detailsOpen && (
+					<div className="mb-3 sm:pl-[78px]">
+						<MessageDetailsPanel message={message} onClose={() => setDetailsOpen(false)} />
+					</div>
+				)}
 				{expanded && body && (
-					<div className="pb-4 pt-2 sm:pl-16">
+					<div className="pb-4 pt-2 sm:pl-[78px]">
 						{outbound && <MessageOpenStatus messageId={message.id} />}
 						{outbound && message.status !== "draft" && <MessageFollowUpStatus messageId={message.id} />}
 						{body.html ? (

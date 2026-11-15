@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { BellRing, Check } from "lucide-react";
+import { BellRing, Check } from "@/components/icons";
 import { useLanguage } from "@/components/language-provider";
 import { Tooltip } from "@/components/ui/tooltip";
 import type { DueFollowUp } from "@/lib/follow-ups/types";
@@ -24,12 +24,26 @@ export function DueFollowUps({ mailboxId }: { mailboxId?: string | null }) {
 	}, [mailboxId]);
 
 	useEffect(() => {
+		let timer: number | null = null;
+		function scheduleLoad() {
+			if (document.visibilityState !== "visible") return;
+			if (timer) window.clearTimeout(timer);
+			timer = window.setTimeout(() => {
+				timer = null;
+				load();
+			}, 150);
+		}
+		function onMessagesChanged(event: Event) {
+			if ((event as CustomEvent<{ kind?: string }>).detail?.kind === "read") return;
+			scheduleLoad();
+		}
 		load();
 		window.addEventListener(FOLLOW_UPS_CHANGED_EVENT, load);
-		window.addEventListener("mailflare:messages-changed", load);
+		window.addEventListener("mailflare:messages-changed", onMessagesChanged);
 		return () => {
 			window.removeEventListener(FOLLOW_UPS_CHANGED_EVENT, load);
-			window.removeEventListener("mailflare:messages-changed", load);
+			window.removeEventListener("mailflare:messages-changed", onMessagesChanged);
+			if (timer) window.clearTimeout(timer);
 		};
 	}, [load]);
 

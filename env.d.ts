@@ -1,5 +1,7 @@
 interface CloudflareEnv {
 	DB: D1Database;
+	/** The raw D1 binding, kept on the primary while `DB` is a read-replica session (set by `withD1ReadSession`). */
+	DB_PRIMARY?: D1Database;
 	/** Connection string for an external database (PostgreSQL, MySQL, libSQL, ...); unset keeps D1. See docs/databases.md. */
 	DATABASE_URL?: string;
 	/** Driver override when it cannot be inferred from DATABASE_URL (neon, postgres-js, pglite, planetscale, ...). */
@@ -72,6 +74,8 @@ interface CloudflareEnv {
 	MAILFLARE_RUNTIME?: "node";
 	/** Shared secret the Cloudflare email relay signs inbound webhooks with (self-hosted only). */
 	INBOUND_WEBHOOK_SECRET?: string;
+	/** "1" refuses relays that do not sign the header map with a timestamp (relay Worker v2). */
+	INBOUND_REQUIRE_SIGNED_HEADERS?: string;
 	/** Cloudflare account id, needed for the Email Sending REST API off Workers. */
 	CF_ACCOUNT_ID?: string;
 	/** Public origin of this install (https://mail.example.com) when it sits behind a proxy. */

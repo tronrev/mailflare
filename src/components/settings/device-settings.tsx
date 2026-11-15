@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Bell, Smartphone } from "lucide-react";
+import { confirmDestructive } from "@/components/ui/confirm-dialog";
+import { Bell, Smartphone } from "@/components/icons";
 import { useLanguage } from "@/components/language-provider";
 import { Button } from "@/components/ui/button";
 import { formatUserDate } from "@/lib/time/utils";
@@ -24,7 +25,7 @@ export function DeviceSettings() {
 	}, [t]);
 
 	async function remove(device: MobileDevice) {
-		if (!window.confirm(t("devices.signOutConfirm", { name: device.name }))) return;
+		if (!await confirmDestructive(t("devices.signOutConfirm", { name: device.name }))) return;
 		setBusy(device.id);
 		try {
 			await signOutDevice(device.id);

@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, inArray, isNull, lte, notInArray, sql } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, isNotNull, isNull, lte, notInArray, sql } from "drizzle-orm";
 import { getDb } from "@/db";
 import { domains, mailboxes, messageTriage, messages, users } from "@/db/schema";
 import { sendSystemEmail } from "@/lib/email/system-mail";

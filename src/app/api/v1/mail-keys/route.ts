@@ -136,7 +136,7 @@ export async function POST(request: Request) {
 	if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	const owner = await resolveKeyOwner(env, admin, boxes);
 	if ("error" in owner) return NextResponse.json({ error: owner.error }, { status: owner.status });
-	const { fullKey, prefix, hash } = generateApiKey();
+	const { fullKey, prefix, hash, sha256 } = await generateApiKey();
 	const id = newId("key");
 	await db.insert(apiKeys).values({
 		id,
@@ -144,6 +144,7 @@ export async function POST(request: Request) {
 		name,
 		prefix,
 		keyHash: hash,
+		keySha256: sha256,
 		scopes: scopesToJson(scopes),
 		mailboxScopeEnabled: true,
 	});

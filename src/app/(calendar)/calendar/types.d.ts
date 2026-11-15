@@ -14,11 +14,17 @@ export type CalendarEvent = {
   repeatAnchorDay: number | null;
   repeatUntil: string | null;
   excludedOccurrences: string;
+  reminderMinutes?: number | null;
   timeZone?: string | null;
   seriesStartsAt?: string;
+  /** Set on events created from an emailed invitation: needs-action (pending), tentative or accepted. */
+  responseStatus?: string | null;
+  inviteMessageId?: string | null;
+  /** JSON map of guest address to accepted, tentative or declined. */
+  attendeeResponses?: string | null;
 };
 
-export type CalendarView = "week" | "day";
+export type CalendarView = "month" | "week" | "day";
 
 export type CalendarEventTimes = { startsAt: Date; endsAt: Date };
 

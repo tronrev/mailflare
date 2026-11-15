@@ -60,7 +60,7 @@ await build({
 });
 
 const { GET, POST, DELETE } = await import(pathToFileURL(join(outDir, "route.mjs")).href);
-const { verifyApiKey } = await import(pathToFileURL(join(outDir, "apiKeys.mjs")).href);
+const { hashApiKey } = await import(pathToFileURL(join(outDir, "apiKeys.mjs")).href);
 const { SqliteDatabase } = await import(pathToFileURL(join(outDir, "database.mjs")).href);
 const { applyMigrations } = await import(pathToFileURL(join(outDir, "migrate.mjs")).href);
 
@@ -123,7 +123,10 @@ test("issues a mailbox-scoped read key and returns the secret once", async (t) =
 	assert.equal(row.name, "welcome-mailer");
 	assert.equal(row.scopes, '["read"]');
 	assert.equal(row.mailbox_scope_enabled, 1, "the key must stay inside its mailboxes");
-	assert.ok(verifyApiKey(body.key, row.key_hash), "the returned secret matches the stored hash");
+	// This fork stores SHA-256 in `key_hash` (bcrypt would blow the Workers CPU
+	// budget on the request that issues the key); `verifyApiKey` only reads the
+	// bcrypt rows issued before `key_sha256` existed.
+	assert.equal(row.key_hash, await hashApiKey(body.key), "the returned secret matches the stored hash");
 	assert.notEqual(row.key_hash, body.key, "only the hash is stored");
 
 	const scoped = state.database.db.prepare("SELECT mailbox_id FROM mcp_key_mailboxes WHERE key_id = ?").all(body.id);
