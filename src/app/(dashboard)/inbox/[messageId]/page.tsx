@@ -2,8 +2,9 @@
 import { confirmDestructive } from "@/components/ui/confirm-dialog";
 
 import { authFetch } from "@/lib/auth/client";
-import { useParams } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { getMessageReaderPath } from "@/lib/messages/folder-route";
 import { ArrowDownToLine, Cloud, ExternalLink } from "@/components/icons";
 import { useLanguage } from "@/components/language-provider";
 import { formatUserDate } from "@/lib/time/utils";
@@ -72,6 +73,8 @@ export default function MessageDetailPage() {
 
 function MessageDetailContent({ messageId }: { messageId: string }) {
   const { t } = useLanguage();
+  const router = useRouter();
+  const pathname = usePathname();
   const { selectedMailbox, mailboxes } = useSelectedMailbox();
   const [data, setData] = useState<MessageDetailResponse | null>(
     () => getCachedMessageDetailForDisplay(messageId) ?? null,
@@ -198,6 +201,16 @@ function MessageDetailContent({ messageId }: { messageId: string }) {
   }
 
   const message = data?.message;
+
+  // A message can be opened from a link that names the wrong list: a push
+  // notification, an assistant answer and a bookmark all point at /inbox. A
+  // triaged message is not in the Inbox, so the sidebar would claim Inbox while
+  // the reader shows mail filed in OTP. Follow the message instead.
+  useEffect(() => {
+    if (!message) return;
+    const nextPath = getMessageReaderPath(pathname, message);
+    if (nextPath) router.replace(nextPath, { scroll: false });
+  }, [message, pathname, router]);
   const body = data?.body;
   const attachments = data?.attachments ?? EMPTY_ATTACHMENTS;
   const scheduledAt = data?.scheduledAt;
