@@ -1,8 +1,8 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useEffect, useState } from "react";
-import { Save } from "lucide-react";
+import { useState } from "react";
+import { Save } from "@/components/icons";
 import { useLanguage } from "@/components/language-provider";
 import { useSelectedMailbox } from "@/components/mailbox-provider";
 import { Button } from "@/components/ui/button";
@@ -16,17 +16,19 @@ import { getMailboxAddress, updateCurrentMailboxName } from "./utils";
 export function CurrentMailboxForm() {
 	const { t } = useLanguage();
 	const { selectedMailbox, setSelectedMailbox, isLoading } = useSelectedMailbox();
-	const [displayName, setDisplayName] = useState("");
-	const [savedDisplayName, setSavedDisplayName] = useState("");
+	const [displayName, setDisplayName] = useState(selectedMailbox?.displayName ?? "");
+	const [savedDisplayName, setSavedDisplayName] = useState(selectedMailbox?.displayName ?? "");
 	const [status, setStatus] = useState<string | null>(null);
 	const [saving, setSaving] = useState(false);
+	const [syncedMailbox, setSyncedMailbox] = useState({ id: selectedMailbox?.id, displayName: selectedMailbox?.displayName });
 
-	useEffect(() => {
+	if (syncedMailbox.id !== selectedMailbox?.id || syncedMailbox.displayName !== selectedMailbox?.displayName) {
 		const nextName = selectedMailbox?.displayName ?? "";
+		setSyncedMailbox({ id: selectedMailbox?.id, displayName: selectedMailbox?.displayName });
 		setDisplayName(nextName);
 		setSavedDisplayName(nextName);
 		setStatus(null);
-	}, [selectedMailbox?.id, selectedMailbox?.displayName]);
+	}
 
 	async function onSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();

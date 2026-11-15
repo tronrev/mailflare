@@ -241,6 +241,134 @@
         "CREATE TRIGGER mailbox_aliases_jmap_au AFTER UPDATE ON mailbox_aliases FOR EACH ROW\r\nBEGIN\r\n\tINSERT INTO jmap_mailbox_revisions (mailbox_id, revision) VALUES (NEW.mailbox_id, 1) ON DUPLICATE KEY UPDATE revision = revision + 1;\r\n\tIF NOT (OLD.mailbox_id <=> NEW.mailbox_id) THEN\r\n\t\tINSERT INTO jmap_mailbox_revisions (mailbox_id, revision) VALUES (OLD.mailbox_id, 1) ON DUPLICATE KEY UPDATE revision = revision + 1;\r\n\tEND IF;\r\nEND;",
         "CREATE TRIGGER mailbox_aliases_jmap_ad AFTER DELETE ON mailbox_aliases FOR EACH ROW\r\nBEGIN\r\n\tINSERT INTO jmap_mailbox_revisions (mailbox_id, revision) VALUES (OLD.mailbox_id, 1) ON DUPLICATE KEY UPDATE revision = revision + 1;\r\nEND;"
       ]
+    },
+    {
+      "name": "0002_calendar_reminders.sql",
+      "statements": [
+        "ALTER TABLE `calendar_events` ADD `reminder_minutes` bigint;",
+        "ALTER TABLE `calendar_events` ADD `last_reminded_start` bigint;"
+      ]
+    },
+    {
+      "name": "0003_remote_content_ask.sql",
+      "statements": [
+        "UPDATE `users` SET `remote_content_mode` = 'ask' WHERE `remote_content_mode` = 'allow';"
+      ]
+    },
+    {
+      "name": "0004_passkeys_and_step_up_grants.sql",
+      "statements": [
+        "ALTER TABLE `users` ADD `require_second_factor` boolean DEFAULT false NOT NULL;",
+        "ALTER TABLE `users` ADD `passkey_count` bigint DEFAULT 0 NOT NULL;",
+        "ALTER TABLE `users` ADD `security_version` bigint DEFAULT 0 NOT NULL;",
+        "UPDATE `users` SET `require_second_factor` = `totp_enabled`;",
+        "CREATE TABLE `passkey_credentials` (\n\t`id` varchar(191) NOT NULL,\n\t`user_id` varchar(191) NOT NULL,\n\t`credential_id` longtext NOT NULL,\n\t`credential_hash` varchar(191) NOT NULL,\n\t`public_key` longtext NOT NULL,\n\t`counter` bigint DEFAULT 0 NOT NULL,\n\t`transports` longtext,\n\t`device_type` longtext NOT NULL,\n\t`backed_up` boolean DEFAULT false NOT NULL,\n\t`aaguid` longtext,\n\t`name` longtext NOT NULL,\n\t`last_used_at` bigint,\n\t`created_at` bigint NOT NULL,\n\tCONSTRAINT `passkey_credentials_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `passkey_credentials_credential_hash_unique` UNIQUE(`credential_hash`)\n);",
+        "CREATE INDEX `passkey_credentials_user_idx` ON `passkey_credentials` (`user_id`);",
+        "CREATE TABLE `webauthn_challenges` (\n\t`id` varchar(191) NOT NULL,\n\t`ceremony_hash` varchar(191) NOT NULL,\n\t`challenge` longtext NOT NULL,\n\t`purpose` varchar(64) NOT NULL,\n\t`user_id` varchar(191),\n\t`binding_hash` longtext NOT NULL,\n\t`expires_at` bigint NOT NULL,\n\t`used_at` bigint,\n\t`created_at` bigint NOT NULL,\n\tCONSTRAINT `webauthn_challenges_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `webauthn_challenges_ceremony_hash_unique` UNIQUE(`ceremony_hash`)\n);",
+        "CREATE INDEX `webauthn_challenges_user_idx` ON `webauthn_challenges` (`user_id`);",
+        "CREATE INDEX `webauthn_challenges_expires_idx` ON `webauthn_challenges` (`expires_at`);",
+        "CREATE TABLE `passkey_enrollment_grants` (\n\t`id` varchar(191) NOT NULL,\n\t`user_id` varchar(191) NOT NULL,\n\t`token_hash` varchar(191) NOT NULL,\n\t`kind` varchar(64) NOT NULL,\n\t`created_by_user_id` varchar(191),\n\t`expires_at` bigint NOT NULL,\n\t`used_at` bigint,\n\t`created_at` bigint NOT NULL,\n\tCONSTRAINT `passkey_enrollment_grants_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `passkey_enrollment_grants_token_hash_unique` UNIQUE(`token_hash`)\n);",
+        "CREATE INDEX `passkey_enrollment_grants_user_idx` ON `passkey_enrollment_grants` (`user_id`);",
+        "CREATE TABLE `auth_step_ups` (\n\t`id` varchar(191) NOT NULL,\n\t`user_id` varchar(191) NOT NULL,\n\t`session_hash` varchar(191) NOT NULL,\n\t`token_hash` varchar(191) NOT NULL,\n\t`purpose` varchar(64) NOT NULL,\n\t`target_user_id` varchar(191),\n\t`security_version` bigint DEFAULT 0 NOT NULL,\n\t`actor_security_version` bigint DEFAULT 0 NOT NULL,\n\t`expires_at` bigint NOT NULL,\n\t`used_at` bigint,\n\t`created_at` bigint NOT NULL,\n\tCONSTRAINT `auth_step_ups_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `auth_step_ups_token_hash_unique` UNIQUE(`token_hash`)\n);",
+        "CREATE INDEX `auth_step_ups_user_idx` ON `auth_step_ups` (`user_id`);",
+        "ALTER TABLE `passkey_credentials` ADD CONSTRAINT `passkey_credentials_user_id_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE cascade ON UPDATE no action;",
+        "ALTER TABLE `webauthn_challenges` ADD CONSTRAINT `webauthn_challenges_user_id_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE cascade ON UPDATE no action;",
+        "ALTER TABLE `passkey_enrollment_grants` ADD CONSTRAINT `passkey_enrollment_grants_user_id_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE cascade ON UPDATE no action;",
+        "ALTER TABLE `passkey_enrollment_grants` ADD CONSTRAINT `passkey_enrollment_grants_created_by_user_id_users_id_fk` FOREIGN KEY (`created_by_user_id`) REFERENCES `users`(`id`) ON DELETE set null ON UPDATE no action;",
+        "ALTER TABLE `auth_step_ups` ADD CONSTRAINT `auth_step_ups_user_id_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE cascade ON UPDATE no action;",
+        "CREATE TRIGGER `passkey_credentials_count_insert` AFTER INSERT ON `passkey_credentials` FOR EACH ROW\nBEGIN\n\tUPDATE `users` SET `passkey_count` = `passkey_count` + 1 WHERE `id` = NEW.`user_id`;\nEND;",
+        "CREATE TRIGGER `passkey_credentials_count_delete` AFTER DELETE ON `passkey_credentials` FOR EACH ROW\nBEGIN\n\tUPDATE `users` SET `passkey_count` = `passkey_count` - 1 WHERE `id` = OLD.`user_id`;\n\tUPDATE `users` SET `require_second_factor` = 0\n\tWHERE `id` = OLD.`user_id`\n\t\tAND `passkey_count` = 0\n\t\tAND `totp_enabled` = 0\n\t\tAND `deleted_at` IS NULL;\n\tIF (SELECT `passkey_count` FROM `users` WHERE `id` = OLD.`user_id`) = 0\n\t\tAND (SELECT `deleted_at` FROM `users` WHERE `id` = OLD.`user_id`) IS NULL\n\t\tAND (SELECT `password_hash` FROM `users` WHERE `id` = OLD.`user_id`) = '!passkey-only' THEN\n\t\tSIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'last-auth-method';\n\tEND IF;\nEND;",
+        "CREATE TRIGGER `users_last_password_update` BEFORE UPDATE ON `users` FOR EACH ROW\nBEGIN\n\tIF NEW.`password_hash` <> OLD.`password_hash`\n\t\tAND NEW.`password_hash` = '!passkey-only'\n\t\tAND NEW.`passkey_count` = 0 THEN\n\t\tSIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'last-auth-method';\n\tEND IF;\nEND;",
+        "CREATE TRIGGER `users_require_second_factor_update` BEFORE UPDATE ON `users` FOR EACH ROW\nBEGIN\n\tIF OLD.`require_second_factor` = 0\n\t\tAND NEW.`require_second_factor` = 1\n\t\tAND NEW.`passkey_count` = 0\n\t\tAND NEW.`totp_enabled` = 0\n\t\tAND NEW.`deleted_at` IS NULL THEN\n\t\tSIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'second-factor-unavailable';\n\tEND IF;\nEND;"
+      ]
+    },
+    {
+      "name": "0005_feature_access.sql",
+      "statements": [
+        "ALTER TABLE `users` ADD `calendar_enabled` boolean NOT NULL DEFAULT true;",
+        "ALTER TABLE `users` ADD `drive_enabled` boolean NOT NULL DEFAULT true;"
+      ]
+    },
+    {
+      "name": "0006_add_api_key_sha256.sql",
+      "statements": [
+        "ALTER TABLE `api_keys` ADD `key_sha256` varchar(191);",
+        "ALTER TABLE `api_keys` ADD CONSTRAINT `api_keys_key_sha256_idx` UNIQUE(`key_sha256`);"
+      ]
+    },
+    {
+      "name": "0007_message_has_unsubscribe.sql",
+      "statements": [
+        "ALTER TABLE `messages` ADD `has_unsubscribe` boolean NOT NULL DEFAULT false;"
+      ]
+    },
+    {
+      "name": "0008_conversation_notes.sql",
+      "statements": [
+        "CREATE TABLE `conversation_notes` (\n\t`id` varchar(191) NOT NULL,\n\t`mailbox_id` varchar(191) NOT NULL,\n\t`thread_key` varchar(512) NOT NULL,\n\t`message_id` varchar(191),\n\t`html` longtext NOT NULL,\n\t`author_user_id` varchar(191),\n\t`created_at` bigint NOT NULL,\n\t`updated_at` bigint NOT NULL,\n\tCONSTRAINT `conversation_notes_id` PRIMARY KEY(`id`)\n);",
+        "ALTER TABLE `conversation_notes` ADD CONSTRAINT `conversation_notes_mailbox_id_mailboxes_id_fk` FOREIGN KEY (`mailbox_id`) REFERENCES `mailboxes`(`id`) ON DELETE cascade ON UPDATE no action;",
+        "ALTER TABLE `conversation_notes` ADD CONSTRAINT `conversation_notes_message_id_messages_id_fk` FOREIGN KEY (`message_id`) REFERENCES `messages`(`id`) ON DELETE set null ON UPDATE no action;",
+        "ALTER TABLE `conversation_notes` ADD CONSTRAINT `conversation_notes_author_user_id_users_id_fk` FOREIGN KEY (`author_user_id`) REFERENCES `users`(`id`) ON DELETE set null ON UPDATE no action;",
+        "CREATE INDEX `conversation_notes_mailbox_thread_idx` ON `conversation_notes` (`mailbox_id`,`thread_key`,`created_at`);",
+        "CREATE INDEX `conversation_notes_message_idx` ON `conversation_notes` (`message_id`);",
+        "CREATE INDEX `conversation_notes_author_idx` ON `conversation_notes` (`author_user_id`);"
+      ]
+    },
+    {
+      "name": "0009_calendar_invitations.sql",
+      "statements": [
+        "ALTER TABLE `calendar_events` ADD `response_status` text;",
+        "ALTER TABLE `calendar_events` ADD `invite_message_id` text;",
+        "ALTER TABLE `calendar_events` ADD `attendee_responses` text;",
+        "ALTER TABLE `calendar_events` ADD `invite_sender` text;",
+        "ALTER TABLE `calendar_events` ADD `invite_sequence` bigint;"
+      ]
+    },
+    {
+      "name": "0010_booking_confirmation_templates.sql",
+      "statements": [
+        "CREATE TABLE `booking_confirmation_templates` (\n\t`event_id` varchar(191) NOT NULL,\n\t`subject` longtext NOT NULL DEFAULT (''),\n\t`body` longtext NOT NULL DEFAULT (''),\n\t`updated_at` bigint NOT NULL,\n\tCONSTRAINT `booking_confirmation_templates_event_id` PRIMARY KEY(`event_id`)\n);",
+        "ALTER TABLE `booking_confirmation_templates` ADD CONSTRAINT `booking_confirmation_templates_event_id_booking_events_id_fk` FOREIGN KEY (`event_id`) REFERENCES `booking_events`(`id`) ON DELETE cascade ON UPDATE no action;"
+      ]
+    },
+    {
+      "name": "0011_message_invite_response.sql",
+      "statements": [
+        "ALTER TABLE `messages` ADD `invite_response` text;"
+      ]
+    },
+    {
+      "name": "0012_account_and_triage_tables.sql",
+      "statements": [
+        "ALTER TABLE `users` ADD `email_verified_at` bigint;",
+        "ALTER TABLE `users` ADD `send_paid_until` bigint;",
+        "ALTER TABLE `users` ADD `send_provider` text;",
+        "ALTER TABLE `users` ADD `send_credentials` text;",
+        "ALTER TABLE `users` ADD `send_credentials_at` bigint;",
+        "ALTER TABLE `users` ADD `auto_triage_enabled` boolean NOT NULL DEFAULT true;",
+        "ALTER TABLE `users` ADD `daily_summary_on` text;",
+        "UPDATE `users` SET `email_verified_at` = `created_at` WHERE `email_verified_at` IS NULL;",
+        "CREATE INDEX `users_email_verified_at_idx` ON `users` (`email_verified_at`);",
+        "CREATE TABLE `email_verification_tokens` (\n\t`id` varchar(191) NOT NULL,\n\t`user_id` varchar(191) NOT NULL,\n\t`token_hash` varchar(191) NOT NULL,\n\t`expires_at` bigint NOT NULL,\n\t`used_at` bigint,\n\t`created_at` bigint NOT NULL,\n\tCONSTRAINT `email_verification_tokens_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `email_verification_tokens_token_hash_unique` UNIQUE(`token_hash`)\n);",
+        "CREATE INDEX `email_verification_tokens_user_idx` ON `email_verification_tokens` (`user_id`);",
+        "CREATE TABLE `usdt_orders` (\n\t`id` varchar(191) NOT NULL,\n\t`user_id` varchar(191) NOT NULL,\n\t`months` int NOT NULL,\n\t`amount_micro` int NOT NULL,\n\t`address` longtext NOT NULL,\n\t`status` varchar(64) NOT NULL DEFAULT 'pending',\n\t`tx_id` varchar(191),\n\t`created_at` bigint NOT NULL,\n\t`expires_at` bigint NOT NULL,\n\t`paid_at` bigint,\n\t`paid_until` bigint,\n\tCONSTRAINT `usdt_orders_id` PRIMARY KEY(`id`)\n);",
+        "CREATE UNIQUE INDEX `usdt_orders_tx_idx` ON `usdt_orders` (`tx_id`);",
+        "CREATE INDEX `usdt_orders_user_idx` ON `usdt_orders` (`user_id`);",
+        "CREATE INDEX `usdt_orders_status_idx` ON `usdt_orders` (`status`,`expires_at`);",
+        "CREATE TABLE `message_triage` (\n\t`message_id` varchar(191) NOT NULL,\n\t`user_id` varchar(191) NOT NULL,\n\t`mailbox_id` varchar(191),\n\t`category` varchar(64) NOT NULL,\n\t`confidence` int,\n\t`source` varchar(64) NOT NULL,\n\t`model` longtext,\n\t`otp_provider` longtext,\n\t`otp_code` longtext,\n\t`otp_expires_at` bigint,\n\t`verify_provider` varchar(191),\n\t`verify_url` longtext,\n\t`verify_code` longtext,\n\t`verify_expires_at` bigint,\n\t`retain_until` bigint,\n\t`created_at` bigint NOT NULL,\n\tCONSTRAINT `message_triage_id` PRIMARY KEY(`message_id`)\n);",
+        "CREATE INDEX `message_triage_retain_idx` ON `message_triage` (`retain_until`);",
+        "CREATE INDEX `message_triage_user_idx` ON `message_triage` (`user_id`,`category`,`created_at`);",
+        "CREATE INDEX `message_triage_otp_idx` ON `message_triage` (`user_id`,`otp_code`);",
+        "CREATE INDEX `message_triage_verify_idx` ON `message_triage` (`user_id`,`verify_provider`,`verify_expires_at`);",
+        "CREATE TABLE `send_allowance_uses` (\n\t`id` varchar(191) NOT NULL,\n\t`user_id` varchar(191) NOT NULL,\n\t`provider` longtext,\n\t`created_at` bigint NOT NULL,\n\tCONSTRAINT `send_allowance_uses_id` PRIMARY KEY(`id`)\n);",
+        "CREATE INDEX `send_allowance_uses_user_time_idx` ON `send_allowance_uses` (`user_id`,`created_at`);",
+        "ALTER TABLE `email_verification_tokens` ADD CONSTRAINT `email_verification_tokens_user_id_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE cascade ON UPDATE no action;",
+        "ALTER TABLE `usdt_orders` ADD CONSTRAINT `usdt_orders_user_id_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE cascade ON UPDATE no action;",
+        "ALTER TABLE `message_triage` ADD CONSTRAINT `message_triage_message_id_messages_id_fk` FOREIGN KEY (`message_id`) REFERENCES `messages`(`id`) ON DELETE cascade ON UPDATE no action;",
+        "ALTER TABLE `message_triage` ADD CONSTRAINT `message_triage_user_id_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE cascade ON UPDATE no action;",
+        "ALTER TABLE `message_triage` ADD CONSTRAINT `message_triage_mailbox_id_mailboxes_id_fk` FOREIGN KEY (`mailbox_id`) REFERENCES `mailboxes`(`id`) ON DELETE set null ON UPDATE no action;",
+        "ALTER TABLE `send_allowance_uses` ADD CONSTRAINT `send_allowance_uses_user_id_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE cascade ON UPDATE no action;"
+      ]
     }
   ]
 }

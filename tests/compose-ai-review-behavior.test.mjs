@@ -20,6 +20,10 @@ const mock = new Map([
   ["next/navigation", `
 export function useRouter() { return { push() {}, replace() {} }; }
 `],
+  ["next/link", `
+import React from "react";
+export default function Link({children, ...props}) { return React.createElement("a", props, children); }
+`],
   ["@/components/language-provider", `
 export function useLanguage() { return { t(key) { return key; } }; }
 `],
@@ -31,6 +35,9 @@ export function useCompose() { return { showNotice() {}, openComposer() {} }; }
 `],
   ["@/lib/auth/client", `
 export function authFetch(...args) { return globalThis.__reviewTestFetch(...args); }
+`],
+  ["@/lib/messages/detail-cache", `
+export function clearMessageDetailCache() {}
 `],
   ["@/components/compose/utils", `
 export async function fetchDraft() { return globalThis.__reviewTestDraft(); }
@@ -76,6 +83,13 @@ export const Input = React.forwardRef(function Input({size,variant,containerClas
 export function Label({children,...props}){return React.createElement("label",props,children);}
 export function Select({children,containerClassName,...props}){return React.createElement("select",props,children);}
 export function Tooltip({children}){return children;}
+// The send-access gate (this fork's own component) renders a dialog; the stub
+// only has to satisfy the import so the compose form can mount.
+export function Dialog({children}){return children;}
+export function DialogContent({children}){return children;}
+export function DialogDescription({children}){return children;}
+export function DialogHeader({children}){return children;}
+export function DialogTitle({children}){return children;}
 `;
 
 await build({

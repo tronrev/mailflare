@@ -1,5 +1,5 @@
 import { and, eq } from "drizzle-orm";
-import { messages } from "@/db/schema";
+import { agentDraftMetadata, messages } from "@/db/schema";
 import { sendEmail } from "@/lib/email/send";
 import { loadMessageAttachmentContents } from "@/lib/email/attachments";
 import { deleteMessageWithObjects } from "@/lib/email/message-cleanup";
@@ -77,6 +77,12 @@ export const emailSubmissionSet: JmapMethodHandler = async (ctx, args) => {
 			notCreated[creationId] = { type: "invalidProperties", properties: ["emailId"], description: "Not a draft of this account" };
 			continue;
 		}
+		// AI drafts must pass the human review step that /api/send enforces.
+		const [agentDraft] = await ctx.db.select({ draftId: agentDraftMetadata.draftId }).from(agentDraftMetadata).where(eq(agentDraftMetadata.draftId, draft.id)).limit(1);
+		if (agentDraft) {
+			notCreated[creationId] = { type: "forbidden", description: "Review and confirm this AI draft in Mailflare before sending" };
+			continue;
+		}
 		try {
 			const attachments = await loadMessageAttachmentContents(ctx.env, draft.id);
 			const result = await sendEmail(ctx.env, {
@@ -140,7 +146,7 @@ export const emailSubmissionGet: JmapMethodHandler = async (ctx, args) => ({
 	accountId: ctx.accountId,
 	state: await getEmailState(ctx),
 	list: [],
-	notFound: ((args.ids ?? []) as string[]) ?? [],
+	notFound: (args.ids ?? []) as string[],
 });
 export const emailSubmissionQuery: JmapMethodHandler = async (ctx) => ({ accountId: ctx.accountId, queryState: await getEmailState(ctx), canCalculateChanges: false, position: 0, ids: [], total: 0 });
 export const emailSubmissionChanges: JmapMethodHandler = async () => ({ type: "cannotCalculateChanges" });

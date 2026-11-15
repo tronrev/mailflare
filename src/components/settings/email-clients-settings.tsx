@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
 import Link from "next/link";
-import { Copy, KeyRound } from "lucide-react";
+import { Copy, KeyRound } from "@/components/icons";
 import { useLanguage } from "@/components/language-provider";
 import { useSelectedMailbox } from "@/components/mailbox-provider";
 import { Button } from "@/components/ui/button";
@@ -42,10 +42,7 @@ export function EmailClientsSettings() {
 	// The mobile app scans this to fill in the sign-in form; it carries the key, so it is
 	// rendered in the browser and never leaves the page.
 	useEffect(() => {
-		if (!key) {
-			setQr(null);
-			return;
-		}
+		if (!key) return;
 		let cancelled = false;
 		QRCode.toDataURL(buildSignInQrPayload({ server, email: username, key }), { margin: 1, width: 240, errorCorrectionLevel: "M" })
 			.then((url) => { if (!cancelled) setQr(url); })
