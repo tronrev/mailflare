@@ -31,6 +31,23 @@ export type DomainDnsView = {
 	sendingSubdomain?: { name: string; tag: string };
 };
 
+/**
+ * Hostnames this deployment receives mail for, oldest first.
+ *
+ * Used by the sign-in screen to complete the email address a user starts
+ * typing. A fresh install may not have the table yet; callers treat a failure
+ * as "no domains to offer".
+ */
+export async function listActiveDomainHostnames(env: CloudflareEnv): Promise<string[]> {
+	const db = getDb(env);
+	const rows = await db
+		.select({ hostname: domains.hostname })
+		.from(domains)
+		.where(eq(domains.status, "active"))
+		.orderBy(domains.createdAt);
+	return rows.map((row) => row.hostname);
+}
+
 export async function listUserDomains(env: CloudflareEnv, userIds: string | string[]) {
 	const db = getDb(env);
 	const ids = Array.isArray(userIds) ? userIds : [userIds];
