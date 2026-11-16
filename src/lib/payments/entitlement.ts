@@ -3,6 +3,7 @@ import { getDb } from "@/db";
 import { domains, mailboxes, users } from "@/db/schema";
 import { getAwsConfig } from "@/lib/aws/config";
 import { describeDatabaseError } from "@/lib/database-errors";
+import { emailDomainOf } from "@/lib/email/address";
 import { getOutboundProviderConfig, getResendKeyStatus } from "@/lib/email/outbound-provider";
 import type { OutboundProviderConfig } from "@/lib/email/outbound-provider-types";
 import { describeCredentials, type OwnCredentials } from "@/lib/payments/credentials";
@@ -133,7 +134,9 @@ async function getDomainSending(
 	env: CloudflareEnv,
 	from: string,
 ): Promise<{ provider: "none" | "cloudflare" | "resend" | "ses"; enabled: boolean } | null> {
-	const hostname = from.split("@")[1]?.toLowerCase();
+	// `from` arrives as the stored sender, display name included; asking for the
+	// domain of the raw string would look up `example.com>` and find nothing.
+	const hostname = emailDomainOf(from);
 	if (!hostname) return null;
 	const [row] = await getDb(env)
 		.select({ provider: domains.sendingProvider, enabled: domains.sendingEnabled })

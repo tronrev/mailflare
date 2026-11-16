@@ -39,6 +39,21 @@ export function normalizeEmailAddress(value: string): string {
 	return getEmailAddress(value).trim().toLowerCase();
 }
 
+/**
+ * The domain part of an address, ignoring any display name.
+ *
+ * A sender is stored as `"Support" <support@example.com>`, so splitting the raw
+ * string on "@" yields "example.com>" and answers "not a domain we know" for
+ * every mailbox that has a display name.
+ */
+export function emailDomainOf(value: string): string | null {
+	const address = getEmailAddress(value).trim();
+	const at = address.lastIndexOf("@");
+	if (at < 0) return null;
+	const domain = address.slice(at + 1).toLowerCase();
+	return domain || null;
+}
+
 export function getEmailDisplayName(value: string): string {
 	const parts = parseEmailAddressParts(value);
 	if (parts.name) return parts.name;

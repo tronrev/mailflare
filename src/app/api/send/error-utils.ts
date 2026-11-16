@@ -1,3 +1,4 @@
+import { describeDatabaseError, isMissingColumnError, isMissingTableError } from "@/lib/database-errors";
 import { SEND_QUOTA_MESSAGE } from "@/lib/payments/free-send-rules";
 
 /**
@@ -19,4 +20,33 @@ export function getSendErrorStatus(message: string): number {
 	}
 	if (message === SEND_QUOTA_MESSAGE || message.startsWith("Sending is not enabled for this address")) return 402;
 	return 500;
+}
+
+/** How a failed send is answered, and what the composer shows. */
+export type SendFailure = {
+	message: string;
+	status: number;
+	code?: "MIGRATION_REQUIRED";
+};
+
+const MIGRATION_REQUIRED_MESSAGE =
+	"This deployment has a database migration pending, so the message could not be saved. Apply the pending migrations from the admin settings, then send it again.";
+
+/**
+ * The failure to report for a send that threw.
+ *
+ * Drizzle reports every failed query as "Failed query: insert into `messages` …
+ * params: …", which says the insert failed and nothing about why — and puts the
+ * SQL, along with the subject and body, in front of whoever pressed Send. The
+ * driver's own reason lives on `cause`, so that is what the response carries. A
+ * missing table or column is the one failure whose fix the person reading it can
+ * apply, so it gets its own status and sentence instead of a bare 500.
+ */
+export function describeSendFailure(error: unknown): SendFailure {
+	if (isMissingTableError(error) || isMissingColumnError(error)) {
+		return { message: MIGRATION_REQUIRED_MESSAGE, status: 409, code: "MIGRATION_REQUIRED" };
+	}
+	if (!(error instanceof Error)) return { message: "Send failed", status: 500 };
+	const message = describeDatabaseError(error);
+	return { message, status: getSendErrorStatus(message) };
 }
