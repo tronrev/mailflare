@@ -12,6 +12,7 @@ import {
 import { KeyRound, Mail, ShieldCheck } from "@/components/icons";
 import { useLanguage } from "@/components/language-provider";
 import { AuthShell } from "@/components/auth/auth-shell";
+import { EmailSuggestionInput } from "@/components/auth/email-suggestion-input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,17 +28,29 @@ import {
 	submitPasskeyMfa,
 } from "./utils";
 
-export function LoginClient({ adding = false }: { adding?: boolean }) {
+export function LoginClient({
+  adding = false,
+  domains = [],
+  hostname = "",
+}: {
+  adding?: boolean;
+  /** Domains that receive mail here, for the email field's completion. */
+  domains?: string[];
+  /** Hostname serving this page, so its own domain is offered first. */
+  hostname?: string;
+}) {
   const { t } = useLanguage();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
   const [turnstileReset, setTurnstileReset] = useState(0);
   // Set once the password is accepted for an account with a second factor.
   const [challengeToken, setChallengeToken] = useState<string | null>(null);
   const [methods, setMethods] = useState<string[]>([]);
   const [code, setCode] = useState("");
   const runningRef = useRef(false);
+  const passwordRef = useRef<HTMLInputElement>(null);
 
   const finish = useCallback((redirect?: string) => {
     router.replace(redirect ?? "/inbox");
@@ -273,11 +286,15 @@ export function LoginClient({ adding = false }: { adding?: boolean }) {
       <form method="post" onSubmit={onSubmit} className="space-y-5">
         <div className="space-y-2">
           <Label htmlFor="email">{t("auth.email")}</Label>
-          <Input
+          <EmailSuggestionInput
             id="email"
             name="email"
-            type="email"
             autoComplete="username webauthn"
+            value={email}
+            onChange={setEmail}
+            domains={domains}
+            hostname={hostname}
+            onAccept={() => passwordRef.current?.focus()}
             aria-invalid={error ? true : undefined}
             aria-describedby={error ? "login-error" : undefined}
             required
@@ -291,6 +308,7 @@ export function LoginClient({ adding = false }: { adding?: boolean }) {
             </Link>
           </div>
           <Input
+            ref={passwordRef}
             id="password"
             name="password"
             type="password"
