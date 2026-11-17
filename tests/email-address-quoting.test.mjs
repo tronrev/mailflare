@@ -61,3 +61,13 @@ test("plain and unquoted names still parse as before", () => {
 test("an empty quoted display name leaves just the address", () => {
 	assert.deepEqual(address.parseEmailAddressParts('"" <ada@example.com>'), { name: null, address: "ada@example.com" });
 });
+
+test("the domain of a stored sender ignores the display name", () => {
+	// `messages.from_addr` is written by formatEmailAddress, so the domain has to
+	// be read from the address inside the header, not from the raw string.
+	assert.equal(address.emailDomainOf('"Support" <support@Example.com>'), "example.com");
+	assert.equal(address.emailDomainOf("Ada <ada@example.com>"), "example.com");
+	assert.equal(address.emailDomainOf("ada@example.com"), "example.com");
+	assert.equal(address.emailDomainOf("ada"), null);
+	assert.equal(address.emailDomainOf(""), null);
+});

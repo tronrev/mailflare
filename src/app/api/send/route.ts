@@ -5,7 +5,8 @@ import { sendEmailSchema } from "@/lib/validators";
 import { sendEmail } from "@/lib/email/send";
 import { isPastSchedule, parseSendRequest } from "./utils";
 import { RequestBodyTooLargeError } from "@/lib/http/errors";
-import { getSendErrorStatus } from "./error-utils";
+import { describeSendFailure } from "./error-utils";
+import { describeDatabaseError } from "@/lib/database-errors";
 import { getDb } from "@/db";
 import { agentDraftMetadata, messages } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -54,7 +55,13 @@ export async function POST(request: Request) {
 		});
 		return NextResponse.json(result);
 	} catch (err) {
-		const message = err instanceof Error ? err.message : "Send failed";
-		return NextResponse.json({ error: message }, { status: getSendErrorStatus(message) });
+		// The response is what the composer shows, so it carries the reason rather
+		// than drizzle's "Failed query: … params: …" envelope.
+		const failure = describeSendFailure(err);
+		console.error("Could not send message", describeDatabaseError(err));
+		return NextResponse.json(
+			{ error: failure.message, code: failure.code },
+			{ status: failure.status },
+		);
 	}
 }
